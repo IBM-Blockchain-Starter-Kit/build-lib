@@ -1,5 +1,7 @@
 #!/bin/bash -x
 
+source env.file
+
 ls -la
 echo "######## Build chaincode ########"
 

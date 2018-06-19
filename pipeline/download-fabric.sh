@@ -9,3 +9,8 @@ tar -xvf v${HLF_VERSION}.tar.gz
 
 export FABRIC_SRC_DIR=$(pwd)/fabric-${HLF_VERSION}
 echo "FABRIC_SRC_DIR: ${FABRIC_SRC_DIR}"
+
+for var in HLF_VERSION FABRIC_SRC_DIR
+do
+    echo "$var="'"'"$(eval echo '$'"$var")"'"'
+done >> env.file

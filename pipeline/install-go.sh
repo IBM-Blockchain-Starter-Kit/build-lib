@@ -19,3 +19,8 @@ export GOPATH=$(pwd)
 
 echo "GOPATH: ${GOPATH}" 
 echo "GOROOT: ${GOROOT}" 
+
+for var in GOROOT PATH GOPATH GO_VERSION
+do
+    echo "$var="'"'"$(eval echo '$'"$var")"'"'
+done >> env.file
