@@ -1,6 +1,5 @@
 #!/bin/bash
-default_scripts=
-"build.sh
+default_scripts="build.sh
 deploy-enterprise.sh
 download-fabric.sh
 install-go.sh
