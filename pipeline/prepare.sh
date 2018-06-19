@@ -20,3 +20,6 @@ for script in ${BUILD_SCRIPTS:=$default_scripts}; do
     echo "Script found at ${SCRIPT_FILE}"
   fi
 done
+
+source ${SCRIPT_DIR}install-go.sh
+source ${SCRIPT_DIR}download-fabric.sh
