@@ -22,5 +22,8 @@ for script in ${BUILD_SCRIPTS:=$default_scripts}; do
   fi
 done
 
+mkdir build
+cd build
+
 source ${SCRIPT_DIR}install-go.sh
 source ${SCRIPT_DIR}download-fabric.sh
