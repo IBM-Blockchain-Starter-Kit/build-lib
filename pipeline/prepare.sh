@@ -25,5 +25,5 @@ done
 mkdir build
 cd build
 
-source ${SCRIPT_DIR}install-go.sh
-source ${SCRIPT_DIR}download-fabric.sh
+source ../scripts/install-go.sh
+source ../scripts/download-fabric.sh
