@@ -3,7 +3,8 @@ default_scripts="build.sh
 deploy-enterprise.sh
 download-fabric.sh
 install-go.sh
-unitest.sh"
+unitest.sh
+env.sh"
 
 if [ ! -f  ${SCRIPT_DIR:=./scripts/} ]; then
   mkdir -p ${SCRIPT_DIR}
