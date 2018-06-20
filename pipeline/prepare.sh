@@ -25,5 +25,6 @@ done
 mkdir build
 cd build
 
+ls -la
 source ../scripts/install-go.sh
 source ../scripts/download-fabric.sh

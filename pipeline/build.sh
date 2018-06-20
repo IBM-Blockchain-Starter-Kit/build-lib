@@ -1,8 +1,8 @@
 #!/bin/bash -x
-
+echo "######## Build chaincode ########"
+cd build
 source ./scripts/env.sh
 
-echo "######## Build chaincode ########"
 
 echo "######## Placing source in directory expected by go build ########"
 mkdir ${GOPATH}/src
