@@ -1,7 +1,7 @@
 #!/bin/bash -x
 echo "######## Build chaincode ########"
 cd build
-source ./scripts/env.sh
+source ../scripts/env.sh
 
 
 echo "######## Placing source in directory expected by go build ########"
