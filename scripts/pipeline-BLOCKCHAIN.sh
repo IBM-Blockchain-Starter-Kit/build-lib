@@ -2,7 +2,7 @@
 
 set -ex
 
-source .bluemix/pipeline-COMMON.sh
+source "${SCRIPT_DIR}/pipeline-COMMON.sh"
 
 export BLOCKCHAIN_SERVICE_NAME=ibm-blockchain-5-prod
 export BLOCKCHAIN_SERVICE_PLAN=ibm-blockchain-plan-v1-ga1-starter-prod
@@ -143,28 +143,4 @@ function create_blockchain_network_card {
         composer card import -f adminCard.card -c ${BLOCKCHAIN_NETWORK_CARD}
         rm -f adminCard.card
     fi
-}
-
-function update_blockchain_deploy_status {
-    COMPLETED_STEP=$1
-    if [[ "${BLOCKCHAIN_SAMPLE_ID}" = "" ]]
-    then
-        echo trying to update blockchain deploy status but no sample id specified
-        return 0
-    fi
-    echo updating blockchain deploy status to ${COMPLETED_STEP} at $(date)
-    cat << EOF > request.json
-{
-    "app": "${BLOCKCHAIN_SAMPLE_APP}",
-    "completed_step": "${COMPLETED_STEP}",
-    "url": "${BLOCKCHAIN_SAMPLE_URL}"
-}
-EOF
-    do_curl \
-        -X PUT \
-        -H 'Content-Type: application/json' \
-        -u ${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET} \
-        --data-binary @request.json \
-        ${BLOCKCHAIN_URL}/api/v1/networks/${BLOCKCHAIN_NETWORK_ID}/sample/${BLOCKCHAIN_SAMPLE_ID}
-    rm -f request.json
 }
