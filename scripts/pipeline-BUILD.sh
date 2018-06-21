@@ -2,7 +2,7 @@
 
 set -ex
 
-source .bluemix/pipeline-COMMON.sh
+source "${SCRIPT_DIR}/pipeline-COMMON.sh"
 
 export CONTRACTS=$(ls contracts)
 export APPS=$(ls apps)

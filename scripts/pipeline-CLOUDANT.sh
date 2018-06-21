@@ -2,7 +2,7 @@
 
 set -ex
 
-source .bluemix/pipeline-COMMON.sh
+source "${SCRIPT_DIR}/pipeline-COMMON.sh"
 
 export CLOUDANT_SERVICE_NAME=cloudantNoSQLDB
 export CLOUDANT_SERVICE_PLAN=Lite
