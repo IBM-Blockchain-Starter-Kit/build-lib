@@ -4,8 +4,15 @@ set -ex
 
 source "${SCRIPT_DIR}/pipeline-COMMON.sh"
 
-export BLOCKCHAIN_SERVICE_NAME=ibm-blockchain-5-prod
-export BLOCKCHAIN_SERVICE_PLAN=ibm-blockchain-plan-v1-ga1-starter-prod
+region_instance=$(echo $REGION_ID | cut -d : -f 2)
+if [ "${region_instance}" = "ys1" ]; then
+    export BLOCKCHAIN_SERVICE_NAME=ibm-blockchain-5-staging
+    export BLOCKCHAIN_SERVICE_PLAN=ibm-blockchain-plan-v1-ga1-starter-staging
+else
+    export BLOCKCHAIN_SERVICE_NAME=ibm-blockchain-5-prod
+    export BLOCKCHAIN_SERVICE_PLAN=ibm-blockchain-plan-v1-ga1-starter-prod
+fi
+
 export BLOCKCHAIN_SERVICE_KEY=Credentials-1
 export BLOCKCHAIN_NETWORK_CARD=admin@blockchain-network
 
