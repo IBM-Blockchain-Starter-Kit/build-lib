@@ -1,0 +1,1 @@
+# Go chaincode specific build script

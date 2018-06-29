@@ -1,0 +1,1 @@
+# Go chaincode specific deploy script
