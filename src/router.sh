@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash 
 
 # Common pipeline build script will 
 # delegate to appropriate composer/fabric build script
