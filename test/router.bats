@@ -23,20 +23,25 @@
 
 @test "router.sh: go platform selected" {
   stage="build"
-  run src/router.sh ${stage} "go"
+  run scripts/router.sh ${stage} "go"
   [ "${lines[1]}" = "Go selected" ]
   [ "${lines[2]}" = "go-chaincode/${stage}.sh" ]
 }
 
 @test "router.sh: composer platform selected" {
   stage="build"
-  run src/router.sh ${stage} "composer"
+  run scripts/router.sh ${stage} "composer"
   [ "${lines[1]}" = "Composer selected" ]
   [ "${lines[2]}" = "composer/${stage}.sh" ]
 }
 
+<<<<<<< HEAD
 @test "router.sh: fail on invalid platform selected" {
   run src/router.sh "build" "foobar"
+=======
+@test "Test fail on invalid platform selected" {
+  run scripts/router.sh "build" "foobar"
+>>>>>>> pair
   [ "${lines[1]}" = "Invalid platform: foobar selected" ]
   [ "$status" -eq 1 ]
 }
