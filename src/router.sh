@@ -1,7 +1,9 @@
-# #!/bin/bash -x
+#!/bin/bash -x
 
-# # Common pipeline build script will 
-# # delegate to appropriate composer/fabric build script
+# Common pipeline build script will 
+# delegate to appropriate composer/fabric build script
+# script receives two parameters, the stage to route  
+# and the platform 
 
 stage="$1"
 platform="$2"
@@ -27,4 +29,5 @@ else
     exit 1
 fi
 
+# ok now let's call the command we are routing to
 source ${executable_script}

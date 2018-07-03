@@ -1,6 +1,7 @@
 #!/bin/bash
-
 set -ex
+
+# Temporary prepare.sh script file while we get the versioned script
 
 SCRIPT_URL=${SCRIPT_URL:=https://raw.githubusercontent.com/IBM-Blockchain-Starter-Kit/build-lib/master/src}
 SCRIPT_DIR=${SCRIPT_DIR:=./scripts/}
