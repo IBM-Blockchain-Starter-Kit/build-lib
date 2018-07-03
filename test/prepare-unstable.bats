@@ -3,7 +3,7 @@
 load test_helper
 
 setup() {
-  src_dir="${BATS_TEST_DIRNAME}/../src"
+  src_dir="scripts"
   testcase_dirname="$(mktemp -d)"
 
   export SCRIPT_DIR="${testcase_dirname}/script_dir/"

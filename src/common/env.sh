@@ -1,4 +1,4 @@
-: ${ROOTDIR:="../../"}
+: ${ROOTDIR:="."}
 
 echo "ROOTDIR: " ${ROOTDIR}
 
