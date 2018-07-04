@@ -1,4 +1,6 @@
 install:
   - git clone --branch v1.0.2 --depth 1 https://github.com/bats-core/bats-core.git bats
 script:
-  - PATH="./bats/bin:$PATH" bats test/*
+  - PATH="./bats/bin:$PATH" 
+  - chmod +x test_container.sh
+  - ./test_container.sh
