@@ -1,1 +1,0 @@
-# Bootstrap script will be sourced from a prepare stage job to copy required files in to place from an extracted tarball

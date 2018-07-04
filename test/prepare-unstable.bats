@@ -28,12 +28,7 @@ setup() {
 @test "prepare-unstable.sh: should only create expected script files" {
   run "${src_dir}/prepare-unstable.sh"
 
-  ls -R "${testcase_dirname}"
-  assert_build_scripts_exist "${SCRIPT_DIR}"
-
-  file_count=$(count_files "${testcase_dirname}")
-  echo "file_count = ${file_count}"
-  [ $file_count -eq 13 ]
+  assert_build_scripts_exist "${src_dir}" "${SCRIPT_DIR}"
 }
 
 @test "prepare-unstable.sh: should not overwrite existing scripts in SCRIPT_DIR" {
