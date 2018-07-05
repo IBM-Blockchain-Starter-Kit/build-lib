@@ -23,6 +23,8 @@ build_lib_scripts="common/blockchain.sh
   composer/test.sh
   go-chaincode/build.sh
   go-chaincode/deploy.sh
+  go-chaincode/download-fabric.sh
+  go-chaincode/install-go.sh
   go-chaincode/test.sh
   router.sh"
 
