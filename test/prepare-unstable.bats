@@ -22,6 +22,8 @@ stub_curl_all() {
     "-fsSL https://example.org/scripts/composer/test.sh : cat ${src_dir}/composer/test.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/build.sh : cat ${src_dir}/go-chaincode/build.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/deploy.sh : cat ${src_dir}/go-chaincode/deploy.sh" \
+    "-fsSL https://example.org/scripts/go-chaincode/download-fabric.sh : cat ${src_dir}/go-chaincode/download-fabric.sh" \
+    "-fsSL https://example.org/scripts/go-chaincode/install-go.sh : cat ${src_dir}/go-chaincode/install-go.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/test.sh : cat ${src_dir}/go-chaincode/test.sh" \
     "-fsSL https://example.org/scripts/router.sh : cat ${src_dir}/router.sh"
 }
@@ -37,6 +39,8 @@ stub_curl_without_router() {
     "-fsSL https://example.org/scripts/composer/test.sh : cat ${src_dir}/composer/test.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/build.sh : cat ${src_dir}/go-chaincode/build.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/deploy.sh : cat ${src_dir}/go-chaincode/deploy.sh" \
+    "-fsSL https://example.org/scripts/go-chaincode/download-fabric.sh : cat ${src_dir}/go-chaincode/download-fabric.sh" \
+    "-fsSL https://example.org/scripts/go-chaincode/install-go.sh : cat ${src_dir}/go-chaincode/install-go.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/test.sh : cat ${src_dir}/go-chaincode/test.sh"
 }
 
