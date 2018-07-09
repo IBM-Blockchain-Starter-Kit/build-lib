@@ -8,8 +8,11 @@ assert_build_scripts_exist() {
 }
 
 setup_script_dir() {
-  export SCRIPT_DIR="${2}/script_dir/"
+  src_dirname="$1"
+  test_dirname="$2"
+
+  export SCRIPT_DIR="${test_dirname}/script_dir/"
 
   mkdir -p "${SCRIPT_DIR}"
-  cp -a "${1}/"* "${SCRIPT_DIR}"
+  cp -a "${src_dirname}/"* "${SCRIPT_DIR}"
 }
