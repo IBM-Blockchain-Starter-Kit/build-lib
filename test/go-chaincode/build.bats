@@ -23,10 +23,10 @@ setup() {
     "true" \
     "true"
 
-  run "${SCRIPT_DIR}/go-chaincode/build.sh"
-
-  echo $output
+  pushd ${SCRIPT_DIR}
+  run "./go-chaincode/build.sh"
   [ $status -eq 0 ]
+  popd
 
   unstub curl
   unstub go
