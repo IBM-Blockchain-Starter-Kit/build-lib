@@ -170,7 +170,7 @@ function deploy_composer_rest_server {
     pushd contracts/${CONTRACT}
     BUSINESS_NETWORK_NAME=$(jq --raw-output '.name' package.json)
     BUSINESS_NETWORK_CARD=admin@${BUSINESS_NETWORK_NAME}
-    CF_APP_NAME=composer-rest-server-${BUSINESS_NETWORK_NAME}
+    CF_APP_NAME=$(get_deploy_name "${IDS_JOB_ID}" "${BLOCKCHAIN_SERVICE_INSTANCE}" "${BUSINESS_NETWORK_NAME}")
     cf push \
         ${CF_APP_NAME} \
         --docker-image ibmblockchain/composer-rest-server:${COMPOSER_VERSION} \
@@ -210,7 +210,7 @@ function deploy_cf_app {
     APP=$1
     echo deploying cloud foundry app ${APP}
     pushd apps/${APP}
-    cf push ${APP} -i 1 -m 128M --no-start
+    cf push ${APP} -i 1 -m 128M --random-route --no-start
     cf bind-service ${APP} ${BLOCKCHAIN_SERVICE_INSTANCE} -c '{"permissions":"read-only"}'
     popd
 }
@@ -245,9 +245,9 @@ function gather_composer_rest_server_url {
     echo gathering rest server url for composer contract ${CONTRACT}
     pushd contracts/${CONTRACT}
     BUSINESS_NETWORK_NAME=$(jq --raw-output '.name' package.json)
-    CF_APP_NAME=composer-rest-server-${BUSINESS_NETWORK_NAME}
+    CF_APP_NAME=$(get_deploy_name "${IDS_JOB_ID}" "${BLOCKCHAIN_SERVICE_INSTANCE}" "${BUSINESS_NETWORK_NAME}")
     REST_SERVER_URL=$(cf app ${CF_APP_NAME} | grep routes: | awk '{print $2}')
-    export REST_SERVER_URLS=$(echo ${REST_SERVER_URLS} | jq ". + {\"${BUSINESS_NETWORK_NAME}\":\"https://${REST_SERVER_URL}\"}")
+    export REST_SERVER_URLS=$(echo ${REST_SERVER_URLS} | jq ". + {\"${BUSINESS_NETWORK_NAME}\": {\"httpURL\": \"https://${REST_SERVER_URL}/api\", \"webSocketURL\": \"wss://${REST_SERVER_URL}\"}}")
     popd
 }
 
@@ -313,7 +313,7 @@ function start_composer_rest_server {
     echo starting rest server for composer contract ${CONTRACT}
     pushd contracts/${CONTRACT}
     BUSINESS_NETWORK_NAME=$(jq --raw-output '.name' package.json)
-    CF_APP_NAME=composer-rest-server-${BUSINESS_NETWORK_NAME}
+    CF_APP_NAME=$(get_deploy_name "${IDS_JOB_ID}" "${BLOCKCHAIN_SERVICE_INSTANCE}" "${BUSINESS_NETWORK_NAME}")
     cf start ${CF_APP_NAME}
     popd
 }
