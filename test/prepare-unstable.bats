@@ -87,6 +87,7 @@ stub_curl_without_router() {
 
   run "${src_dir}/prepare-unstable.sh"
 
+  head -n 1 "${SCRIPT_DIR}router.sh"
   cat "${SCRIPT_DIR}router.sh" | grep -Fxq 'DO NOT OVERWRITE'
 
   unstub curl
