@@ -11,6 +11,10 @@ setup() {
   export GO_VERSION=9.9.9
 }
 
+teardown() {
+  cleanup_stubs
+}
+
 @test "install-go.sh: should exist and be executable" {
   [ -x "${SCRIPT_DIR}/go-chaincode/install-go.sh" ]
 }

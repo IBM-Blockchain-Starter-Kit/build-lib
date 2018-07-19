@@ -16,3 +16,12 @@ setup_script_dir() {
   mkdir -p "${SCRIPT_DIR}"
   cp -a "${src_dirname}/"* "${SCRIPT_DIR}"
 }
+
+cleanup_stubs() {
+  if stat ${BATS_TMPDIR}/*-stub-plan >/dev/null 2>&1; then
+    for file in ${BATS_TMPDIR}/*-stub-plan; do
+      program=$(basename $(echo "$file" | rev | cut -c 11- | rev))
+      unstub $program || true
+    done
+  fi
+}

@@ -11,6 +11,10 @@ setup() {
   export SCRIPT_DIR="${testcase_dirname}/script_dir/"
 }
 
+teardown() {
+  cleanup_stubs
+}
+
 stub_curl_all() {
   stub curl \
     "-fsSL https://example.org/scripts/common/blockchain.sh : cat ${src_dir}/common/blockchain.sh" \

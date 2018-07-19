@@ -11,6 +11,10 @@ setup() {
   export SCRIPT_DIR="${testcase_dirname}/script_dir/"
 }
 
+teardown() {
+  cleanup_stubs
+}
+
 stub_curl() {
   stub curl "-fsSL https://example.org/toolchain-script-lib.tgz : tar --exclude prepare*.sh -C ${src_dir} -cvzf - ."
 }

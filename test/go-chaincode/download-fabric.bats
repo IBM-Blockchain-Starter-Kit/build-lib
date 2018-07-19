@@ -12,6 +12,10 @@ setup() {
   export HLF_VERSION=9.9.9
 }
 
+teardown() {
+  cleanup_stubs
+}
+
 @test "download-fabric.sh: should exist and be executable" {
   [ -x "${SCRIPT_DIR}/go-chaincode/download-fabric.sh" ]
 }
