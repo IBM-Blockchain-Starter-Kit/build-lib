@@ -1,6 +1,5 @@
 #!/usr/bin/env bats
 
-load "${BATS_TEST_DIRNAME}/../../bats-mock/stub.bash"
 load ../test_helper
 
 setup() {
