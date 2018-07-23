@@ -31,9 +31,9 @@ function install_jq {
 
 function do_curl {
     HTTP_RESPONSE=$(mktemp)
-    HTTP_STATUS=$(curl -w '%{http_code}' -o ${HTTP_RESPONSE} "$@")
-    cat ${HTTP_RESPONSE}
-    rm -f ${HTTP_RESPONSE}
+    HTTP_STATUS=$(curl -w '%{http_code}' -o "${HTTP_RESPONSE}" "$@")
+    cat "${HTTP_RESPONSE}"
+    rm -f "${HTTP_RESPONSE}"
     if [[ ${HTTP_STATUS} -ge 200 && ${HTTP_STATUS} -lt 300 ]]
     then
         return 0

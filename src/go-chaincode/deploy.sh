@@ -2,8 +2,11 @@
 
 # Go chaincode specific deploy script
 
+# shellcheck source=src/common/env.sh
 source "${SCRIPT_DIR}/common/env.sh"
+# shellcheck source=src/common/utils.sh
 source "${SCRIPT_DIR}/common/utils.sh"
+# shellcheck source=src/common/blockchain.sh
 source "${SCRIPT_DIR}/common/blockchain.sh"
 
 if [[ ! -f $CONFIGPATH ]]; then

@@ -2,10 +2,13 @@
 
 # Common IBM blockchain platform functions, e.g. to provision a blockchain service
 
+# shellcheck disable=2086
+
+# shellcheck source=src/common/utils.sh
 source "${SCRIPT_DIR}/common/utils.sh"
 
 function setup_service_constants {
-    region_instance=$(echo $REGION_ID | cut -d : -f 2)
+    region_instance=$(echo "$REGION_ID" | cut -d : -f 2)
 
     if [ "${region_instance}" = "ys1" ]; then
         export BLOCKCHAIN_SERVICE_NAME="ibm-blockchain-5-staging"
@@ -45,8 +48,8 @@ function get_blockchain_connection_profile_inner {
     do_curl \
         -H 'Content-Type: application/json' \
         -H 'Accept: application/json' \
-        -u ${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET} \
-        ${BLOCKCHAIN_URL}/api/v1/networks/${BLOCKCHAIN_NETWORK_ID}/connection_profile > blockchain-connection-profile.json
+        -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
+        "${BLOCKCHAIN_URL}/api/v1/networks/${BLOCKCHAIN_NETWORK_ID}/connection_profile" > blockchain-connection-profile.json
 }
 
 function get_blockchain_connection_profile {
@@ -69,9 +72,9 @@ function install_fabric_chaincode {
 
     OUTPUT=$(do_curl \
         -X POST \
-        -u ${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET} \
-        -F files[]=@${CC_FILE} -F chaincode_id=${CC_ID} -F chaincode_version=${CC_VERSION} \
-        ${request_url})
+        -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
+        -F files[]=@"${CC_FILE}" -F chaincode_id="${CC_ID}" -F chaincode_version="${CC_VERSION}" \
+        "${request_url}")
     
     if [ $? -eq 1 ]
     then
@@ -82,7 +85,7 @@ function install_fabric_chaincode {
             return 2
         else
             echo "Unrecognized error returned:"
-            echo $OUTPUT
+            echo "$OUTPUT"
             return 1
         fi  
     fi
@@ -113,9 +116,9 @@ EOF
     do_curl \
         -X POST \
         -H 'Content-Type: application/json' \
-        -u ${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET} \
+        -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
         --data-binary @request.json \
-        ${request_url}
+        "${request_url}"
     )
     do_curl_status=$?
 
@@ -152,22 +155,22 @@ function parse_fabric_config {
     NET_CONFIG_FILE=$1
 
     echo "Parsing deployment configuration:"
-    cat $NET_CONFIG_FILE
+    cat "$NET_CONFIG_FILE"
 
-    for org in $(jq -r "to_entries[] | .key" $NET_CONFIG_FILE)
+    for org in $(jq -r "to_entries[] | .key" "$NET_CONFIG_FILE")
     do
         echo "Targeting org '$org'..."
-        authenticate_org $org
+        authenticate_org "$org"
         
         cc_index=0
-        jq -r ".${org}.chaincode[].path" $NET_CONFIG_FILE | while read CC_PATH
+        jq -r ".${org}.chaincode[].path" "$NET_CONFIG_FILE" | while read -r CC_PATH
         do
-            CC_NAME=$(jq -r ".${org}.chaincode[$cc_index].name" $NET_CONFIG_FILE)
+            CC_NAME=$(jq -r ".${org}.chaincode[$cc_index].name" "$NET_CONFIG_FILE")
             CC_FILE="${CC_PATH}/${CC_NAME}.go"
-            CC_INSTALL=$(jq -r ".${org}.chaincode[$cc_index].install" $NET_CONFIG_FILE)
-            CC_INSTANTIATE=$(jq -r ".${org}.chaincode[$cc_index].instantiate" $NET_CONFIG_FILE)
-            CC_CHANNELS=$(jq -r ".${org}.chaincode[$cc_index].channels[]" $NET_CONFIG_FILE)
-            CC_INIT_ARGS=$(jq ".${org}.chaincode[$cc_index].init_args[]" $NET_CONFIG_FILE)
+            CC_INSTALL=$(jq -r ".${org}.chaincode[$cc_index].install" "$NET_CONFIG_FILE")
+            CC_INSTANTIATE=$(jq -r ".${org}.chaincode[$cc_index].instantiate" "$NET_CONFIG_FILE")
+            CC_CHANNELS=$(jq -r ".${org}.chaincode[$cc_index].channels[]" "$NET_CONFIG_FILE")
+            CC_INIT_ARGS=$(jq ".${org}.chaincode[$cc_index].init_args[]" "$NET_CONFIG_FILE")
 
             # TODO: Integrate with configuration
             CC_ID="${CC_NAME}"
