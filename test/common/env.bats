@@ -27,6 +27,7 @@ setup() {
   ROOTDIR="test"
   GO_VERSION="1.0.0"
   HLF_VERSION="2.0.0"
+  CONFIGPATH="path"
 
   source "${SCRIPT_DIR}/common/env.sh"
 
@@ -35,6 +36,7 @@ setup() {
   [ "${GO_VERSION}" = "1.0.0" ]
   [ "${HLF_VERSION}" = "2.0.0" ]
   [ "${FABRIC_SRC_DIR}" = "test/fabric-2.0.0" ]
+  [ "${CONFIGPATH}" = "path" ]
 
 }
 
@@ -42,6 +44,7 @@ setup() {
   
   source "${SCRIPT_DIR}/common/env.sh"
 
+  [ "${CONFIGPATH}" = "deploy_config.json" ]
   [ "${GOPATH}" = "${PWD}" ]
   [ "${GOROOT}" = "${PWD}/go" ]
   [ "${GO_VERSION}" = "1.9.2" ]

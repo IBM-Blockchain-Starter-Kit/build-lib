@@ -1,5 +1,6 @@
 #!/usr/bin/env bats
 
+load "${BATS_TEST_DIRNAME}/../../bats-mock/stub.bash"
 load ../test_helper
 
 setup() {
@@ -41,4 +42,31 @@ setup() {
   echo "output = ${output}"
   [ $status -eq 1 ]
   echo "$output" | grep 'get_deploy_name must be called with at least one argument$'
+}
+
+@test "utils.sh: should exist and be executable" {
+  [ -x "${SCRIPT_DIR}/common/utils.sh" ]
+}
+
+@test "utils.sh: should return proper values in do_curl" {
+  stub cat \
+      "true" \
+      "true" \
+      "true"
+  stub curl \
+      "echo 100" \
+      "echo 250" \
+      "echo 300"
+
+  run do_curl
+  [ $status -eq 1 ]
+
+  run do_curl
+  [ $status -eq 0 ]
+
+  run do_curl
+  [ $status -eq 1 ]
+
+  unstub cat
+  unstub curl
 }
