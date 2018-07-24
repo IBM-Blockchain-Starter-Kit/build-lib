@@ -371,8 +371,8 @@ EOF
   stub date \
     "echo v100" \
     "echo v200"
-  stub install_fabric_chaincode "contract2 v200 lib/chaincode/contract2.go : true"
-  stub instantiate_fabric_chaincode "contract2 v200 channel2 : true"
+  stub install_fabric_chaincode "contract2 v200- lib/chaincode/contract2.go : true"
+  stub instantiate_fabric_chaincode "contract2 v200- channel2 : true"
 
   run parse_fabric_config "sample-config.json"
 

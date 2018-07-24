@@ -276,7 +276,7 @@ function parse_fabric_config {
 
             # TODO: Integrate with configuration
             CC_ID="${CC_NAME}"
-            CC_VERSION=$(date '+%Y%m%d%H%M%S')
+            CC_VERSION="$(date '+%Y%m%d%H%M%S')-${BUILD_NUMBER}"
 
             if $CC_INSTALL
             then
