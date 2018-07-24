@@ -27,6 +27,7 @@ setup() {
   ROOTDIR="test"
   GO_VERSION="1.0.0"
   HLF_VERSION="2.0.0"
+  DEBUG=true
 
   source "${SCRIPT_DIR}/common/env.sh"
 
@@ -35,6 +36,7 @@ setup() {
   [ "${GO_VERSION}" = "1.0.0" ]
   [ "${HLF_VERSION}" = "2.0.0" ]
   [ "${FABRIC_SRC_DIR}" = "test/fabric-2.0.0" ]
+  [ "${DEBUG}" = true ]
 
 }
 
@@ -47,5 +49,6 @@ setup() {
   [ "${GO_VERSION}" = "1.9.2" ]
   [ "${HLF_VERSION}" = "1.0.4" ]
   [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.0.4" ]
+  [ "${DEBUG}" = false ]
 
 }
