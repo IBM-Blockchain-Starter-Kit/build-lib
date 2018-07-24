@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-set -x
-
 echo "######## Build chaincode ########"
 
 # shellcheck source=src/common/env.sh
 source "${SCRIPT_DIR}/common/env.sh"
+
+$DEBUG && set -x
 
 echo "######## Download dependencies ########"
 
