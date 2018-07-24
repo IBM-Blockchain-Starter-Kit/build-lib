@@ -9,59 +9,67 @@ source "${SCRIPT_DIR}/common/utils.sh"
 #######################################
 # Setup constants for bluemix cloud foundry interaction
 # Globals:
-#   REGION_ID
-#   BLOCKCHAIN_SERVICE_NAME
-#   BLOCKCHAIN_SERVICE_PLAN
-#   BLOCKCHAIN_SERVICE_KEY
+#   get: REGION_ID
+#   set: BLOCKCHAIN_SERVICE_NAME
+#   set: BLOCKCHAIN_SERVICE_PLAN
+#   set: BLOCKCHAIN_SERVICE_KEY
 # Arguments:
 #   None
 # Returns:
 #   None
 #######################################
 function setup_service_constants {
+    local region_instance
+
     region_instance=$(echo "$REGION_ID" | cut -d : -f 2)
 
     if [ "${region_instance}" = "ys1" ]; then
-        export BLOCKCHAIN_SERVICE_NAME="ibm-blockchain-5-staging"
-        export BLOCKCHAIN_SERVICE_PLAN="ibm-blockchain-plan-v1-ga1-starter-staging"
+        BLOCKCHAIN_SERVICE_NAME="ibm-blockchain-5-staging"
+        BLOCKCHAIN_SERVICE_PLAN="ibm-blockchain-plan-v1-ga1-starter-staging"
     else
-        export BLOCKCHAIN_SERVICE_NAME="ibm-blockchain-5-prod"
-        export BLOCKCHAIN_SERVICE_PLAN="ibm-blockchain-plan-v1-ga1-starter-prod"
+        BLOCKCHAIN_SERVICE_NAME="ibm-blockchain-5-prod"
+        BLOCKCHAIN_SERVICE_PLAN="ibm-blockchain-plan-v1-ga1-starter-prod"
     fi
 
     export BLOCKCHAIN_SERVICE_KEY="Credentials-1"
+    export BLOCKCHAIN_SERVICE_NAME
+    export BLOCKCHAIN_SERVICE_PLAN
 }
 
 #######################################
 # Update network credentials to reflect targeted 'org' argument using 'blockchain.json'
 # Globals:
-#   BLOCKCHAIN_NETWORK_ID
-#   BLOCKCHAIN_SECRET
-#   BLOCKCHAIN_KEY
-#   BLOCKCHAIN_URL
+#   set: BLOCKCHAIN_SECRET
+#   set: BLOCKCHAIN_KEY
+#   set: BLOCKCHAIN_API
 # Arguments:
 #   org: must match a top-level key in 'blockchain.json'
 # Returns:
 #   None
 #######################################
 function authenticate_org {
-    org=$1
-    file="blockchain.json"
+    local org=$1
+    local file="blockchain.json"
+
+    local BLOCKCHAIN_NETWORK_ID
+    local BLOCKCHAIN_URL
 
     BLOCKCHAIN_NETWORK_ID=$(jq --raw-output ".${org}.network_id" ${file})
+    BLOCKCHAIN_URL=$(jq --raw-output ".${org}.url" ${file})
     BLOCKCHAIN_KEY=$(jq --raw-output ".${org}.key" ${file})
     BLOCKCHAIN_SECRET=$(jq --raw-output ".${org}.secret" ${file})
-    BLOCKCHAIN_URL=$(jq --raw-output ".${org}.url" ${file})
+
+    BLOCKCHAIN_API="${BLOCKCHAIN_URL}/api/v1/networks/${BLOCKCHAIN_NETWORK_ID}"
 }
 
 #######################################
 # Populate 'blockchain.json' with network credentials by interacting with the 
 # bluemix cloud foundry CLI to create/modify service instance and key
 # Globals:
-#   BLOCKCHAIN_SERVICE_INSTANCE
-#   BLOCKCHAIN_SERVICE_NAME
-#   BLOCKCHAIN_SERVICE_PLAN
-#   BLOCKCHAIN_SERVICE_KEY
+#   get: BLOCKCHAIN_SERVICE_INSTANCE
+#   get: BLOCKCHAIN_SERVICE_NAME
+#   get: BLOCKCHAIN_SERVICE_PLAN
+#   get: BLOCKCHAIN_SERVICE_KEY
 # Arguments:
 #   None
 # Returns:
@@ -90,10 +98,9 @@ function provision_blockchain {
 #######################################
 # Helper for get_blockchain_connection_profile
 # Globals:
-#   BLOCKCHAIN_KEY
-#   BLOCKCHAIN_SECRET
-#   BLOCKCHAIN_URL
-#   BLOCKCHAIN_NETWORK_ID
+#   get: BLOCKCHAIN_KEY
+#   get: BLOCKCHAIN_SECRET
+#   get: BLOCKCHAIN_API
 # Arguments:
 #   None
 # Returns:
@@ -104,7 +111,7 @@ function get_blockchain_connection_profile_inner {
         -H 'Content-Type: application/json' \
         -H 'Accept: application/json' \
         -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
-        "${BLOCKCHAIN_URL}/api/v1/networks/${BLOCKCHAIN_NETWORK_ID}/connection_profile" > blockchain-connection-profile.json
+        "${BLOCKCHAIN_API}/connection_profile" > blockchain-connection-profile.json
 }
 
 #######################################
@@ -129,10 +136,9 @@ function get_blockchain_connection_profile {
 #######################################
 # Installs chaincode file with specified id and version
 # Globals:
-#   BLOCKCHAIN_URL
-#   BLOCKCHAIN_NETWORK_ID
-#   BLOCKCHAIN_KEY
-#   BLOCKCHAIN_SECRET
+#   get: BLOCKCHAIN_API
+#   get: BLOCKCHAIN_KEY
+#   get: BLOCKCHAIN_SECRET
 # Arguments:
 #   CC_ID:      Name to label installation with
 #   CC_VERSION: Version to label installation with
@@ -144,12 +150,14 @@ function get_blockchain_connection_profile {
 #     0 = chaincode successfully installed with specified id and version
 #######################################
 function install_fabric_chaincode {
-    CC_ID=$1
-    CC_VERSION=$2
-    CC_PATH=$3
+    local CC_ID=$1
+    local CC_VERSION=$2
+    local CC_PATH=$3
+
+    local CHAINCODE_FILES
 
     echo "Installing chaincode '$CC_PATH' with id '$CC_ID' and version '$CC_VERSION'..."
-
+    
     CHAINCODE_FILES=$(find ${CC_PATH} -type f ! -name "*test*")
     CHAINCODE_FILE_OPTS=""
     for CHAINCODE_FILE in ${CHAINCODE_FILES}
@@ -157,14 +165,12 @@ function install_fabric_chaincode {
         CHAINCODE_FILE_OPTS="${CHAINCODE_FILE_OPTS} -F files[]=@${CHAINCODE_FILE}"
     done
 
-    request_url="${BLOCKCHAIN_URL}/api/v1/networks/${BLOCKCHAIN_NETWORK_ID}/chaincode/install"
-
     OUTPUT=$(do_curl \
         -X POST \
         -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
         "$CHAINCODE_FILE_OPTS" \
         -F chaincode_id="${CC_ID}" -F chaincode_version="${CC_VERSION}" \
-        "${request_url}")
+        "${BLOCKCHAIN_API}/chaincode/install")
     
     if [ $? -eq 1 ]
     then
@@ -188,10 +194,9 @@ function install_fabric_chaincode {
 # Instantiates chaincode object with specified id and version in target channel, 
 # using optional initial arguments
 # Globals:
-#   BLOCKCHAIN_URL
-#   BLOCKCHAIN_NETWORK_ID
-#   BLOCKCHAIN_KEY
-#   BLOCKCHAIN_SECRET
+#   get: BLOCKCHAIN_API
+#   get: BLOCKCHAIN_KEY
+#   get: BLOCKCHAIN_SECRET
 # Arguments:
 #   CC_ID:      Name to label instance with
 #   CC_VERSION: Version to label instance with
@@ -204,10 +209,10 @@ function install_fabric_chaincode {
 #     0 = chaincode successfully instantiated with specified id and version
 #######################################
 function instantiate_fabric_chaincode {
-    CC_ID=$1
-    CC_VERSION=$2
-    CHANNEL=$3
-    INIT_ARGS=$4
+    local CC_ID=$1
+    local CC_VERSION=$2
+    local CHANNEL=$3
+    local INIT_ARGS=$4
 
     cat << EOF > request.json
 {
@@ -217,19 +222,16 @@ function instantiate_fabric_chaincode {
 }
 EOF
 
-    request_url="${BLOCKCHAIN_URL}/api/v1/networks/${BLOCKCHAIN_NETWORK_ID}/channels/${CHANNEL}/chaincode/instantiate"
-
     echo "Instantiating fabric contract with id '$CC_ID' and version '$CC_VERSION' on channel '$CHANNEL' with arguments '$INIT_ARGS'..."
 
-    OUTPUT=$(
-    do_curl \
+    OUTPUT=$(do_curl \
         -X POST \
         -H 'Content-Type: application/json' \
         -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
         --data-binary @request.json \
-        "${request_url}"
-    )
-    do_curl_status=$?
+        "${BLOCKCHAIN_API}/channels/${CHANNEL}/chaincode/instantiate")
+    
+    local do_curl_status=$?
 
     rm -f request.json
 
@@ -265,12 +267,12 @@ EOF
 # Globals:
 #   None
 # Arguments:
-#   DEPLOY_CONFIG
+#   DEPLOY_CONFIG: path to json config file
 # Returns:
 #   None
 #######################################
 function deploy_fabric_chaincode {
-    DEPLOY_CONFIG=$1
+    local DEPLOY_CONFIG=$1
 
     echo "Parsing deployment configuration:"
     cat "$DEPLOY_CONFIG"
@@ -280,7 +282,7 @@ function deploy_fabric_chaincode {
         echo "Targeting org '$org'..."
         authenticate_org "$org"
         
-        cc_index=0
+        local cc_index=0
         jq -r ".${org}.chaincode[].path" "$DEPLOY_CONFIG" | while read -r CC_PATH
         do
             CC_NAME=$(jq -r ".${org}.chaincode[$cc_index].name" "$DEPLOY_CONFIG")

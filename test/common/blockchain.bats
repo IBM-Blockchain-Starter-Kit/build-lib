@@ -46,17 +46,15 @@ cleanup_blockchain_json() {
 
 	authenticate_org "org1"
 
-	[ "$BLOCKCHAIN_NETWORK_ID" = "networkid1" ]
 	[ "$BLOCKCHAIN_KEY" = "key1" ]
 	[ "$BLOCKCHAIN_SECRET" = "secret1" ]
-	[ "$BLOCKCHAIN_URL" = "url1" ]
+  [ "$BLOCKCHAIN_API" = "url1/api/v1/networks/networkid1" ]
 
 	authenticate_org "org2"
 
-	[ "$BLOCKCHAIN_NETWORK_ID" = "networkid2" ]
 	[ "$BLOCKCHAIN_KEY" = "key2" ]
 	[ "$BLOCKCHAIN_SECRET" = "secret2" ]
-	[ "$BLOCKCHAIN_URL" = "url2" ]
+  [ "$BLOCKCHAIN_API" = "url2/api/v1/networks/networkid2" ]
 
 	cleanup_blockchain_json
 	popd
