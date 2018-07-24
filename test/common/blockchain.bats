@@ -65,9 +65,9 @@ cleanup_blockchain_json() {
 @test "blockchain.sh: provision_blockchain should populate 'blockchain.json' without an existing service instance and key" {
 	stub cf \
 		"service bsi : cat SERVICEINFO" \
-		"create-service bsn bsp bsi : echo INSTANCECREATED" \
+		"create-service bsn bsp bsi : echo Creating service...OK" \
 		"service-key bsi bsk : cat KEYINFO" \
-		"create-service-key bsi bsk : echo KEYCREATED" \
+		"create-service-key bsi bsk : echo Creating service key...OK" \
 		"service-key bsi bsk : true"
 
 	stub tail "-n +2 : echo BLOCKCHAINJSON"
@@ -80,9 +80,8 @@ cleanup_blockchain_json() {
   source "${SCRIPT_DIR}/common/blockchain.sh"
 
 	run provision_blockchain
+  
 	[ $status -eq 0 ]
-  [ "${lines[0]}" = "INSTANCECREATED" ]
-  [ "${lines[1]}" = "KEYCREATED" ]
 
 	v=$(cat blockchain.json)
 	[ "$v" = "BLOCKCHAINJSON" ]
@@ -91,6 +90,47 @@ cleanup_blockchain_json() {
 
 	unstub cf
 	unstub tail
+}
+
+@test "blockchain.sh: provision_blockchain should exit 1 if it fails to create service" {
+	stub cf \
+		"service bsi : cat SERVICEINFO" \
+		"create-service bsn bsp bsi : exit 1"
+  
+  export BLOCKCHAIN_SERVICE_INSTANCE="bsi"
+	export BLOCKCHAIN_SERVICE_NAME="bsn"
+	export BLOCKCHAIN_SERVICE_PLAN="bsp"
+
+  source "${SCRIPT_DIR}/common/blockchain.sh"
+
+	run provision_blockchain
+
+  [ "${lines[0]}" = "Failed to create service." ]
+	[ $status -eq 1 ]
+
+	unstub cf
+}
+
+@test "blockchain.sh: provision_blockchain should exit 1 if it fails to create service key" {
+	stub cf \
+		"service bsi : cat SERVICEINFO" \
+		"create-service bsn bsp bsi : exit 0" \
+		"service-key bsi bsk : cat KEYINFO" \
+		"create-service-key bsi bsk : exit 1"
+
+  export BLOCKCHAIN_SERVICE_INSTANCE="bsi"
+	export BLOCKCHAIN_SERVICE_NAME="bsn"
+	export BLOCKCHAIN_SERVICE_PLAN="bsp"
+	export BLOCKCHAIN_SERVICE_KEY="bsk"
+
+  source "${SCRIPT_DIR}/common/blockchain.sh"
+
+	run provision_blockchain
+
+  [ "${lines[0]}" = "Failed to create service key." ]
+	[ $status -eq 1 ]
+
+	unstub cf
 }
 
 @test "blockchain.sh: provision_blockchain should populate 'blockchain.json' using an existing service instance and key" {
@@ -388,4 +428,3 @@ EOF
   unstub install_fabric_chaincode
   unstub instantiate_fabric_chaincode
 }
-
