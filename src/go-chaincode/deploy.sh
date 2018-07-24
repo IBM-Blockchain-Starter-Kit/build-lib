@@ -17,4 +17,4 @@ fi
 install_jq
 setup_service_constants
 provision_blockchain
-parse_fabric_config $CONFIGPATH
+deploy_fabric_chaincode $CONFIGPATH

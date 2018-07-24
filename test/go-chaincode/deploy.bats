@@ -28,7 +28,7 @@ setup() {
     echo "unset -f install_jq" >> "${SCRIPT_DIR}/common/utils.sh"
     echo "unset -f setup_service_constants" >> "${SCRIPT_DIR}/common/blockchain.sh"
     echo "unset -f provision_blockchain" >> "${SCRIPT_DIR}/common/blockchain.sh"
-    echo "unset -f parse_fabric_config" >> "${SCRIPT_DIR}/common/blockchain.sh"
+    echo "unset -f deploy_fabric_chaincode" >> "${SCRIPT_DIR}/common/blockchain.sh"
 
     source "${SCRIPT_DIR}/common/utils.sh"
     source "${SCRIPT_DIR}/common/blockchain.sh"
@@ -36,7 +36,7 @@ setup() {
     stub install_jq "true"
     stub setup_service_constants "true"
     stub provision_blockchain "true"
-    stub parse_fabric_config "true"
+    stub deploy_fabric_chaincode "true"
 
     ${SCRIPT_DIR}/go-chaincode/deploy.sh
     
@@ -45,5 +45,5 @@ setup() {
     unstub install_jq
     unstub setup_service_constants
     unstub provision_blockchain
-    unstub parse_fabric_config
+    unstub deploy_fabric_chaincode
 }

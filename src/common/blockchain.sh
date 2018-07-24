@@ -265,29 +265,29 @@ EOF
 # Globals:
 #   None
 # Arguments:
-#   NET_CONFIG_FILE
+#   DEPLOY_CONFIG
 # Returns:
 #   None
 #######################################
-function parse_fabric_config {
-    NET_CONFIG_FILE=$1
+function deploy_fabric_chaincode {
+    DEPLOY_CONFIG=$1
 
     echo "Parsing deployment configuration:"
-    cat "$NET_CONFIG_FILE"
+    cat "$DEPLOY_CONFIG"
 
-    for org in $(jq -r "to_entries[] | .key" "$NET_CONFIG_FILE")
+    for org in $(jq -r "to_entries[] | .key" "$DEPLOY_CONFIG")
     do
         echo "Targeting org '$org'..."
         authenticate_org "$org"
         
         cc_index=0
-        jq -r ".${org}.chaincode[].path" "$NET_CONFIG_FILE" | while read -r CC_PATH
+        jq -r ".${org}.chaincode[].path" "$DEPLOY_CONFIG" | while read -r CC_PATH
         do
-            CC_NAME=$(jq -r ".${org}.chaincode[$cc_index].name" "$NET_CONFIG_FILE")
-            CC_INSTALL=$(jq -r ".${org}.chaincode[$cc_index].install" "$NET_CONFIG_FILE")
-            CC_INSTANTIATE=$(jq -r ".${org}.chaincode[$cc_index].instantiate" "$NET_CONFIG_FILE")
-            CC_CHANNELS=$(jq -r ".${org}.chaincode[$cc_index].channels[]" "$NET_CONFIG_FILE")
-            CC_INIT_ARGS=$(jq ".${org}.chaincode[$cc_index].init_args[]" "$NET_CONFIG_FILE")
+            CC_NAME=$(jq -r ".${org}.chaincode[$cc_index].name" "$DEPLOY_CONFIG")
+            CC_INSTALL=$(jq -r ".${org}.chaincode[$cc_index].install" "$DEPLOY_CONFIG")
+            CC_INSTANTIATE=$(jq -r ".${org}.chaincode[$cc_index].instantiate" "$DEPLOY_CONFIG")
+            CC_CHANNELS=$(jq -r ".${org}.chaincode[$cc_index].channels[]" "$DEPLOY_CONFIG")
+            CC_INIT_ARGS=$(jq ".${org}.chaincode[$cc_index].init_args[]" "$DEPLOY_CONFIG")
 
             # TODO: Integrate with configuration
             CC_ID="${CC_NAME}"

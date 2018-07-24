@@ -374,7 +374,7 @@ cleanup_blockchain_json() {
   [ "${lines[3]}" = "${error_msg}" ]
 }
 
-@test "blockchain.sh: parse_fabric_config should iterate through provided organizations and authenticate" {
+@test "blockchain.sh: deploy_fabric_chaincode should iterate through provided organizations and authenticate" {
   cat << EOF > sample-config.json
 {
   "org1": {},
@@ -390,7 +390,7 @@ EOF
     "org1 : echo AUTH1" \
     "org2 : echo AUTH2"
 
-  run parse_fabric_config "sample-config.json"
+  run deploy_fabric_chaincode "sample-config.json"
 
   [ $status -eq 0 ]
   [ "${lines[0]}" = "Parsing deployment configuration:" ]
@@ -405,7 +405,7 @@ EOF
   unstub authenticate_org
 }
 
-@test "blockchain.sh: parse_fabric_config should make appropriate calls to install/instantiate bsaed on an org config" {
+@test "blockchain.sh: deploy_fabric_chaincode should make appropriate calls to install/instantiate bsaed on an org config" {
   cat << EOF > sample-config.json
 {
   "org1": {
@@ -444,7 +444,7 @@ EOF
   stub install_fabric_chaincode "contract2 v200- lib/chaincode : true"
   stub instantiate_fabric_chaincode "contract2 v200- channel2 : true"
 
-  run parse_fabric_config "sample-config.json"
+  run deploy_fabric_chaincode "sample-config.json"
 
   [ $status -eq 0 ]
   [ "${lines[0]}" = "Parsing deployment configuration:" ]
