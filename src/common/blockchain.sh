@@ -136,7 +136,7 @@ function get_blockchain_connection_profile {
 # Arguments:
 #   CC_ID:      Name to label installation with
 #   CC_VERSION: Version to label installation with
-#   CC_FILE:    Path to chaincode file to be installed
+#   CC_PATH:    Path to chaincode directory to be installed
 # Returns:
 #   err_no:
 #     2 = chaincode exists with specified id and version
@@ -146,16 +146,24 @@ function get_blockchain_connection_profile {
 function install_fabric_chaincode {
     CC_ID=$1
     CC_VERSION=$2
-    CC_FILE=$3
+    CC_PATH=$3
+
+    echo "Installing chaincode '$CC_PATH' with id '$CC_ID' and version '$CC_VERSION'..."
+
+    CHAINCODE_FILES=$(find ${CC_PATH} -type f ! -name "*test*")
+    CHAINCODE_FILE_OPTS=""
+    for CHAINCODE_FILE in ${CHAINCODE_FILES}
+    do
+        CHAINCODE_FILE_OPTS="${CHAINCODE_FILE_OPTS} -F files[]=@${CHAINCODE_FILE}"
+    done
 
     request_url="${BLOCKCHAIN_URL}/api/v1/networks/${BLOCKCHAIN_NETWORK_ID}/chaincode/install"
-
-    echo "Installing fabric contract '$CC_FILE' with id '$CC_ID' and version '$CC_VERSION'..."
 
     OUTPUT=$(do_curl \
         -X POST \
         -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
-        -F files[]=@"${CC_FILE}" -F chaincode_id="${CC_ID}" -F chaincode_version="${CC_VERSION}" \
+        "$CHAINCODE_FILE_OPTS" \
+        -F chaincode_id="${CC_ID}" -F chaincode_version="${CC_VERSION}" \
         "${request_url}")
     
     if [ $? -eq 1 ]
@@ -276,7 +284,6 @@ function parse_fabric_config {
         jq -r ".${org}.chaincode[].path" "$NET_CONFIG_FILE" | while read -r CC_PATH
         do
             CC_NAME=$(jq -r ".${org}.chaincode[$cc_index].name" "$NET_CONFIG_FILE")
-            CC_FILE="${CC_PATH}/${CC_NAME}.go"
             CC_INSTALL=$(jq -r ".${org}.chaincode[$cc_index].install" "$NET_CONFIG_FILE")
             CC_INSTANTIATE=$(jq -r ".${org}.chaincode[$cc_index].instantiate" "$NET_CONFIG_FILE")
             CC_CHANNELS=$(jq -r ".${org}.chaincode[$cc_index].channels[]" "$NET_CONFIG_FILE")
@@ -288,7 +295,7 @@ function parse_fabric_config {
 
             if $CC_INSTALL
             then
-                install_fabric_chaincode $CC_ID $CC_VERSION $CC_FILE
+                install_fabric_chaincode $CC_ID $CC_VERSION $CC_PATH
                 
                 # If install failed due to a reason other than an identical version already exists, skip instantiate
                 if [ $? -eq 1 ]; then

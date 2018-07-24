@@ -232,43 +232,73 @@ cleanup_blockchain_json() {
   echo "true" > "${SCRIPT_DIR}/common/utils.sh"
 
   stub do_curl "exit 0"
+  stub find "echo contract.go"
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
-  run install_fabric_chaincode "ccid" "ccversion" "ccfile"
+  run install_fabric_chaincode "ccid" "ccversion" "ccpath"
 
   [ "${lines[1]}" = "Successfully installed fabric contract." ]
   [ $status -eq 0 ]
 
   unstub do_curl
+  unstub find
 }
 
 @test "blockchain.sh: install_fabric_chaincode should return status 1 if unrecognized error is received" {
   echo "true" > "${SCRIPT_DIR}/common/utils.sh"
 
-  stub do_curl "echo error; exit 1"
+  error_msg="error"
+
+  stub do_curl "echo ${error_msg}; exit 1"
+  stub find "echo contract.go"
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
-  run install_fabric_chaincode "ccid" "ccversion" "ccfile"
+  run install_fabric_chaincode "ccid" "ccversion" "ccpath"
 
   [ "${lines[1]}" = "Failed to install fabric contract:" ]
   [ "${lines[2]}" = "Unrecognized error returned:" ]
-  [ "${lines[3]}" = "error" ]
+  [ "${lines[3]}" = "${error_msg}" ]
   [ $status -eq 1 ]
 
   unstub do_curl
+  unstub find
 }
 
 @test "blockchain.sh: install_fabric_chaincode should return status 2 if already installed with specified version and id" {
   echo "true" > "${SCRIPT_DIR}/common/utils.sh"
 
   stub do_curl "echo chaincode code exists; exit 1"
+  stub find "echo contract.go"
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
-  run install_fabric_chaincode "ccid" "ccversion" "ccfile"
+  run install_fabric_chaincode "ccid" "ccversion" "ccpath"
 
   [ "${lines[1]}" = "Failed to install fabric contract:" ]
   [ "${lines[2]}" = "Chaincode already installed with id 'ccid' and version 'ccversion'" ]
   [ $status -eq 2 ]
+
+  unstub do_curl
+  unstub find
+}
+
+@test "blockchain.sh: install_fabric_chaincode should correctly build array of files from directory path" {
+  echo "true" > "${SCRIPT_DIR}/common/utils.sh"
+
+  stub do_curl "exit 0"
+
+  source "${SCRIPT_DIR}/common/blockchain.sh"
+
+  pushd "${SCRIPT_DIR}/.."
+  mkdir -p "cc/path"
+  touch "cc/path/contract.go"
+  touch "cc/path/contract_test.go"
+  touch "cc/path/notchaincode.txt"
+
+  install_fabric_chaincode "ccid" "ccversion" "cc/path"
+  popd
+
+  [[ "${CHAINCODE_FILE_OPTS}" == ?"-F files[]=@cc/path/notchaincode.txt -F files[]=@cc/path/contract.go" ]] || \
+  [[ "${CHAINCODE_FILE_OPTS}" == ?"-F files[]=@cc/path/contract.go -F files[]=@cc/path/notchaincode.txt" ]]
 
   unstub do_curl
 }
@@ -411,7 +441,7 @@ EOF
   stub date \
     "echo v100" \
     "echo v200"
-  stub install_fabric_chaincode "contract2 v200- lib/chaincode/contract2.go : true"
+  stub install_fabric_chaincode "contract2 v200- lib/chaincode : true"
   stub instantiate_fabric_chaincode "contract2 v200- channel2 : true"
 
   run parse_fabric_config "sample-config.json"
