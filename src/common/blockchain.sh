@@ -3,10 +3,21 @@
 # Common IBM blockchain platform functions, e.g. to provision a blockchain service
 
 # shellcheck disable=2086
-
 # shellcheck source=src/common/utils.sh
 source "${SCRIPT_DIR}/common/utils.sh"
 
+#######################################
+# Setup constants for bluemix cloud foundry interaction
+# Globals:
+#   REGION_ID
+#   BLOCKCHAIN_SERVICE_NAME
+#   BLOCKCHAIN_SERVICE_PLAN
+#   BLOCKCHAIN_SERVICE_KEY
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function setup_service_constants {
     region_instance=$(echo "$REGION_ID" | cut -d : -f 2)
 
@@ -18,9 +29,21 @@ function setup_service_constants {
         export BLOCKCHAIN_SERVICE_PLAN="ibm-blockchain-plan-v1-ga1-starter-prod"
     fi
 
-    export BLOCKCHAIN_SERVICE_KEY=Credentials-1
+    export BLOCKCHAIN_SERVICE_KEY="Credentials-1"
 }
 
+#######################################
+# Update network credentials to reflect targeted 'org' argument using 'blockchain.json'
+# Globals:
+#   BLOCKCHAIN_NETWORK_ID
+#   BLOCKCHAIN_SECRET
+#   BLOCKCHAIN_KEY
+#   BLOCKCHAIN_URL
+# Arguments:
+#   org: must match a top-level key in 'blockchain.json'
+# Returns:
+#   None
+#######################################
 function authenticate_org {
     org=$1
     file="blockchain.json"
@@ -31,6 +54,19 @@ function authenticate_org {
     BLOCKCHAIN_URL=$(jq --raw-output ".${org}.url" ${file})
 }
 
+#######################################
+# Populate 'blockchain.json' with network credentials by interacting with the 
+# bluemix cloud foundry CLI to create/modify service instance and key
+# Globals:
+#   BLOCKCHAIN_SERVICE_INSTANCE
+#   BLOCKCHAIN_SERVICE_NAME
+#   BLOCKCHAIN_SERVICE_PLAN
+#   BLOCKCHAIN_SERVICE_KEY
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function provision_blockchain {
     if ! cf service ${BLOCKCHAIN_SERVICE_INSTANCE} > /dev/null 2>&1
     then
@@ -43,8 +79,19 @@ function provision_blockchain {
     cf service-key ${BLOCKCHAIN_SERVICE_INSTANCE} ${BLOCKCHAIN_SERVICE_KEY} | tail -n +2 > blockchain.json
 }
 
+#######################################
+# Helper for get_blockchain_connection_profile
+# Globals:
+#   BLOCKCHAIN_KEY
+#   BLOCKCHAIN_SECRET
+#   BLOCKCHAIN_URL
+#   BLOCKCHAIN_NETWORK_ID
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function get_blockchain_connection_profile_inner {
-    #set -x
     do_curl \
         -H 'Content-Type: application/json' \
         -H 'Accept: application/json' \
@@ -52,6 +99,16 @@ function get_blockchain_connection_profile_inner {
         "${BLOCKCHAIN_URL}/api/v1/networks/${BLOCKCHAIN_NETWORK_ID}/connection_profile" > blockchain-connection-profile.json
 }
 
+#######################################
+# Requests and waits for network information from the IBM Blockchain platform 
+# api, outputting into 'blockchain-connection-profile.json'
+# Globals:
+#   None
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function get_blockchain_connection_profile {
     get_blockchain_connection_profile_inner
     while ! jq -e ".channels.defaultchannel" blockchain-connection-profile.json
@@ -61,6 +118,23 @@ function get_blockchain_connection_profile {
     done
 }
 
+#######################################
+# Installs chaincode file with specified id and version
+# Globals:
+#   BLOCKCHAIN_URL
+#   BLOCKCHAIN_NETWORK_ID
+#   BLOCKCHAIN_KEY
+#   BLOCKCHAIN_SECRET
+# Arguments:
+#   CC_ID:      Name to label installation with
+#   CC_VERSION: Version to label installation with
+#   CC_FILE:    Path to chaincode file to be installed
+# Returns:
+#   err_no:
+#     2 = chaincode exists with specified id and version
+#     1 = unrecognized error returned by IBM Blockchain platform api
+#     0 = chaincode successfully installed with specified id and version
+#######################################
 function install_fabric_chaincode {
     CC_ID=$1
     CC_VERSION=$2
@@ -94,6 +168,25 @@ function install_fabric_chaincode {
     return 0
 }
 
+#######################################
+# Instantiates chaincode object with specified id and version in target channel, 
+# using optional initial arguments
+# Globals:
+#   BLOCKCHAIN_URL
+#   BLOCKCHAIN_NETWORK_ID
+#   BLOCKCHAIN_KEY
+#   BLOCKCHAIN_SECRET
+# Arguments:
+#   CC_ID:      Name to label instance with
+#   CC_VERSION: Version to label instance with
+#   CHANNEL:    Channel for instance to be constructed in
+#   INIT_ARGS:  (optional) Constructor arguments
+# Returns:
+#   err_no:
+#     2 = chaincode instance exists with specified id and version
+#     1 = unrecognized error returned by IBM Blockchain platform api
+#     0 = chaincode successfully instantiated with specified id and version
+#######################################
 function instantiate_fabric_chaincode {
     CC_ID=$1
     CC_VERSION=$2
@@ -150,7 +243,16 @@ EOF
     return 0
 }
 
-
+#######################################
+# Parses deployment configuration and makes corresponding install and 
+# instatiate requests
+# Globals:
+#   None
+# Arguments:
+#   NET_CONFIG_FILE
+# Returns:
+#   None
+#######################################
 function parse_fabric_config {
     NET_CONFIG_FILE=$1
 
