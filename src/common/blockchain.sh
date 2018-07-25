@@ -76,7 +76,16 @@ function authenticate_org {
 #   None
 #######################################
 function provision_blockchain {
-    if ! cf service ${BLOCKCHAIN_SERVICE_INSTANCE} > /dev/null 2>&1
+    SERVICE_OUTPUT=$(cf service ${BLOCKCHAIN_SERVICE_INSTANCE})
+    RETVAL=$?
+
+    if [ $RETVAL -eq 0 ] && [[ ${SERVICE_OUTPUT} != *"service: ${BLOCKCHAIN_SERVICE_PLAN}"* ]]
+    then
+        echo "Service with the provided name exists, but it is not a blockchain service."
+        exit 1
+    fi
+
+    if [ $RETVAL -eq 1 ]
     then
         cf create-service ${BLOCKCHAIN_SERVICE_NAME} ${BLOCKCHAIN_SERVICE_PLAN} ${BLOCKCHAIN_SERVICE_INSTANCE}
         if [ $? -eq 1 ]; then
@@ -84,7 +93,8 @@ function provision_blockchain {
             exit 1
         fi
     fi
-    if ! cf service-key ${BLOCKCHAIN_SERVICE_INSTANCE} ${BLOCKCHAIN_SERVICE_KEY} > /dev/null 2>&1
+    cf service-key ${BLOCKCHAIN_SERVICE_INSTANCE} ${BLOCKCHAIN_SERVICE_KEY}
+    if [ $? -eq 1 ]
     then
         cf create-service-key ${BLOCKCHAIN_SERVICE_INSTANCE} ${BLOCKCHAIN_SERVICE_KEY}
         if [ $? -eq 1 ]; then
