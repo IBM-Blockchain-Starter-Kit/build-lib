@@ -90,7 +90,7 @@ cleanup_blockchain_json() {
 	unstub tail
 }
 
-@test "blockchain.sh: provision_blockchain should exit 1 if service exists but is incorrect type" {
+@test "blockchain.sh: provision_blockchain should exit 1 if service exists but is not a blockchain service" {
 	stub cf "service bsi : echo name: Blockchain-m5 service: test tags: plan: ibm-blockchain-plan-v1-ga1-starter-prod"
   
   export BLOCKCHAIN_SERVICE_INSTANCE="bsi"
@@ -100,7 +100,7 @@ cleanup_blockchain_json() {
 
 	run provision_blockchain
 
-  [ "${lines[0]}" = "Existing service is not the correct type." ]
+  [ "${lines[0]}" = "Service with the provided name exists, but it is not a blockchain service." ]
 	[ $status -eq 1 ]
 
 	unstub cf

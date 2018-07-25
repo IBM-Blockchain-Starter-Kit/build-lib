@@ -81,7 +81,7 @@ function provision_blockchain {
 
     if [ $RETVAL -eq 0 ] && [[ ${SERVICE_OUTPUT} != *"service: ${BLOCKCHAIN_SERVICE_PLAN}"* ]]
     then
-        echo "Existing service is not the correct type."
+        echo "Service with the provided name exists, but it is not a blockchain service."
         exit 1
     fi
 
