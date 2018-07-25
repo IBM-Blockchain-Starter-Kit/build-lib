@@ -168,7 +168,7 @@ function install_fabric_chaincode {
     OUTPUT=$(do_curl \
         -X POST \
         -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
-        "$CHAINCODE_FILE_OPTS" \
+        $CHAINCODE_FILE_OPTS \
         -F chaincode_id="${CC_ID}" -F chaincode_version="${CC_VERSION}" \
         "${BLOCKCHAIN_API}/chaincode/install")
     
