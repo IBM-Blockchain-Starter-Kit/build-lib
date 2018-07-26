@@ -79,7 +79,7 @@ function provision_blockchain {
     SERVICE_OUTPUT=$(cf service ${BLOCKCHAIN_SERVICE_INSTANCE})
     RETVAL=$?
 
-    if [ $RETVAL -eq 0 ] && [[ ${SERVICE_OUTPUT} != *"service: ${BLOCKCHAIN_SERVICE_PLAN}"* ]]
+    if [ $RETVAL -eq 0 ] && [[ ${SERVICE_OUTPUT} != *"Service: ${BLOCKCHAIN_SERVICE_NAME}"* ]]
     then
         echo "Service with the provided name exists, but it is not a blockchain service."
         exit 1
