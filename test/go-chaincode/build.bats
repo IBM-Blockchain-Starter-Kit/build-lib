@@ -22,7 +22,7 @@ teardown() {
   stub curl \
     "true" \
     "true"
-  stub go "build -v -x chaincode : true"
+  stub go "build -v -x chaincode/... : true"
   stub tar \
     "true" \
     "true"
