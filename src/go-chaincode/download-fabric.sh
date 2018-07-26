@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -x
-
 echo "######## Begin download Fabric ########"
 
 echo "######## Extracting and decompressing Fabric version ${HLF_VERSION} ########"
