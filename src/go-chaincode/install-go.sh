@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -x
-
 echo "######## Begin install and configure Go ########"
 
 echo "######## Extracting and decompressing Go version ${GO_VERSION} ########"
