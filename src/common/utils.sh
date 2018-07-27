@@ -9,6 +9,7 @@
 #   None
 # Arguments:
 #   uuid: Universally unique identifier
+#   name: Additional name arguments
 # Returns:
 #   None
 #######################################
