@@ -91,15 +91,15 @@ cleanup_blockchain_json() {
 }
 
 @test "blockchain.sh: provision_blockchain should exit 1 if service exists but is not a blockchain service" {
-	stub cf "service bsi : echo name: Blockchain-m5 service: test tags: plan: ibm-blockchain-plan-v1-ga1-starter-prod"
+	stub cf "service bsi : echo Name: Blockchain-m5 Service: test tags: Plan: ibm-blockchain-plan-v1-ga1-starter-prod"
   
   export BLOCKCHAIN_SERVICE_INSTANCE="bsi"
-  export BLOCKCHAIN_SERVICE_PLAN="bsp"
+  export BLOCKCHAIN_SERVICE_NAME="bsn"
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
 
 	run provision_blockchain
-
+  
   [ "${lines[0]}" = "Service with the provided name exists, but it is not a blockchain service." ]
 	[ $status -eq 1 ]
 
@@ -149,13 +149,13 @@ cleanup_blockchain_json() {
 
 @test "blockchain.sh: provision_blockchain should populate 'blockchain.json' using an existing service instance and key" {
 	stub cf \
-		"service bsi : echo name: Blockchain-m5 service: bsp tags: plan: ibm-blockchain-plan-v1-ga1-starter-prod" \
+		"service bsi : echo Name: Blockchain-m5 Service: bsn tags: Plan: ibm-blockchain-plan-v1-ga1-starter-prod" \
 		"service-key bsi bsk : exit 0" \
 		"service-key bsi bsk : true"
 
 	stub tail "-n +2 : echo BLOCKCHAINJSON"
   
-  export BLOCKCHAIN_SERVICE_PLAN="bsp"
+  export BLOCKCHAIN_SERVICE_NAME="bsn"
   export BLOCKCHAIN_SERVICE_INSTANCE="bsi"
 	export BLOCKCHAIN_SERVICE_KEY="bsk"
 

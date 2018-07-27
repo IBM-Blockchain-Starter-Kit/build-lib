@@ -19,7 +19,7 @@ teardown() {
 }
 
 @test "test.sh: should run without errors" {
-  stub go "test -v chaincode : true"
+  stub go "test -v chaincode/... : true"
 
   run "${SCRIPT_DIR}/go-chaincode/test.sh"
 
