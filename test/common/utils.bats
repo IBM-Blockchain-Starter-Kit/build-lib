@@ -12,6 +12,22 @@ setup() {
   source "${SCRIPT_DIR}/common/utils.sh"
 }
 
+@test "utils.sh: error_exit should exit 1 with a default error message" {
+  run error_exit
+
+  echo "$output"
+  [ $status -eq 1 ]
+  [ "${output}" = "Unknown Error" ]
+}
+
+@test "utils.sh: error_exit should exit 1 with the provided error message" {
+  run error_exit "R Tape loading error, 0:1"
+
+  echo "$output"
+  [ $status -eq 1 ]
+  [ "${output}" = "R Tape loading error, 0:1" ]
+}
+
 @test "utils.sh: get_deploy_name should create a stable deploy name" {
   run get_deploy_name 20354d7a-e4fe-47af-8ff6-187bca92f3f9 toolchain-name network-name
 
