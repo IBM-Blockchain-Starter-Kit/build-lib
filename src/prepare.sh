@@ -17,8 +17,8 @@ set -ex
 if [ -n "$BUILD_LIB_URL" ]; then
   build_lib_dir=$(mktemp -d)
 
-  (curl -fsSL ${BUILD_LIB_URL}) > ${build_lib_dir}/blockchain-build-lib.tgz
+  (curl -fsSL "$BUILD_LIB_URL") > "$build_lib_dir/blockchain-build-lib.tgz"
 
-  mkdir -p $SCRIPT_DIR
-  tar --keep-old-files -xvzf ${build_lib_dir}/blockchain-build-lib.tgz -C $SCRIPT_DIR > /dev/null 2>&1 || true
+  mkdir -p "$SCRIPT_DIR"
+  tar --keep-old-files -xvzf "$build_lib_dir/blockchain-build-lib.tgz" -C "$SCRIPT_DIR" > /dev/null 2>&1 || true
 fi

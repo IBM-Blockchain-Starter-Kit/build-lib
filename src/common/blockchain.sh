@@ -2,7 +2,6 @@
 
 # Common IBM blockchain platform functions, e.g. to provision a blockchain service
 
-# shellcheck disable=2086
 # shellcheck source=src/common/utils.sh
 source "${SCRIPT_DIR}/common/utils.sh"
 
@@ -76,7 +75,7 @@ function authenticate_org {
 #   None
 #######################################
 function provision_blockchain {
-    SERVICE_OUTPUT=$(cf service ${BLOCKCHAIN_SERVICE_INSTANCE})
+    SERVICE_OUTPUT=$(cf service "$BLOCKCHAIN_SERVICE_INSTANCE")
     RETVAL=$?
 
     if [ $RETVAL -eq 0 ] && [[ ${SERVICE_OUTPUT} != *"Service: ${BLOCKCHAIN_SERVICE_NAME}"* ]]
@@ -87,22 +86,22 @@ function provision_blockchain {
 
     if [ $RETVAL -eq 1 ]
     then
-        cf create-service ${BLOCKCHAIN_SERVICE_NAME} ${BLOCKCHAIN_SERVICE_PLAN} ${BLOCKCHAIN_SERVICE_INSTANCE}
+        cf create-service "$BLOCKCHAIN_SERVICE_NAME" "$BLOCKCHAIN_SERVICE_PLAN" "$BLOCKCHAIN_SERVICE_INSTANCE"
         if [ $? -eq 1 ]; then
             echo "Failed to create service."
             exit 1
         fi
     fi
-    cf service-key ${BLOCKCHAIN_SERVICE_INSTANCE} ${BLOCKCHAIN_SERVICE_KEY}
+    cf service-key "$BLOCKCHAIN_SERVICE_INSTANCE" "$BLOCKCHAIN_SERVICE_KEY"
     if [ $? -eq 1 ]
     then
-        cf create-service-key ${BLOCKCHAIN_SERVICE_INSTANCE} ${BLOCKCHAIN_SERVICE_KEY}
+        cf create-service-key "$BLOCKCHAIN_SERVICE_INSTANCE" "$BLOCKCHAIN_SERVICE_KEY"
         if [ $? -eq 1 ]; then
             echo "Failed to create service key."
             exit 1
         fi
     fi
-    cf service-key ${BLOCKCHAIN_SERVICE_INSTANCE} ${BLOCKCHAIN_SERVICE_KEY} | tail -n +2 > blockchain.json
+    cf service-key "$BLOCKCHAIN_SERVICE_INSTANCE" "$BLOCKCHAIN_SERVICE_KEY" | tail -n +2 > blockchain.json
 }
 
 #######################################
@@ -168,13 +167,14 @@ function install_fabric_chaincode {
 
     echo "Installing chaincode '$CC_PATH' with id '$CC_ID' and version '$CC_VERSION'..."
     
-    CHAINCODE_FILES=$(find ${CC_PATH} -type f ! -name "*test*")
+    CHAINCODE_FILES=$(find "$CC_PATH" -type f ! -name "*test*")
     CHAINCODE_FILE_OPTS=""
     for CHAINCODE_FILE in ${CHAINCODE_FILES}
     do
         CHAINCODE_FILE_OPTS="${CHAINCODE_FILE_OPTS} -F files[]=@${CHAINCODE_FILE}"
     done
 
+    # shellcheck disable=2086
     OUTPUT=$(do_curl \
         -X POST \
         -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
@@ -307,7 +307,7 @@ function deploy_fabric_chaincode {
 
             if $CC_INSTALL
             then
-                install_fabric_chaincode $CC_ID $CC_VERSION $CC_PATH
+                install_fabric_chaincode "$CC_ID" "$CC_VERSION" "$CC_PATH"
                 
                 # If install failed due to a reason other than an identical version already exists, skip instantiate
                 if [ $? -eq 1 ]; then
@@ -319,7 +319,7 @@ function deploy_fabric_chaincode {
             then
                 for channel in $CC_CHANNELS
                 do
-                    instantiate_fabric_chaincode $CC_ID $CC_VERSION $channel $CC_INIT_ARGS
+                    instantiate_fabric_chaincode "$CC_ID" "$CC_VERSION" "$channel" "$CC_INIT_ARGS"
                 done  
             fi
             cc_index=$((cc_index + 1))
