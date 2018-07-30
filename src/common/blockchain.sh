@@ -2,7 +2,6 @@
 
 # Common IBM blockchain platform functions, e.g. to provision a blockchain service
 
-# shellcheck disable=2086
 # shellcheck source=src/common/utils.sh
 source "${SCRIPT_DIR}/common/utils.sh"
 
@@ -150,13 +149,14 @@ function install_fabric_chaincode {
 
     echo "Installing chaincode '$CC_PATH' with id '$CC_ID' and version '$CC_VERSION'..."
     
-    CHAINCODE_FILES=$(find ${CC_PATH} -type f ! -name "*test*")
+    CHAINCODE_FILES=$(find "$CC_PATH" -type f ! -name "*test*")
     CHAINCODE_FILE_OPTS=""
     for CHAINCODE_FILE in ${CHAINCODE_FILES}
     do
         CHAINCODE_FILE_OPTS="${CHAINCODE_FILE_OPTS} -F files[]=@${CHAINCODE_FILE}"
     done
 
+    # shellcheck disable=2086
     OUTPUT=$(do_curl \
         -X POST \
         -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
@@ -297,7 +297,7 @@ function deploy_fabric_chaincode {
 
             if $CC_INSTALL
             then
-                install_fabric_chaincode $CC_ID $CC_VERSION $CC_PATH $CC_TYPE
+                install_fabric_chaincode "$CC_ID" "$CC_VERSION" "$CC_PATH" "$CC_TYPE"
                 
                 # If install failed due to a reason other than an identical version already exists, skip instantiate
                 if [ $? -eq 1 ]; then
@@ -309,7 +309,7 @@ function deploy_fabric_chaincode {
             then
                 for channel in $CC_CHANNELS
                 do
-                    instantiate_fabric_chaincode $CC_ID $CC_VERSION $CC_TYPE $channel $CC_INIT_ARGS
+                    instantiate_fabric_chaincode "$CC_ID" "$CC_VERSION" "$CC_TYPE" "$channel" "$CC_INIT_ARGS"
                 done  
             fi
             cc_index=$((cc_index + 1))
