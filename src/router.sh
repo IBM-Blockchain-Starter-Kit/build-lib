@@ -24,6 +24,10 @@ elif [ "${platform}" = "composer" ]; then
     executable_script="${SCRIPT_DIR}composer/${stage}.sh"
     echo "Composer selected"
     echo ${executable_script}
+elif [ "${platform}" = "js" ]; then
+    executable_script="${SCRIPT_DIR}js-chaincode/${stage}.sh"
+    echo "JS selected"
+    echo ${executable_script}
 else 
     echo "Invalid platform: ${platform} selected"
     exit 1
