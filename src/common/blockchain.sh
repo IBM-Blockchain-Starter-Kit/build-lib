@@ -164,7 +164,7 @@ function install_fabric_chaincode {
     local CC_ID=$1
     local CC_VERSION=$2
     local CC_PATH=$3
-    local CC_TYPE=${4}
+    local CC_TYPE=$4
 
     local CHAINCODE_FILES
 
@@ -182,7 +182,7 @@ function install_fabric_chaincode {
         -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
         $CHAINCODE_FILE_OPTS \
         -F chaincode_id="${CC_ID}" -F chaincode_version="${CC_VERSION}" \
-        -F chaincode_type="${CC_TYPE}"
+        -F chaincode_type="${CC_TYPE}" \
         "${BLOCKCHAIN_API}/chaincode/install")
     
     if [ $? -eq 1 ]
@@ -225,7 +225,7 @@ function install_fabric_chaincode {
 function instantiate_fabric_chaincode {
     local CC_ID=$1
     local CC_VERSION=$2
-    local CC_TYPE=${3}
+    local CC_TYPE=$3
     local CHANNEL=$4
     local INIT_ARGS=$5
 
