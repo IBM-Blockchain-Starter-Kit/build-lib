@@ -153,6 +153,7 @@ function get_blockchain_connection_profile {
 #   CC_ID:      Name to label installation with
 #   CC_VERSION: Version to label installation with
 #   CC_PATH:    Path to chaincode directory to be installed
+#   CC_TYPE:    Type of chaincode to install (golang|node)
 # Returns:
 #   err_no:
 #     2 = chaincode exists with specified id and version
@@ -163,6 +164,7 @@ function install_fabric_chaincode {
     local CC_ID=$1
     local CC_VERSION=$2
     local CC_PATH=$3
+    local CC_TYPE=${4}
 
     local CHAINCODE_FILES
 
@@ -180,6 +182,7 @@ function install_fabric_chaincode {
         -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
         $CHAINCODE_FILE_OPTS \
         -F chaincode_id="${CC_ID}" -F chaincode_version="${CC_VERSION}" \
+        -F chaincode_type="${CC_TYPE}"
         "${BLOCKCHAIN_API}/chaincode/install")
     
     if [ $? -eq 1 ]
@@ -210,6 +213,7 @@ function install_fabric_chaincode {
 # Arguments:
 #   CC_ID:      Name to label instance with
 #   CC_VERSION: Version to label instance with
+#   CC_TYPE:    Type of chaincode to instantiate (golang|node)
 #   CHANNEL:    Channel for instance to be constructed in
 #   INIT_ARGS:  (optional) Constructor arguments
 # Returns:
@@ -221,13 +225,15 @@ function install_fabric_chaincode {
 function instantiate_fabric_chaincode {
     local CC_ID=$1
     local CC_VERSION=$2
-    local CHANNEL=$3
-    local INIT_ARGS=$4
+    local CC_TYPE=${3}
+    local CHANNEL=$4
+    local INIT_ARGS=$5
 
     cat << EOF > request.json
 {
     "chaincode_id": "${CC_ID}",
     "chaincode_version": "${CC_VERSION}",
+    "chaincode_type": "${CC_TYPE}",
     "chaincode_arguments": [${INIT_ARGS}]
 }
 EOF
@@ -277,12 +283,14 @@ EOF
 # Globals:
 #   None
 # Arguments:
+#   CC_TYPE:       Type of chaincode to deploy (golang|node)
 #   DEPLOY_CONFIG: path to json config file
 # Returns:
 #   None
 #######################################
 function deploy_fabric_chaincode {
-    local DEPLOY_CONFIG=$1
+    local CC_TYPE=$1
+    local DEPLOY_CONFIG=$2
 
     echo "Parsing deployment configuration:"
     cat "$DEPLOY_CONFIG"
@@ -307,7 +315,7 @@ function deploy_fabric_chaincode {
 
             if $CC_INSTALL
             then
-                install_fabric_chaincode $CC_ID $CC_VERSION $CC_PATH
+                install_fabric_chaincode $CC_ID $CC_VERSION $CC_PATH $CC_TYPE
                 
                 # If install failed due to a reason other than an identical version already exists, skip instantiate
                 if [ $? -eq 1 ]; then
@@ -319,7 +327,7 @@ function deploy_fabric_chaincode {
             then
                 for channel in $CC_CHANNELS
                 do
-                    instantiate_fabric_chaincode $CC_ID $CC_VERSION $channel $CC_INIT_ARGS
+                    instantiate_fabric_chaincode $CC_ID $CC_VERSION $CC_TYPE $channel $CC_INIT_ARGS
                 done  
             fi
             cc_index=$((cc_index + 1))
