@@ -7,4 +7,4 @@ source "${SCRIPT_DIR}/common/env.sh"
 
 $DEBUG && set -x
 
-go test -v "chaincode/..." 
+#go test -v "chaincode/..." 
