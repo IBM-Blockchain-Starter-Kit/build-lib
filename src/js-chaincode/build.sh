@@ -9,6 +9,8 @@ $DEBUG && set -x
 
 echo "######## Download dependencies ########"
 
+# shellcheck source=src/js-chaincode/install-node.sh
+source "${SCRIPT_DIR}/js-chaincode/install-node.sh"
 
 echo "######## Placing source in directory expected by go build ########"
 
