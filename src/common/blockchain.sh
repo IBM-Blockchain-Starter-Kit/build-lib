@@ -239,6 +239,9 @@ function instantiate_fabric_chaincode {
 EOF
 
     echo "Instantiating fabric contract with id '$CC_ID' and version '$CC_VERSION' on channel '$CHANNEL' with arguments '$INIT_ARGS'..."
+    
+    echo "request.json content:"
+    cat request.json
 
     OUTPUT=$(do_curl \
         -X POST \
