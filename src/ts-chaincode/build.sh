@@ -12,3 +12,9 @@ $DEBUG && set -x
 echo "######## Download dependencies ########"
 
 install_node "$NODE_VERSION" "$NVM_VERSION"
+
+npm install
+
+echo "######## Building chaincode ########"
+
+npm run build

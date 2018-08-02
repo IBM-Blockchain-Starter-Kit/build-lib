@@ -28,8 +28,10 @@ build_lib_scripts="common/blockchain.sh
   go-chaincode/test.sh
   js-chaincode/build.sh
   js-chaincode/deploy.sh
-  js-chaincode/install-node.sh
   js-chaincode/test.sh
+  ts-chaincode/build.sh
+  ts-chaincode/deploy.sh
+  ts-chaincode/test.sh
   router.sh"
 
 mkdir -p ${SCRIPT_DIR:=./scripts/}
