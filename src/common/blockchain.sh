@@ -238,10 +238,7 @@ function instantiate_fabric_chaincode {
 }
 EOF
 
-    echo "Instantiating fabric contract with id '$CC_ID' and version '$CC_VERSION' on channel '$CHANNEL' with arguments '$INIT_ARGS'..."
-    
-    echo "request.json content:"
-    cat request.json
+    echo "Instantiating fabric contract with id '$CC_ID' version '$CC_VERSION' and chaincode type '$CC_TYPE' on channel '$CHANNEL' with arguments '$INIT_ARGS'..."
 
     OUTPUT=$(do_curl \
         -X POST \
@@ -267,7 +264,7 @@ EOF
         echo "Failed to instantiate fabric contract:"
         if [[ "${OUTPUT}" == *"version already exists for chaincode"* ]]
         then
-            echo "Chaincode instance already exists with id '${CC_ID}' and version '${CC_VERSION}'"
+            echo "Chaincode instance already exists with id '${CC_ID}' version '${CC_VERSION}' and chaincode type '$CC_TYPE'"
             return 2
         else
             echo "Unrecognized error returned:"
