@@ -28,6 +28,10 @@ elif [ "${platform}" = "js" ]; then
     executable_script="${SCRIPT_DIR}js-chaincode/${stage}.sh"
     echo "JS selected"
     echo ${executable_script}
+elif [ "${platform}" = "ts" ]; then
+    executable_script="${SCRIPT_DIR}ts-chaincode/${stage}.sh"
+    echo "TypeScript selected"
+    echo ${executable_script}
 else 
     echo "Invalid platform: ${platform} selected"
     exit 1
