@@ -62,18 +62,16 @@ cleanup_blockchain_json() {
 
 @test "blockchain.sh: provision_blockchain should populate 'blockchain.json' without an existing service instance and key" {
   stub cf \
-    "service bsi : exit 1" \
-    "create-service bsn bsp bsi : exit 0" \
-    "service-key bsi bsk : exit 1" \
-    "create-service-key bsi bsk : exit 0" \
-    "service-key bsi bsk : true"
+    "create-service blockchain-service-name blockchain-service-plan blockchain-service-instance : echo 'Creating service instance...'" \
+    "create-service-key blockchain-service-instance blockchain-service-key : echo 'Creating service key...'" \
+    "service-key blockchain-service-instance blockchain-service-key : echo 'Getting key...'"
 
   stub tail "-n +2 : echo BLOCKCHAINJSON"
   
-  export BLOCKCHAIN_SERVICE_INSTANCE="bsi"
-  export BLOCKCHAIN_SERVICE_NAME="bsn"
-  export BLOCKCHAIN_SERVICE_PLAN="bsp"
-  export BLOCKCHAIN_SERVICE_KEY="bsk"
+  export BLOCKCHAIN_SERVICE_INSTANCE="blockchain-service-instance"
+  export BLOCKCHAIN_SERVICE_NAME="blockchain-service-name"
+  export BLOCKCHAIN_SERVICE_PLAN="blockchain-service-plan"
+  export BLOCKCHAIN_SERVICE_KEY="blockchain-service-key"
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
 
@@ -91,16 +89,19 @@ cleanup_blockchain_json() {
 }
 
 @test "blockchain.sh: provision_blockchain should exit 1 if service exists but is not a blockchain service" {
-  stub cf "service bsi : echo Name: Blockchain-m5 Service: test tags: Plan: ibm-blockchain-plan-v1-ga1-starter-prod"
+  stub cf \
+    "create-service blockchain-service-name blockchain-service-plan blockchain-service-instance : echo 'The service instance name is taken...' && false"
   
-  export BLOCKCHAIN_SERVICE_INSTANCE="bsi"
-  export BLOCKCHAIN_SERVICE_NAME="bsn"
+  export BLOCKCHAIN_SERVICE_INSTANCE="blockchain-service-instance"
+  export BLOCKCHAIN_SERVICE_NAME="blockchain-service-name"
+  export BLOCKCHAIN_SERVICE_PLAN="blockchain-service-plan"
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
 
   run provision_blockchain
   
-  [ "${lines[0]}" = "Service with the provided name exists, but it is not a blockchain service." ]
+  echo "$output"
+  [ "${lines[1]}" = "Error creating blockchain service" ]
   [ $status -eq 1 ]
 
   unstub cf
@@ -108,18 +109,18 @@ cleanup_blockchain_json() {
 
 @test "blockchain.sh: provision_blockchain should exit 1 if it fails to create service" {
   stub cf \
-    "service bsi : exit 1" \
-    "create-service bsn bsp bsi : exit 1"
+    "create-service blockchain-service-name blockchain-service-plan blockchain-service-instance : false"
   
-  export BLOCKCHAIN_SERVICE_INSTANCE="bsi"
-  export BLOCKCHAIN_SERVICE_NAME="bsn"
-  export BLOCKCHAIN_SERVICE_PLAN="bsp"
+  export BLOCKCHAIN_SERVICE_INSTANCE="blockchain-service-instance"
+  export BLOCKCHAIN_SERVICE_NAME="blockchain-service-name"
+  export BLOCKCHAIN_SERVICE_PLAN="blockchain-service-plan"
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
 
   run provision_blockchain
 
-  [ "${lines[0]}" = "Failed to create service." ]
+  echo "$output"
+  [ "${lines[0]}" = "Error creating blockchain service" ]
   [ $status -eq 1 ]
 
   unstub cf
@@ -127,50 +128,45 @@ cleanup_blockchain_json() {
 
 @test "blockchain.sh: provision_blockchain should exit 1 if it fails to create service key" {
   stub cf \
-    "service bsi : exit 1" \
-    "create-service bsn bsp bsi : exit 0" \
-    "service-key bsi bsk : exit 1" \
-    "create-service-key bsi bsk : exit 1"
+    "create-service blockchain-service-name blockchain-service-plan blockchain-service-instance : exit 0" \
+    "create-service-key blockchain-service-instance blockchain-service-key : exit 1"
 
-  export BLOCKCHAIN_SERVICE_INSTANCE="bsi"
-  export BLOCKCHAIN_SERVICE_NAME="bsn"
-  export BLOCKCHAIN_SERVICE_PLAN="bsp"
-  export BLOCKCHAIN_SERVICE_KEY="bsk"
+  export BLOCKCHAIN_SERVICE_INSTANCE="blockchain-service-instance"
+  export BLOCKCHAIN_SERVICE_NAME="blockchain-service-name"
+  export BLOCKCHAIN_SERVICE_PLAN="blockchain-service-plan"
+  export BLOCKCHAIN_SERVICE_KEY="blockchain-service-key"
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
 
   run provision_blockchain
 
-  [ "${lines[0]}" = "Failed to create service key." ]
+  echo "$output"
+  [ "${lines[0]}" = "Error creating blockchain service key" ]
   [ $status -eq 1 ]
 
   unstub cf
 }
 
-@test "blockchain.sh: provision_blockchain should populate 'blockchain.json' using an existing service instance and key" {
+@test "blockchain.sh: provision_blockchain should exit 1 if it fails to get the service key" {
   stub cf \
-    "service bsi : echo Name: Blockchain-m5 Service: bsn tags: Plan: ibm-blockchain-plan-v1-ga1-starter-prod" \
-    "service-key bsi bsk : exit 0" \
-    "service-key bsi bsk : true"
+    "create-service blockchain-service-name blockchain-service-plan blockchain-service-instance : echo 'Creating service instance...'" \
+    "create-service-key blockchain-service-instance blockchain-service-key : echo 'Creating service key...'" \
+    "service-key blockchain-service-instance blockchain-service-key : echo 'Could not get service key...' && false"
 
-  stub tail "-n +2 : echo BLOCKCHAINJSON"
-  
-  export BLOCKCHAIN_SERVICE_NAME="bsn"
-  export BLOCKCHAIN_SERVICE_INSTANCE="bsi"
-  export BLOCKCHAIN_SERVICE_KEY="bsk"
+  export BLOCKCHAIN_SERVICE_NAME="blockchain-service-name"
+  export BLOCKCHAIN_SERVICE_INSTANCE="blockchain-service-instance"
+  export BLOCKCHAIN_SERVICE_KEY="blockchain-service-key"
+  export BLOCKCHAIN_SERVICE_PLAN="blockchain-service-plan"
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
 
   run provision_blockchain
-  [ $status -eq 0 ]
 
-  v=$(cat blockchain.json)
-  [ "$v" = "BLOCKCHAINJSON" ]
-
-  cleanup_blockchain_json
+  echo "$output"
+  [ "${lines[2]}" = "Error retrieving blockchain service key" ]
+  [ $status -eq 1 ]
 
   unstub cf
-  unstub tail
 }
 
 @test "blockchain.sh: setup_service_constants should export correct variables when region instance is ys1" {
