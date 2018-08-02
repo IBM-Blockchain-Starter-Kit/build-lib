@@ -76,33 +76,13 @@ function authenticate_org {
 #   None
 #######################################
 function provision_blockchain {
-    SERVICE_OUTPUT=$(cf service ${BLOCKCHAIN_SERVICE_INSTANCE})
-    RETVAL=$?
-
-    if [ $RETVAL -eq 0 ] && [[ ${SERVICE_OUTPUT} != *"Service: ${BLOCKCHAIN_SERVICE_NAME}"* ]]
-    then
-        echo "Service with the provided name exists, but it is not a blockchain service."
-        exit 1
-    fi
-
-    if [ $RETVAL -eq 1 ]
-    then
-        cf create-service ${BLOCKCHAIN_SERVICE_NAME} ${BLOCKCHAIN_SERVICE_PLAN} ${BLOCKCHAIN_SERVICE_INSTANCE}
-        if [ $? -eq 1 ]; then
-            echo "Failed to create service."
-            exit 1
-        fi
-    fi
-    cf service-key ${BLOCKCHAIN_SERVICE_INSTANCE} ${BLOCKCHAIN_SERVICE_KEY}
-    if [ $? -eq 1 ]
-    then
-        cf create-service-key ${BLOCKCHAIN_SERVICE_INSTANCE} ${BLOCKCHAIN_SERVICE_KEY}
-        if [ $? -eq 1 ]; then
-            echo "Failed to create service key."
-            exit 1
-        fi
-    fi
-    cf service-key ${BLOCKCHAIN_SERVICE_INSTANCE} ${BLOCKCHAIN_SERVICE_KEY} | tail -n +2 > blockchain.json
+    cf create-service "${BLOCKCHAIN_SERVICE_NAME}" "${BLOCKCHAIN_SERVICE_PLAN}" "${BLOCKCHAIN_SERVICE_INSTANCE}" || error_exit "Error creating blockchain service"
+    
+    cf create-service-key "${BLOCKCHAIN_SERVICE_INSTANCE}" "${BLOCKCHAIN_SERVICE_KEY}" || error_exit "Error creating blockchain service key"
+    
+    local blockchain_service_key
+    blockchain_service_key=$(cf service-key "${BLOCKCHAIN_SERVICE_INSTANCE}" "${BLOCKCHAIN_SERVICE_KEY}") || error_exit "Error retrieving blockchain service key"
+    echo "$blockchain_service_key" | tail -n +2 > blockchain.json
 }
 
 #######################################
