@@ -31,8 +31,10 @@ stub_curl_all() {
     "-fsSL https://example.org/scripts/go-chaincode/test.sh : cat ${src_dir}/go-chaincode/test.sh" \
     "-fsSL https://example.org/scripts/js-chaincode/build.sh : cat ${src_dir}/js-chaincode/build.sh" \
     "-fsSL https://example.org/scripts/js-chaincode/deploy.sh : cat ${src_dir}/js-chaincode/deploy.sh" \
-    "-fsSL https://example.org/scripts/js-chaincode/install-node.sh : cat ${src_dir}/js-chaincode/install-node.sh" \
     "-fsSL https://example.org/scripts/js-chaincode/test.sh : cat ${src_dir}/js-chaincode/test.sh" \
+    "-fsSL https://example.org/scripts/ts-chaincode/build.sh : cat ${src_dir}/ts-chaincode/build.sh" \
+    "-fsSL https://example.org/scripts/ts-chaincode/deploy.sh : cat ${src_dir}/ts-chaincode/deploy.sh" \
+    "-fsSL https://example.org/scripts/ts-chaincode/test.sh : cat ${src_dir}/ts-chaincode/test.sh" \
     "-fsSL https://example.org/scripts/router.sh : cat ${src_dir}/router.sh"
 }
 
@@ -52,8 +54,10 @@ stub_curl_without_router() {
     "-fsSL https://example.org/scripts/go-chaincode/test.sh : cat ${src_dir}/go-chaincode/test.sh" \
     "-fsSL https://example.org/scripts/js-chaincode/build.sh : cat ${src_dir}/js-chaincode/build.sh" \
     "-fsSL https://example.org/scripts/js-chaincode/deploy.sh : cat ${src_dir}/js-chaincode/deploy.sh" \
-    "-fsSL https://example.org/scripts/js-chaincode/install-node.sh : cat ${src_dir}/js-chaincode/install-node.sh" \
-    "-fsSL https://example.org/scripts/js-chaincode/test.sh : cat ${src_dir}/js-chaincode/test.sh"
+    "-fsSL https://example.org/scripts/js-chaincode/test.sh : cat ${src_dir}/js-chaincode/test.sh" \
+    "-fsSL https://example.org/scripts/ts-chaincode/build.sh : cat ${src_dir}/ts-chaincode/build.sh" \
+    "-fsSL https://example.org/scripts/ts-chaincode/deploy.sh : cat ${src_dir}/ts-chaincode/deploy.sh" \
+    "-fsSL https://example.org/scripts/ts-chaincode/test.sh : cat ${src_dir}/ts-chaincode/test.sh"
 }
 
 @test "prepare-unstable.sh: should exist and be executable" {

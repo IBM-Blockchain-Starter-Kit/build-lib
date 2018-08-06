@@ -17,22 +17,25 @@ teardown() {
   cleanup_stubs
 }
 
-@test "build.sh: should exist and be executable" {
-  [ -x "${SCRIPT_DIR}/js-chaincode/build.sh" ]
+@test "test.sh: should exist and be executable" {
+  [ -x "${SCRIPT_DIR}/ts-chaincode/test.sh" ]
 }
 
-@test "build.sh: should run without errors" {
+@test "test.sh: should run without errors" {
   echo "unset -f install_node" >> "${SCRIPT_DIR}/common/utils.sh"
 
   source "${SCRIPT_DIR}/common/utils.sh"
 
   stub install_node \
     "9.9.9 1.1.1 : true"
+  stub npm \
+    "run test : true"
 
-  run ${SCRIPT_DIR}/js-chaincode/build.sh
+  run ${SCRIPT_DIR}/ts-chaincode/test.sh
 
   echo $output
   [ $status -eq 0 ]
 
   unstub install_node
+  unstub npm
 }
