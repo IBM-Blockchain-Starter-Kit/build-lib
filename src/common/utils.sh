@@ -109,3 +109,38 @@ function do_curl {
     return 1
   fi
 }
+
+#######################################
+# Retries a command until it succeeds, with an increasing delay between each attempt
+# Globals:
+#   None
+# Arguments:
+#   max_attempts: maximum number of times to retry the command
+#   command: command to run
+# Returns:
+#   exitCode: the exit code of the last attempt
+#######################################
+function retry_with_backoff {
+  local attempt=1
+  local max_attempts=5
+  local timeout=1
+  local exitCode=0
+
+  if [ "$1" -gt 0 ]; then
+    max_attempts="$1"
+  fi
+  shift
+
+  while : ; do
+    "$@"
+    exitCode=$?
+
+    if [ "$exitCode" -ne 0 ] && [ "$attempt" -lt "$max_attempts" ]; then
+      sleep $timeout
+      attempt=$(( attempt + 1 ))
+      timeout=$(( timeout * 2 ))
+    else
+      return $exitCode
+    fi
+  done
+}
