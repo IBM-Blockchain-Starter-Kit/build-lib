@@ -60,6 +60,32 @@ function install_jq {
 }
 
 #######################################
+# Installs node using mvn
+# Globals:
+#   None
+# Arguments:
+#   NODE_VERSION:   Version of Node.js to install
+#   NVM_VERSION:    Version of NVM to install
+# Returns:
+#   None
+#######################################
+function install_node {
+  local NODE_VERSION=$1
+  local NVM_VERSION=$2
+
+  echo "######## Installing Node.js version ${NODE_VERSION} using nvm ${NVM_VERSION} ########"
+  # Can safely ignore nvm.sh since it's not ours
+  # shellcheck disable=SC1090
+  npm config delete prefix \
+    && curl "https://raw.githubusercontent.com/creationix/nvm/v${NVM_VERSION}/install.sh" | bash \
+    && . "$HOME/.nvm/nvm.sh" \
+    && nvm alias default "$NODE_VERSION" \
+    && nvm use default \
+    && node -v \
+    && npm -v
+}
+
+#######################################
 # Performs curl request, displays response, and returns status
 # Globals:
 #   None

@@ -8,6 +8,9 @@ setup() {
   testcase_dirname="$(mktemp -d)"
 
   setup_script_dir "${src_dir}" "${testcase_dirname}"
+
+  export NODE_VERSION=9.9.9
+  export NVM_VERSION=1.1.1
 }
 
 teardown() {
@@ -19,8 +22,20 @@ teardown() {
 }
 
 @test "test.sh: should run without errors" {
-  run "${SCRIPT_DIR}/js-chaincode/test.sh"
+  echo "unset -f install_node" >> "${SCRIPT_DIR}/common/utils.sh"
+
+  source "${SCRIPT_DIR}/common/utils.sh"
+
+  stub install_node \
+    "9.9.9 1.1.1 : true"
+  stub npm \
+    "run test : true"
+
+  run ${SCRIPT_DIR}/js-chaincode/test.sh
 
   echo $output
   [ $status -eq 0 ]
+
+  unstub install_node
+  unstub npm
 }

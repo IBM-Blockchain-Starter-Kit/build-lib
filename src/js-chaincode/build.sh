@@ -4,14 +4,17 @@ echo "######## Build chaincode ########"
 
 # shellcheck source=src/common/env.sh
 source "${SCRIPT_DIR}/common/env.sh"
+# shellcheck source=src/common/utils.sh
+source "${SCRIPT_DIR}/common/utils.sh"
 
 $DEBUG && set -x
 
 echo "######## Download dependencies ########"
 
-# shellcheck source=src/js-chaincode/install-node.sh
-source "${SCRIPT_DIR}/js-chaincode/install-node.sh"
+install_node "$NODE_VERSION" "$NVM_VERSION"
 
-echo "######## Placing source in directory expected by go build ########"
+npm install
 
 echo "######## Building chaincode ########"
+
+npm run build
