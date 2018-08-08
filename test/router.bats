@@ -79,6 +79,18 @@ setup() {
   [ "${lines[2]}" = "${SCRIPT_DIR}go-chaincode/${stage}.sh" ]
 }
 
+@test "router.sh: should accept valid platform argument (js)" {
+  stage="build"
+  echo "exit 200" > "${SCRIPT_DIR}js-chaincode/${stage}.sh"
+
+  run ${src_dir}/router.sh ${stage} "js"
+
+  echo $output
+  [ $status -eq 200 ]
+  [ "${lines[1]}" = "JS selected" ]
+  [ "${lines[2]}" = "${SCRIPT_DIR}js-chaincode/${stage}.sh" ]
+}
+
 @test "router.sh: should accept valid platform argument (composer)" {
   stage="build"
   echo "exit 200" > "${SCRIPT_DIR}composer/${stage}.sh"
