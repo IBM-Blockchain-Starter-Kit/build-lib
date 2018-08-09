@@ -53,8 +53,8 @@ setup() {
   [ "${GOPATH}" = "${PWD}" ]
   [ "${GOROOT}" = "${PWD}/go" ]
   [ "${GO_VERSION}" = "1.9.2" ]
-  [ "${HLF_VERSION}" = "1.1.2" ]
-  [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.1.2" ]
+  [ "${HLF_VERSION}" = "1.1.1" ]
+  [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.1.1" ]
   [ "${DEBUG}" = false ]
 
 }
