@@ -53,8 +53,17 @@ setup() {
   [ "${GOPATH}" = "${PWD}" ]
   [ "${GOROOT}" = "${PWD}/go" ]
   [ "${GO_VERSION}" = "1.9.2" ]
-  [ "${HLF_VERSION}" = "1.1.2" ]
-  [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.1.2" ]
+  [ "${HLF_VERSION}" = "1.1.0" ]
+  [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.1.0" ]
   [ "${DEBUG}" = false ]
 
+}
+
+@test "env.sh: HLF_VERSION should be a valid Hyperledger Fabric version" {
+  source "${SCRIPT_DIR}/common/env.sh"
+
+  run curl -fIL https://github.com/hyperledger/fabric/archive/v${HLF_VERSION}.tar.gz
+
+  echo "$output"
+  [ $status -eq 0 ]
 }
