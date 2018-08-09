@@ -21,8 +21,8 @@ teardown() {
 }
 
 @test "download-fabric.sh: should run without errors" {
-  stub curl "-O -L https://github.com/hyperledger/fabric/archive/v${HLF_VERSION}.tar.gz : true"
-  stub tar "-xvf v${HLF_VERSION}.tar.gz : true"
+  stub curl "-O -L https://github.com/hyperledger/fabric/archive/v9.9.9.tar.gz : true"
+  stub tar "-xvf v9.9.9.tar.gz : true"
 
   run "${SCRIPT_DIR}/go-chaincode/download-fabric.sh"
 
