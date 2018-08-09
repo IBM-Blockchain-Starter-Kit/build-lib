@@ -12,6 +12,14 @@ setup() {
   source "${SCRIPT_DIR}/common/utils.sh"
 }
 
+teardown() {
+  cleanup_stubs
+}
+
+@test "utils.sh: should exist and be executable" {
+  [ -x "${SCRIPT_DIR}/common/utils.sh" ]
+}
+
 @test "utils.sh: error_exit should exit 1 with a default error message" {
   run error_exit
 
@@ -60,10 +68,6 @@ setup() {
   echo "$output" | grep 'get_deploy_name must be called with at least one argument$'
 }
 
-@test "utils.sh: should exist and be executable" {
-  [ -x "${SCRIPT_DIR}/common/utils.sh" ]
-}
-
 @test "utils.sh: should return proper values in do_curl" {
   stub cat \
       "true" \
@@ -86,3 +90,122 @@ setup() {
   unstub cat
   unstub curl
 }
+
+@test "utils.sh: retry_with_backoff should run a successful command once" {
+  stub successful_command \
+    "true"
+
+  run retry_with_backoff 0 successful_command
+  [ $status -eq 0 ]
+
+  unstub successful_command
+}
+
+@test "utils.sh: retry_with_backoff should rerun a command until it succeeds" {
+  stub sleep \
+    "1 : true" \
+    "2 : true"
+
+  stub unreliable_command \
+    "false" \
+    "false" \
+    "true"
+
+  run retry_with_backoff 0 unreliable_command
+  [ $status -eq 0 ]
+
+  unstub sleep
+  unstub unreliable_command
+}
+
+@test "utils.sh: retry_with_backoff should fail if a command does not succeed in default number of attempts if the first argument is 0" {
+  stub sleep \
+    "1 : true" \
+    "2 : true" \
+    "4 : true" \
+    "8 : true"
+
+  stub failing_command \
+    "false" \
+    "false" \
+    "false" \
+    "false" \
+    "false"
+
+  run retry_with_backoff 0 failing_command
+  [ $status -eq 1 ]
+
+  unstub sleep
+  unstub failing_command
+}
+
+@test "utils.sh: retry_with_backoff should fail if a command does not succeed in default number of attempts if the first argument is negative" {
+  stub sleep \
+    "1 : true" \
+    "2 : true" \
+    "4 : true" \
+    "8 : true"
+
+  stub failing_command \
+    "false" \
+    "false" \
+    "false" \
+    "false" \
+    "false"
+
+  run retry_with_backoff -1 failing_command
+  [ $status -eq 1 ]
+
+  unstub sleep
+  unstub failing_command
+}
+
+@test "utils.sh: retry_with_backoff should fail if a command does not succeed in default number of attempts if the first argument is not a number" {
+  stub sleep \
+    "1 : true" \
+    "2 : true" \
+    "4 : true" \
+    "8 : true"
+
+  stub failing_command \
+    "false" \
+    "false" \
+    "false" \
+    "false" \
+    "false"
+
+  run retry_with_backoff muppet failing_command
+  [ $status -eq 1 ]
+
+  unstub sleep
+  unstub failing_command
+}
+
+@test "utils.sh: retry_with_backoff should fail if a command does not succeed in specified number of attempts" {
+  stub sleep \
+    "1 : true" \
+    "2 : true" \
+    "4 : true" \
+    "8 : true" \
+    "16 : true" \
+    "32 : true" \
+    "64 : true"
+
+  stub failing_command \
+    "false" \
+    "false" \
+    "false" \
+    "false" \
+    "false" \
+    "false" \
+    "false" \
+    "false"
+
+  run retry_with_backoff 8 failing_command
+  [ $status -eq 1 ]
+
+  unstub sleep
+  unstub failing_command
+}
+
+
