@@ -31,14 +31,14 @@ build_lib_scripts="common/blockchain.sh
   js-chaincode/test.sh
   router.sh"
 
-mkdir -p ${SCRIPT_DIR:=./scripts/}
+mkdir -p "${SCRIPT_DIR:=./scripts/}"
 
 for script in $build_lib_scripts; do
   script_src="${SCRIPT_URL:=https://raw.githubusercontent.com/IBM-Blockchain-Starter-Kit/build-lib/master/src}/${script}"
   script_file="${SCRIPT_DIR}${script}"
   
-  if [ ! -f  ${script_file} ]; then
-    mkdir -p $(dirname "${script_file}")
-    (curl -fsSL ${script_src}) > ${script_file}
+  if [ ! -f  "$script_file" ]; then
+    mkdir -p "$(dirname "$script_file")"
+    (curl -fsSL "$script_src") > "$script_file"
   fi
 done
