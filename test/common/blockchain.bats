@@ -452,13 +452,12 @@ EOF
   source "${SCRIPT_DIR}/common/blockchain.sh"
 
   stub authenticate_org "org1 : true"
-  stub date \
-    "echo v100" \
-    "echo v200"
-  stub install_fabric_chaincode "contract2 v200- lib/chaincode type : true"
-  stub instantiate_fabric_chaincode "contract2 v200- type channel2 : true"
+  stub date "echo 20180821105050"
+  stub install_fabric_chaincode "contract2 20180821105050-8 lib/chaincode type : true"
+  stub instantiate_fabric_chaincode "contract2 20180821105050-8 type channel2 : true"
 
-  run deploy_fabric_chaincode "type" "sample-config.json"
+  BUILD_NUMBER=8 \
+    run deploy_fabric_chaincode "type" "sample-config.json"
 
   echo "$output"
   [ $status -eq 0 ]
@@ -472,4 +471,61 @@ EOF
   unstub authenticate_org
   unstub install_fabric_chaincode
   unstub instantiate_fabric_chaincode
+}
+
+@test "blockchain.sh: deploy_fabric_chaincode should install the same chaincode version for every org" {
+  cat << EOF > sample-config.json
+{
+  "org1": {
+    "chaincode": [
+      {
+        "name": "contract1",
+        "path": "chaincode/contract1",
+        "channels": [ "channel1" ],
+        "init_args": [],
+        "instantiate": false,
+        "install": true
+      }
+    ]
+  },
+  "org2": {
+    "chaincode": [
+      {
+        "name": "contract1",
+        "path": "chaincode/contract1",
+        "channels": [ "channel1" ],
+        "init_args": [],
+        "instantiate": false,
+        "install": true
+      }
+    ]
+  }
+}
+EOF
+
+  echo "unset -f authenticate_org" >> "${SCRIPT_DIR}/common/blockchain.sh"
+  echo "unset -f install_fabric_chaincode" >> "${SCRIPT_DIR}/common/blockchain.sh"
+  echo "unset -f instantiate_fabric_chaincode" >> "${SCRIPT_DIR}/common/blockchain.sh"
+
+  source "${SCRIPT_DIR}/common/blockchain.sh"
+
+  stub authenticate_org \
+    "org1 : true" \
+    "org2 : true"
+  stub date "echo 20180821105050"
+  stub install_fabric_chaincode \
+    "contract1 20180821105050-8 chaincode/contract1 type : true" \
+    "contract1 20180821105050-8 chaincode/contract1 type : true"
+
+  BUILD_NUMBER=8 \
+    run deploy_fabric_chaincode "type" "sample-config.json"
+
+  echo "$output"
+  [ $status -eq 0 ]
+
+  rm sample-config.json
+
+  unstub date
+  unstub authenticate_org
+  unstub install_fabric_chaincode
 }

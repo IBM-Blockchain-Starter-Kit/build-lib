@@ -272,6 +272,9 @@ function deploy_fabric_chaincode {
     local CC_TYPE=$1
     local DEPLOY_CONFIG=$2
 
+    # TODO: Integrate with configuration
+    CC_VERSION="$(date '+%Y%m%d%H%M%S')-${BUILD_NUMBER}"
+
     echo "Parsing deployment configuration:"
     cat "$DEPLOY_CONFIG"
 
@@ -291,7 +294,6 @@ function deploy_fabric_chaincode {
 
             # TODO: Integrate with configuration
             CC_ID="${CC_NAME}"
-            CC_VERSION="$(date '+%Y%m%d%H%M%S')-${BUILD_NUMBER}"
 
             if $CC_INSTALL
             then
