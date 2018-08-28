@@ -93,8 +93,8 @@ function install_node {
 #   $@: Curl options
 # Returns:
 #   err_no:
-#     1 = http status code is between 200 and 299 inclusive, indicating success
-#     0 = http status code is less than 200, indicating an informational response, or
+#     0 = http status code is between 200 and 299 inclusive, indicating success
+#     1 = http status code is less than 200, indicating an informational response, or
 #         greater than 299, indicating redirection or error
 #######################################
 function do_curl {

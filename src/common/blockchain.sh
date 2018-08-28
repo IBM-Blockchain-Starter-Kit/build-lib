@@ -123,6 +123,98 @@ function get_blockchain_connection_profile {
 }
 
 #######################################
+# Checks that a peer has the specified status
+# Globals:
+#   get: BLOCKCHAIN_KEY
+#   get: BLOCKCHAIN_SECRET
+#   get: BLOCKCHAIN_API
+# Arguments:
+#   PEER: name of the peer
+#   REQUIRED_STATUS: the expected status
+# Returns:
+#   err_no:
+#     0 = the peer has the expected status
+#     1 = the peer does not have the expected status
+#######################################
+function confirm_peer_status {
+    PEER=$1
+    REQUIRED_STATUS=$2
+
+    STATUS=$(do_curl \
+        -H 'Accept: application/json' \
+        -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
+        "${BLOCKCHAIN_API}/nodes/status") || error_exit "Error retrieving peer status"
+    PEER_STATUS=$(echo "${STATUS}" | jq --raw-output ".[\"${PEER}\"].status") || error_exit "Error processing peer status"
+
+    if [ "$REQUIRED_STATUS" = "$PEER_STATUS" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+#######################################
+# Start a peer
+# Globals:
+#   get: BLOCKCHAIN_KEY
+#   get: BLOCKCHAIN_SECRET
+#   get: BLOCKCHAIN_API
+# Arguments:
+#   PEER: name of the peer to start
+# Returns:
+#   None
+#######################################
+function start_blockchain_peer {
+    PEER=$1
+    do_curl \
+        -X POST \
+        -H 'Accept: application/json' \
+        -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
+        "${BLOCKCHAIN_API}/nodes/${PEER}/start"
+
+    retry_with_backoff 5 confirm_peer_status "${PEER}" running
+}
+
+#######################################
+# Stop a peer
+# Globals:
+#   get: BLOCKCHAIN_KEY
+#   get: BLOCKCHAIN_SECRET
+#   get: BLOCKCHAIN_API
+# Arguments:
+#   PEER: name of the peer to stop
+# Returns:
+#   None
+#######################################
+function stop_blockchain_peer {
+    PEER=$1
+    do_curl \
+        -X POST \
+        -H 'Accept: application/json' \
+        -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
+        "${BLOCKCHAIN_API}/nodes/${PEER}/stop"
+
+    retry_with_backoff 5 confirm_peer_status "${PEER}" exited
+}
+
+#######################################
+# Restart a peer
+# Globals:
+#   get: BLOCKCHAIN_KEY
+#   get: BLOCKCHAIN_SECRET
+#   get: BLOCKCHAIN_API
+# Arguments:
+#   PEER: name of the peer to restart
+# Returns:
+#   None
+#######################################
+function restart_blockchain_peer {
+    PEER=$1
+    stop_blockchain_peer "${PEER}"
+    start_blockchain_peer "${PEER}"
+}
+
+#######################################
 # Installs chaincode file with specified id and version
 # Globals:
 #   get: BLOCKCHAIN_API

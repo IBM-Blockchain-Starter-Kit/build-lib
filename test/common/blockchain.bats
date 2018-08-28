@@ -239,6 +239,145 @@ cleanup_blockchain_json() {
   unstub do_curl
 }
 
+@test "blockchain.sh: confirm_peer_status should return 0 if the peer has the expected status" {
+  echo "true" > "${SCRIPT_DIR}/common/utils.sh"
+
+  stub do_curl "-H Accept:?application/json -u test_key:test_secret https://blockchain.example.org/api/v1/networks/test_network/nodes/status : true"
+  stub jq "--raw-output .\[\\\"peer1\\\"].status : echo running"
+
+  source "${SCRIPT_DIR}/common/blockchain.sh"
+
+  BLOCKCHAIN_KEY=test_key \
+    BLOCKCHAIN_SECRET=test_secret \
+    BLOCKCHAIN_API=https://blockchain.example.org/api/v1/networks/test_network \
+    run confirm_peer_status peer1 running
+
+  echo "$output"
+  [ $status -eq 0 ]
+
+  unstub do_curl
+  unstub jq
+}
+
+@test "blockchain.sh: confirm_peer_status should return 1 if the peer does not have the expected status" {
+  echo "true" > "${SCRIPT_DIR}/common/utils.sh"
+
+  stub do_curl "-H Accept:?application/json -u test_key:test_secret https://blockchain.example.org/api/v1/networks/test_network/nodes/status : true"
+  stub jq "--raw-output .\[\\\"peer1\\\"].status : echo walking"
+
+  source "${SCRIPT_DIR}/common/blockchain.sh"
+  
+  BLOCKCHAIN_KEY=test_key \
+    BLOCKCHAIN_SECRET=test_secret \
+    BLOCKCHAIN_API=https://blockchain.example.org/api/v1/networks/test_network \
+    run confirm_peer_status peer1 running
+
+  echo "$output"
+  [ $status -eq 1 ]
+
+  unstub do_curl
+  unstub jq
+}
+
+@test "blockchain.sh: confirm_peer_status should exit 1 if the peer status cannot be retrieved" {
+  echo "unset -f do_curl" >> "${SCRIPT_DIR}/common/utils.sh"
+  stub do_curl "-H Accept:?application/json -u test_key:test_secret https://blockchain.example.org/api/v1/networks/test_network/nodes/status : false"
+
+  source "${SCRIPT_DIR}/common/blockchain.sh"
+  
+  BLOCKCHAIN_KEY=test_key \
+    BLOCKCHAIN_SECRET=test_secret \
+    BLOCKCHAIN_API=https://blockchain.example.org/api/v1/networks/test_network \
+    run confirm_peer_status peer1 running
+
+  echo "$output"
+  [ $status -eq 1 ]
+  [ "${lines[0]}" = "Error retrieving peer status" ]
+
+  unstub do_curl
+}
+
+@test "blockchain.sh: confirm_peer_status should exit 1 if the peer status cannot be processed" {
+  echo "unset -f do_curl" >> "${SCRIPT_DIR}/common/utils.sh"
+  stub do_curl "-H Accept:?application/json -u test_key:test_secret https://blockchain.example.org/api/v1/networks/test_network/nodes/status : true"
+  stub jq "--raw-output .\[\\\"peer1\\\"].status : echo walking && false"
+
+  source "${SCRIPT_DIR}/common/blockchain.sh"
+  
+  BLOCKCHAIN_KEY=test_key \
+    BLOCKCHAIN_SECRET=test_secret \
+    BLOCKCHAIN_API=https://blockchain.example.org/api/v1/networks/test_network \
+    run confirm_peer_status peer1 running
+
+  echo "$output"
+  [ $status -eq 1 ]
+  [ "${lines[0]}" = "Error processing peer status" ]
+
+  unstub do_curl
+}
+
+@test "blockchain.sh: start_blockchain_peer should post to start URL and wait for peer to start" {
+  echo "true" > "${SCRIPT_DIR}/common/utils.sh"
+
+  stub do_curl \
+    "-X POST -H Accept:?application/json -u test_key:test_secret https://blockchain.example.org/api/v1/networks/test_network/nodes/peer1/start : true"
+  stub retry_with_backoff \
+    "5 confirm_peer_status peer1 running : true"
+
+  source "${SCRIPT_DIR}/common/blockchain.sh"
+
+  BLOCKCHAIN_KEY=test_key \
+    BLOCKCHAIN_SECRET=test_secret \
+    BLOCKCHAIN_API=https://blockchain.example.org/api/v1/networks/test_network \
+    run start_blockchain_peer peer1
+
+  echo "$output"
+  [ $status -eq 0 ]
+
+  unstub do_curl
+  unstub retry_with_backoff
+}
+
+@test "blockchain.sh: stop_blockchain_peer should post to stop URL and wait for peer to stop" {
+  echo "true" > "${SCRIPT_DIR}/common/utils.sh"
+
+  stub do_curl \
+    "-X POST -H Accept:?application/json -u test_key:test_secret https://blockchain.example.org/api/v1/networks/test_network/nodes/peer1/stop : true"
+  stub retry_with_backoff \
+    "5 confirm_peer_status peer1 exited : true"
+
+  source "${SCRIPT_DIR}/common/blockchain.sh"
+
+  BLOCKCHAIN_KEY=test_key \
+    BLOCKCHAIN_SECRET=test_secret \
+    BLOCKCHAIN_API=https://blockchain.example.org/api/v1/networks/test_network \
+    run stop_blockchain_peer peer1
+
+  echo "$output"
+  [ $status -eq 0 ]
+
+  unstub do_curl
+  unstub retry_with_backoff
+}
+
+@test "blockchain.sh: restart_blockchain_peer stop and start a peer" {
+  echo "unset -f stop_blockchain_peer" >> "${SCRIPT_DIR}/common/blockchain.sh"
+  echo "unset -f start_blockchain_peer" >> "${SCRIPT_DIR}/common/blockchain.sh"
+
+  stub stop_blockchain_peer "peer1 : true"
+  stub start_blockchain_peer "peer1 : true"
+
+  source "${SCRIPT_DIR}/common/blockchain.sh"
+
+  run restart_blockchain_peer peer1
+
+  echo "$output"
+  [ $status -eq 0 ]
+
+  unstub stop_blockchain_peer
+  unstub start_blockchain_peer
+}
+
 @test "blockchain.sh: install_fabric_chaincode should return status 0 if fabric chaincode is successfully installed" {
   echo "true" > "${SCRIPT_DIR}/common/utils.sh"
 
