@@ -6,7 +6,7 @@ script:
   - PATH="./bats/bin:$PATH" bats test/*
 before_deploy:
   - tar --exclude prepare*.sh -C src -cvzf blockchain-build-lib.tgz .
-  - tar --exclude pipeline-PREPARE.sh --exclude chaincode-pipeline -C scripts -cvzf sample-blockchain-build-lib.tgz .
+  - tar --exclude pipeline-PREPARE.sh -C scripts -cvzf sample-blockchain-build-lib.tgz .
 deploy:
   provider: releases
   api_key: $GITHUB_TOKEN

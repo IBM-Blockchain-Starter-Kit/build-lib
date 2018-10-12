@@ -173,7 +173,7 @@ function deploy_composer_rest_server {
     CF_APP_NAME=$(get_deploy_name "${IDS_JOB_ID}" "${BLOCKCHAIN_SERVICE_INSTANCE}" "${BUSINESS_NETWORK_NAME}")
     cf push \
         ${CF_APP_NAME} \
-        --docker-image ibmblockchain/composer-rest-server:${COMPOSER_VERSION} \
+        --docker-image hyperledger/composer-rest-server:${COMPOSER_VERSION} \
         -i 1 \
         -m 256M \
         --no-start \
