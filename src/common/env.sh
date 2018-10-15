@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ROOTDIR=${ROOTDIR:=$PWD}
 
-export GO_VERSION=${GO_VERSION:="1.9.2"}
+export GO_VERSION=${GO_VERSION:="1.10.4"}
 
 export NODE_VERSION=${NODE_VERSION:="8.9.0"}
 export NVM_VERSION=${NVM_VERSION:="0.33.11"}
