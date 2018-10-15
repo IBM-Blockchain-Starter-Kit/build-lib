@@ -15,7 +15,7 @@ export GOPATH=${ROOTDIR}
 export CONFIGPATH=${CONFIGPATH:="deploy_config.json"}
 export CHAINCODEPATH=${CHAINCODEPATH:="chaincode"}
 
-export HLF_VERSION=${HLF_VERSION:="1.1.0"}
+export HLF_VERSION=${HLF_VERSION:="1.2.1"}
 export FABRIC_SRC_DIR=${ROOTDIR}/fabric-${HLF_VERSION}
 
 export DEBUG=${DEBUG:=false}
