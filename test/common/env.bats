@@ -52,7 +52,7 @@ setup() {
   [ "${CONFIGPATH}" = "deploy_config.json" ]
   [ "${GOPATH}" = "${PWD}" ]
   [ "${GOROOT}" = "${PWD}/go" ]
-  [ "${GO_VERSION}" = "1.9.2" ]
+  [ "${GO_VERSION}" = "1.10.4" ]
   [ "${HLF_VERSION}" = "1.2.1" ]
   [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.2.1" ]
   [ "${DEBUG}" = false ]
