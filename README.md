@@ -20,7 +20,7 @@ git clone --branch v1.0.2 --depth 1 https://github.com/bats-core/bats-core.git b
 git clone --branch v1.0.1 --depth 1 https://github.com/jasonkarns/bats-mock.git
 ```
 
-One the modules are installed run the following command from the `build-lib` directory:
+Once the modules are installed run the following command from the `build-lib` directory:
 
 ```
 cd build-lib
