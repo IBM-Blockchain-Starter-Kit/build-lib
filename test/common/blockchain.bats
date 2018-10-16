@@ -460,12 +460,12 @@ cleanup_blockchain_json() {
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
 
-  run instantiate_fabric_chaincode "id" "version" "type" "channel" '"arg1", "arg2"'
+  run instantiate_fabric_chaincode "id" "version" "type" "channel" '"arg1", "arg2"' "{}"
 
   echo "$output"
   [ $status -eq 0 ]
-  [ "${lines[0]}" = "Instantiating fabric contract with id 'id' version 'version' and chaincode type 'type' on channel 'channel' with arguments '\"arg1\", \"arg2\"'..." ]
-  [ "${lines[1]}" = "Successfully instantiated fabric contract." ]
+  [ "${lines[7]}" = "Instantiating fabric contract with id 'id' version 'version' and chaincode type 'type' on channel 'channel' with arguments '\"arg1\", \"arg2\"'..." ]
+  [ "${lines[8]}" = "Successfully instantiated fabric contract." ]
 
   unstub do_curl
 }
@@ -483,10 +483,10 @@ cleanup_blockchain_json() {
   run instantiate_fabric_chaincode "id" "version" "type" "channel" '"arg1", "arg2"'
 
   [ $status -eq 0 ]
-  [ "${lines[0]}" = "Instantiating fabric contract with id 'id' version 'version' and chaincode type 'type' on channel 'channel' with arguments '\"arg1\", \"arg2\"'..." ]
-  [ "${lines[1]}" = "Connection problem encountered, delaying 30s and trying again..." ]
-  [ "${lines[2]}" = "Instantiating fabric contract with id 'id' version 'version' and chaincode type 'type' on channel 'channel' with arguments '\"arg1\", \"arg2\"'..." ]
-  [ "${lines[3]}" = "Successfully instantiated fabric contract." ]
+  [ "${lines[7]}" = "Instantiating fabric contract with id 'id' version 'version' and chaincode type 'type' on channel 'channel' with arguments '\"arg1\", \"arg2\"'..." ]
+  [ "${lines[8]}" = "Connection problem encountered, delaying 30s and trying again..." ]
+  [ "${lines[16]}" = "Instantiating fabric contract with id 'id' version 'version' and chaincode type 'type' on channel 'channel' with arguments '\"arg1\", \"arg2\"'..." ]
+  [ "${lines[17]}" = "Successfully instantiated fabric contract." ]
 
   unstub do_curl
   unstub sleep
@@ -502,9 +502,9 @@ cleanup_blockchain_json() {
 
   run instantiate_fabric_chaincode "id" "version" "type" "channel" '"arg1", "arg2"'
   [ $status -eq 2 ]
-  [ "${lines[0]}" = "Instantiating fabric contract with id 'id' version 'version' and chaincode type 'type' on channel 'channel' with arguments '\"arg1\", \"arg2\"'..." ]
-  [ "${lines[1]}" = "Failed to instantiate fabric contract:" ]
-  [ "${lines[2]}" = "Chaincode instance already exists with id 'id' version 'version' and chaincode type 'type'" ]
+  [ "${lines[7]}" = "Instantiating fabric contract with id 'id' version 'version' and chaincode type 'type' on channel 'channel' with arguments '\"arg1\", \"arg2\"'..." ]
+  [ "${lines[8]}" = "Failed to instantiate fabric contract:" ]
+  [ "${lines[9]}" = "Chaincode instance already exists with id 'id' version 'version' and chaincode type 'type'" ]
 }
 
 @test "blockchain.sh: instantiate_fabric_chaincode should fail on unknown error response" {
@@ -520,10 +520,10 @@ cleanup_blockchain_json() {
   run instantiate_fabric_chaincode "id" "version" "type" "channel" '"arg1", "arg2"'
 
   [ $status -eq 1 ]
-  [ "${lines[0]}" = "Instantiating fabric contract with id 'id' version 'version' and chaincode type 'type' on channel 'channel' with arguments '\"arg1\", \"arg2\"'..." ]
-  [ "${lines[1]}" = "Failed to instantiate fabric contract:" ]
-  [ "${lines[2]}" = "Unrecognized error returned:" ]
-  [ "${lines[3]}" = "${error_msg}" ]
+  [ "${lines[7]}" = "Instantiating fabric contract with id 'id' version 'version' and chaincode type 'type' on channel 'channel' with arguments '\"arg1\", \"arg2\"'..." ]
+  [ "${lines[8]}" = "Failed to instantiate fabric contract:" ]
+  [ "${lines[9]}" = "Unrecognized error returned:" ]
+  [ "${lines[10]}" = "${error_msg}" ]
 }
 
 @test "blockchain.sh: deploy_fabric_chaincode should iterate through provided organizations and authenticate" {
