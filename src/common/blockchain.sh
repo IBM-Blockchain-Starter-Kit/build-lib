@@ -300,6 +300,7 @@ function instantiate_fabric_chaincode {
     local CC_TYPE=$3
     local CHANNEL=$4
     local INIT_ARGS=$5
+    local CC_ENDORSEMENT_POLICY=$6
 
     cat << EOF > request.json
 {
@@ -307,8 +308,10 @@ function instantiate_fabric_chaincode {
     "chaincode_version": "${CC_VERSION}",
     "chaincode_type": "${CC_TYPE}",
     "chaincode_arguments": [${INIT_ARGS}]
+    "endorsement_policy": "${CC_ENDORSEMENT_POLICY}"
 }
 EOF
+    cat "request.json"
 
     echo "Instantiating fabric contract with id '$CC_ID' version '$CC_VERSION' and chaincode type '$CC_TYPE' on channel '$CHANNEL' with arguments '$INIT_ARGS'..."
 
@@ -383,6 +386,7 @@ function deploy_fabric_chaincode {
             CC_INSTANTIATE=$(jq -r ".${org}.chaincode[$cc_index].instantiate" "$DEPLOY_CONFIG")
             CC_CHANNELS=$(jq -r ".${org}.chaincode[$cc_index].channels[]" "$DEPLOY_CONFIG")
             CC_INIT_ARGS=$(jq ".${org}.chaincode[$cc_index].init_args[]" "$DEPLOY_CONFIG")
+            CC_ENDORSEMENT_POLICY=$(jq ".${org}.chaincode[$cc_index].endorsement_policy" "$DEPLOY_CONFIG")
 
             # TODO: Integrate with configuration
             CC_ID="${CC_NAME}"
@@ -401,7 +405,7 @@ function deploy_fabric_chaincode {
             then
                 for channel in $CC_CHANNELS
                 do
-                    instantiate_fabric_chaincode "$CC_ID" "$CC_VERSION" "$CC_TYPE" "$channel" "$CC_INIT_ARGS"
+                    instantiate_fabric_chaincode "$CC_ID" "$CC_VERSION" "$CC_TYPE" "$channel" "$CC_INIT_ARGS" "$CC_ENDORSEMENT_POLICY"
                 done  
             fi
             cc_index=$((cc_index + 1))
