@@ -308,7 +308,7 @@ function instantiate_fabric_chaincode {
     "chaincode_version": "${CC_VERSION}",
     "chaincode_type": "${CC_TYPE}",
     "chaincode_arguments": [${INIT_ARGS}]
-    "endorsement_policy": "${CC_ENDORSEMENT_POLICY}"
+    "endorsement_policy": ${CC_ENDORSEMENT_POLICY}
 }
 EOF
     cat "request.json"
