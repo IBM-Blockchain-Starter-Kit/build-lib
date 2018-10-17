@@ -18,9 +18,6 @@ build_lib_scripts="common/blockchain.sh
   common/cloudant.sh
   common/env.sh
   common/utils.sh
-  composer/build.sh
-  composer/deploy.sh
-  composer/test.sh
   go-chaincode/build.sh
   go-chaincode/deploy.sh
   go-chaincode/download-fabric.sh

@@ -21,9 +21,6 @@ stub_curl_all() {
     "-fsSL https://example.org/scripts/common/cloudant.sh : cat ${src_dir}/common/cloudant.sh" \
     "-fsSL https://example.org/scripts/common/env.sh : cat ${src_dir}/common/env.sh" \
     "-fsSL https://example.org/scripts/common/utils.sh : cat ${src_dir}/common/utils.sh" \
-    "-fsSL https://example.org/scripts/composer/build.sh : cat ${src_dir}/composer/build.sh" \
-    "-fsSL https://example.org/scripts/composer/deploy.sh : cat ${src_dir}/composer/deploy.sh" \
-    "-fsSL https://example.org/scripts/composer/test.sh : cat ${src_dir}/composer/test.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/build.sh : cat ${src_dir}/go-chaincode/build.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/deploy.sh : cat ${src_dir}/go-chaincode/deploy.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/download-fabric.sh : cat ${src_dir}/go-chaincode/download-fabric.sh" \
@@ -41,9 +38,6 @@ stub_curl_without_router() {
     "-fsSL https://example.org/scripts/common/cloudant.sh : cat ${src_dir}/common/cloudant.sh" \
     "-fsSL https://example.org/scripts/common/env.sh : cat ${src_dir}/common/env.sh" \
     "-fsSL https://example.org/scripts/common/utils.sh : cat ${src_dir}/common/utils.sh" \
-    "-fsSL https://example.org/scripts/composer/build.sh : cat ${src_dir}/composer/build.sh" \
-    "-fsSL https://example.org/scripts/composer/deploy.sh : cat ${src_dir}/composer/deploy.sh" \
-    "-fsSL https://example.org/scripts/composer/test.sh : cat ${src_dir}/composer/test.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/build.sh : cat ${src_dir}/go-chaincode/build.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/deploy.sh : cat ${src_dir}/go-chaincode/deploy.sh" \
     "-fsSL https://example.org/scripts/go-chaincode/download-fabric.sh : cat ${src_dir}/go-chaincode/download-fabric.sh" \
