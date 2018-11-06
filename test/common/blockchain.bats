@@ -382,16 +382,17 @@ cleanup_blockchain_json() {
   echo "true" > "${SCRIPT_DIR}/common/utils.sh"
 
   stub do_curl "exit 0"
-  stub find "echo contract.go"
-
+  stub zip "echo ZIP file created!"
+      
   source "${SCRIPT_DIR}/common/blockchain.sh"
-  run install_fabric_chaincode "ccid" "ccversion" "ccpath"
+  CCPATH=$(pwd)
+  run install_fabric_chaincode "ccid" "ccversion" "$CCPATH"
 
-  [ "${lines[1]}" = "Successfully installed fabric contract." ]
+  [ "${lines[5]}" = "Successfully installed fabric contract." ]
   [ $status -eq 0 ]
 
+  unstub zip
   unstub do_curl
-  unstub find
 }
 
 @test "blockchain.sh: install_fabric_chaincode should return status 1 if unrecognized error is received" {
@@ -400,56 +401,36 @@ cleanup_blockchain_json() {
   error_msg="error"
 
   stub do_curl "echo ${error_msg}; exit 1"
-  stub find "echo contract.go"
+  stub zip "echo ZIP file created!"
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
-  run install_fabric_chaincode "ccid" "ccversion" "ccpath"
+  CCPATH=$(pwd)
+  run install_fabric_chaincode "ccid" "ccversion" "$CCPATH"
 
-  [ "${lines[1]}" = "Failed to install fabric contract:" ]
-  [ "${lines[2]}" = "Unrecognized error returned:" ]
-  [ "${lines[3]}" = "${error_msg}" ]
+  [ "${lines[5]}" = "Failed to install fabric contract:" ]
+  [ "${lines[6]}" = "Unrecognized error returned:" ]
+  [ "${lines[7]}" = "${error_msg}" ]
   [ $status -eq 1 ]
 
+  unstub zip
   unstub do_curl
-  unstub find
 }
 
 @test "blockchain.sh: install_fabric_chaincode should return status 2 if already installed with specified version and id" {
   echo "true" > "${SCRIPT_DIR}/common/utils.sh"
 
   stub do_curl "echo chaincode code exists; exit 1"
-  stub find "echo contract.go"
+  stub zip "echo ZIP file created!"
 
   source "${SCRIPT_DIR}/common/blockchain.sh"
-  run install_fabric_chaincode "ccid" "ccversion" "ccpath"
+  CCPATH=$(pwd)
+  run install_fabric_chaincode "ccid" "ccversion" "$CCPATH"
 
-  [ "${lines[1]}" = "Failed to install fabric contract:" ]
-  [ "${lines[2]}" = "Chaincode already installed with id 'ccid' and version 'ccversion'" ]
+  [ "${lines[5]}" = "Failed to install fabric contract:" ]
+  [ "${lines[6]}" = "Chaincode already installed with id 'ccid' and version 'ccversion'" ]
   [ $status -eq 2 ]
 
-  unstub do_curl
-  unstub find
-}
-
-@test "blockchain.sh: install_fabric_chaincode should correctly build array of files from directory path" {
-  echo "true" > "${SCRIPT_DIR}/common/utils.sh"
-
-  stub do_curl "exit 0"
-
-  source "${SCRIPT_DIR}/common/blockchain.sh"
-
-  pushd "${SCRIPT_DIR}/.."
-  mkdir -p "cc/path"
-  touch "cc/path/contract.go"
-  touch "cc/path/contract_test.go"
-  touch "cc/path/notchaincode.txt"
-
-  install_fabric_chaincode "ccid" "ccversion" "cc/path"
-  popd
-
-  [[ "${CHAINCODE_FILE_OPTS}" == ?"-F files[]=@cc/path/notchaincode.txt -F files[]=@cc/path/contract.go" ]] || \
-  [[ "${CHAINCODE_FILE_OPTS}" == ?"-F files[]=@cc/path/contract.go -F files[]=@cc/path/notchaincode.txt" ]]
-
+  unstub zip
   unstub do_curl
 }
 

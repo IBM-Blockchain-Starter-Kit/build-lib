@@ -256,11 +256,12 @@ function install_fabric_chaincode {
         -F chaincode_id="${CC_ID}" -F chaincode_version="${CC_VERSION}" \
         -F chaincode_type="${CC_TYPE}" \
         "${BLOCKCHAIN_API}/chaincode/install")
+    RET_CODE=$?
 
-    rm "$CC_ZIP_FILE"
+    rm -f "$CC_ZIP_FILE"
     popd
     
-    if [ $? -eq 1 ]
+    if [ $RET_CODE -eq 1 ]
     then
         echo "Failed to install fabric contract:"
         if [[ "${OUTPUT}" == *"chaincode code"*"exists"* ]]
