@@ -237,8 +237,6 @@ function install_fabric_chaincode {
     local CC_PATH=$3
     local CC_TYPE=$4
 
-    local CHAINCODE_FILES
-
     echo "Installing chaincode '$CC_PATH' with id '$CC_ID' and version '$CC_VERSION'..."
     
     # Cannot leave behind folders... for instance, a chaincode component
@@ -247,8 +245,8 @@ function install_fabric_chaincode {
     pushd "$CC_PATH"
     CC_ZIP_FILE="${CC_ID}.zip"
     echo "Creating ZIP file for chaincode: ${CC_ZIP_FILE}"
-    zip -r "$CC_ZIP_FILE" *
-    #zip -r "$CC_ZIP_FILE" * -x "*test*"
+    zip -r "$CC_ZIP_FILE" ./*
+    #zip -r "$CC_ZIP_FILE" ./* -x "*test*"
 
     # shellcheck disable=2086
     OUTPUT=$(do_curl \
