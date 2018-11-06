@@ -244,11 +244,11 @@ function install_fabric_chaincode {
     # Cannot leave behind folders... for instance, a chaincode component
     # may have additional files such as CouchDB index files.
     # Hence, including all folders and files
-    pushd $CC_PATH
+    pushd "$CC_PATH"
     CC_ZIP_FILE="${CC_ID}.zip"
     echo "Creating ZIP file for chaincode: ${CC_ZIP_FILE}"
-    zip -r $CC_ZIP_FILE *
-    #zip -r $CC_ZIP_FILE * -x "*test*"
+    zip -r "$CC_ZIP_FILE" *
+    #zip -r "$CC_ZIP_FILE" * -x "*test*"
 
     # shellcheck disable=2086
     OUTPUT=$(do_curl \
@@ -259,7 +259,7 @@ function install_fabric_chaincode {
         -F chaincode_type="${CC_TYPE}" \
         "${BLOCKCHAIN_API}/chaincode/install")
 
-    rm $CC_ZIP_FILE
+    rm "$CC_ZIP_FILE"
     popd
     
     if [ $? -eq 1 ]
