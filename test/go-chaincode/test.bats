@@ -19,7 +19,11 @@ teardown() {
 }
 
 @test "test.sh: should run without errors" {
-  stub go "test -v chaincode/... : true"
+  stub go \
+    "get github.com/stretchr/testify/assert : true" \
+    "get -u github.com/jstemmer/go-junit-report : true" \
+    "test -v chaincode/... : true"
+  stub go-junit-report "echo 'GO tests resports created!'"
 
   run "${SCRIPT_DIR}/go-chaincode/test.sh"
 
@@ -27,4 +31,5 @@ teardown() {
   [ $status -eq 0 ]
 
   unstub go
+  unstub go-junit-report
 }
