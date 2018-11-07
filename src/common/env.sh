@@ -11,6 +11,7 @@ export NVM_VERSION=${NVM_VERSION:="0.33.11"}
 export GOROOT=${ROOTDIR}/go
 export PATH=${GOROOT}/bin:$PATH
 export GOPATH=${ROOTDIR}
+export PATH=${GOPATH}/bin:$PATH
 
 export CONFIGPATH=${CONFIGPATH:="deploy_config.json"}
 export CHAINCODEPATH=${CHAINCODEPATH:="chaincode"}
