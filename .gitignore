@@ -1,4 +1,4 @@
 bats/
 bats-mock/
-
 *.tgz
+**/.DS_Store 

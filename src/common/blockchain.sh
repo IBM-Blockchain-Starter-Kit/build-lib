@@ -237,27 +237,31 @@ function install_fabric_chaincode {
     local CC_PATH=$3
     local CC_TYPE=$4
 
-    local CHAINCODE_FILES
-
     echo "Installing chaincode '$CC_PATH' with id '$CC_ID' and version '$CC_VERSION'..."
     
-    CHAINCODE_FILES=$(find "$CC_PATH" -type f ! -name "*test*")
-    CHAINCODE_FILE_OPTS=""
-    for CHAINCODE_FILE in ${CHAINCODE_FILES}
-    do
-        CHAINCODE_FILE_OPTS="${CHAINCODE_FILE_OPTS} -F files[]=@${CHAINCODE_FILE}"
-    done
+    # Cannot leave behind folders... for instance, a chaincode component
+    # may have additional files such as CouchDB index files.
+    # Hence, including all folders and files
+    pushd "$CC_PATH"
+    CC_ZIP_FILE="${CC_ID}.zip"
+    echo "Creating ZIP file for chaincode: ${CC_ZIP_FILE}"
+    zip -r "$CC_ZIP_FILE" ./*
+    #zip -r "$CC_ZIP_FILE" ./* -x "*test*"
 
     # shellcheck disable=2086
     OUTPUT=$(do_curl \
         -X POST \
         -u "${BLOCKCHAIN_KEY}:${BLOCKCHAIN_SECRET}" \
-        $CHAINCODE_FILE_OPTS \
+        -F files="@${CC_ZIP_FILE}" \
         -F chaincode_id="${CC_ID}" -F chaincode_version="${CC_VERSION}" \
         -F chaincode_type="${CC_TYPE}" \
         "${BLOCKCHAIN_API}/chaincode/install")
+    RET_CODE=$?
+
+    rm -f "$CC_ZIP_FILE"
+    popd
     
-    if [ $? -eq 1 ]
+    if [ $RET_CODE -eq 1 ]
     then
         echo "Failed to install fabric contract:"
         if [[ "${OUTPUT}" == *"chaincode code"*"exists"* ]]
