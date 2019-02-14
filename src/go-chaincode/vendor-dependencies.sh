@@ -54,13 +54,17 @@ function _fetch_dependencies_cc {
         shopt -s extglob
         while (( ${#packages[@]} > index )); do
             package=${packages[index]}
-            ### Trim leading whitespaces ###
+            ## Remove newlines, carriage returns
+            package="${package//[$'\r\n']}"
+            ### Trim leading whitespaces
             package="${package##*( )}"
-            ### Trim trailing whitespaces  ##
+            ### Trim trailing whitespaces
             package="${package%%*( )}"
-            #echo "=${package}="
-            echo "Fetching ${package}"
-            govendor fetch "${package}"
+            # echo "=${package}="
+            if ! [[ -z "$package" ]]; then
+                echo "Fetching ${package}"
+                govendor fetch "${package}"
+            fi
             (( index += 1 ))
         done
         shopt -u extglob
