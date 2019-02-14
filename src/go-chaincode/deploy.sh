@@ -8,6 +8,7 @@ source "${SCRIPT_DIR}/common/env.sh"
 source "${SCRIPT_DIR}/common/utils.sh"
 # shellcheck source=src/common/blockchain.sh
 source "${SCRIPT_DIR}/common/blockchain.sh"
+source "${SCRIPT_DIR}/go-chaincode/vendor-dependencies.sh"
 
 $DEBUG && set -x
 
@@ -19,4 +20,5 @@ fi
 install_jq
 setup_service_constants
 provision_blockchain
+fetch_dependencies $CONFIGPATH
 deploy_fabric_chaincode golang $CONFIGPATH
