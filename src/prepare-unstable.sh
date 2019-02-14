@@ -20,6 +20,7 @@ build_lib_scripts="common/blockchain.sh
   common/utils.sh
   go-chaincode/build.sh
   go-chaincode/deploy.sh
+  go-chaincode/vendor-dependencies.sh
   go-chaincode/download-fabric.sh
   go-chaincode/install-go.sh
   go-chaincode/test.sh
