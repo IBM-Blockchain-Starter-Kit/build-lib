@@ -40,7 +40,7 @@ function _fetch_dependencies_cc {
     local CC_PATH=$1
     local TARGET_CC_PATH="${GOPATH}/src/$CC_PATH"
     
-    pushd $TARGET_CC_PATH
+    pushd "$TARGET_CC_PATH"
 
     if [ -f ".govendor_packages" ]; then
         echo "Found .govendor_packages file."
@@ -60,7 +60,7 @@ function _fetch_dependencies_cc {
             package="${package%%*( )}"
             #echo "=${package}="
             echo "Fetching ${package}"
-            govendor fetch ${package}
+            govendor fetch "${package}"
             (( index += 1 ))
         done
         shopt -u extglob
