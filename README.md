@@ -1,15 +1,28 @@
 # build-lib
 
-Common scripts for use in Blockchain build pipelines
+This repository contains common scripts for use in Blockchain build pipelines.
 
 ## Unit tests
 
 This project is tested using Bats when making pull requests.
 
-To run the tests locally, install
-[bats-core](https://github.com/bats-core/bats-core) and
-[bats-mock](https://github.com/jasonkarns/bats-mock), then run the following
-command from the uppermost directory:
+To run the tests locally, install [bats-core](https://github.com/bats-core/bats-core) and [bats-mock](https://github.com/jasonkarns/bats-mock). Here are a few tips on installing these two libraries so you don't go into a rabbit hole when attempting to run the test cases.
+
+### bats-core
+
+You should [install](https://github.com/bats-core/bats-core#installing-bats-from-source) bats-core from source. After you have cloned `bats-core` into the directory of your choosing, navigate to that folder and run the `./install.sh` script by passing the absolute path to the folder where this repository (i.e. `build-lib`) was cloned into your local system and appending `bats` folder to that path as shown below:
+
+```
+./install.sh <absolute path to the build-lib repository>/bats
+```
+
+Executing the `install.sh` script should result in the creation of a `bats` folder under the `build-lib` repository; this `bats` folder contains the `bats-core` files.
+
+### bats-mock
+To install `bats-mock`, first create an empty folder named `bats-mock` under the `build-lib` repository. Then clone the [bats-mock](https://github.com/jasonkarns/bats-mock) repository into the directory of your choosing; navigate to that folder, copy the `binstub` and `stub.bash` files into the `bats-mock` you created under the `build-lib` repository.
+
+### Running test cases
+Once you have installed `bats-core` and `bats-mock` as described the sections above, you can then run the following command from the root directory of this repository:
 
 ```
 PATH="./bats/bin:$PATH" bats test/*

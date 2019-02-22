@@ -17,8 +17,12 @@ setup() {
 @test "deploy.sh: should fail if deploy configuration does not exist" {
     export CONFIGPATH="fakepath"
 
+     stub go \
+        "get -u github.com/kardianos/govendor : true"
+
     run "${SCRIPT_DIR}/go-chaincode/deploy.sh"
-    [ "$output" = "No deploy configuration at specified path: fakepath" ]
+
+    [ "${lines[0]}" = "No deploy configuration at specified path: fakepath" ]    
     [ $status -eq 1 ]
 }
 
