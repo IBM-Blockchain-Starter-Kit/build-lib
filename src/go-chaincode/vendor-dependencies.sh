@@ -19,7 +19,6 @@ go get -u github.com/kardianos/govendor
 function fetch_dependencies {
     local DEPLOY_CONFIG=$1
 
-    #cat "$DEPLOY_CONFIG"   
     # Iterate over every organization and chaincode component defined in deploy config file    
     for org in $(jq -r "to_entries[] | .key" "$DEPLOY_CONFIG")
     do

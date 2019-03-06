@@ -70,7 +70,7 @@ EOF
     [ "${lines[9]}" = "No .govendor_packages file found; no dependencies to vendor in." ]  
 }
 
-@test "vendor-dependencies.sh: fetch_dependencies should run without errors when .govendor_packages file has new lines and white spaces" {
+@test "vendor-dependencies.sh: fetch_dependencies should run without errors when .govendor_packages file has new lines and white spaces; also testing with multiple .govendor_packages file (one per chaincode component)" {
 
     cat << EOF > sample-config.json
 {
@@ -83,6 +83,14 @@ EOF
         "init_args": [],
         "instantiate": false,
         "install": true
+      },
+      {
+        "name": "contract2",
+        "path": "chaincode/contract2",
+        "channels": [ "channel2" ],
+        "init_args": [],
+        "instantiate": false,
+        "install": true
       }
     ]
   }
@@ -90,6 +98,7 @@ EOF
 EOF
 
     mkdir -p "${PWD}/src/chaincode/contract1"
+    mkdir -p "${PWD}/src/chaincode/contract2"
 
     cat << EOF > "${PWD}/src/chaincode/contract1/.govendor_packages"
 
@@ -102,17 +111,30 @@ EOF
 
   
 EOF
-    
+
+     cat << EOF > "${PWD}/src/chaincode/contract2/.govendor_packages"
+
+
+
+       github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1     
+
+
+
+
+  
+EOF
+
     stub go \
         "get -u github.com/kardianos/govendor : true"
 
     stub govendor \
-      "init : true"
-
-    stub govendor \
-       "fetch : true" 
+      "init : true" \
+      "fetch *github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1* : true" \
+       "init : true" \
+      "fetch *github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1* : true"
 
     stub cp \
+      "-r vendor : true" \
       "-r vendor : true"
 
     source "${SCRIPT_DIR}/go-chaincode/vendor-dependencies.sh"
@@ -134,4 +156,12 @@ EOF
     [ "${lines[3]}" = "Found .govendor_packages file." ]
     [ "${lines[4]}" = "Fetching github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1" ]
     [ "${lines[7]}" = "Finished looking up dependencies for chaincode component." ]
+    [ "${lines[8]}" = "About to fetch dependencies for 'chaincode/contract2'" ]
+    [ "${lines[10]}" = "Found .govendor_packages file." ]
+    [ "${lines[11]}" = "Fetching github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1" ]
+    [ "${lines[14]}" = "Finished looking up dependencies for chaincode component." ]
+}
+
+teardown() {
+    cleanup_stubs
 }
