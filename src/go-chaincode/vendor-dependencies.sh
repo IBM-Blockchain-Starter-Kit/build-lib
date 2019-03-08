@@ -3,6 +3,8 @@
 # shellcheck source=src/common/env.sh
 source "${SCRIPT_DIR}/common/env.sh"
 
+$DEBUG && set -ex
+
 # Install govendor
 go get -u github.com/kardianos/govendor
 
