@@ -13,7 +13,7 @@ github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1
 
 ## Unit tests
 
-Make sure you have installed [jq](https://stedolan.github.io/jq/download/) before attempting to run the test cases on your local system. You should also have bash 4 or a later version installed on your system. If running tests on macOS, you can use Homebrew to upgrade bash: `brew update && brew install bash`.
+Make sure you have installed [jq](https://stedolan.github.io/jq/download/) before attempting to run the test cases on your local system.
 
 This project is tested using Bats when making pull requests.
 

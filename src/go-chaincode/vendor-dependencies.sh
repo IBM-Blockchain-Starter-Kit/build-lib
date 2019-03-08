@@ -49,9 +49,11 @@ function _fetch_dependencies_cc {
         # Initialize govendor
         govendor init
         # Get list of packages to vendor in
-        declare -a packages        
-        readarray packages < .govendor_packages        
-        local index=0        
+        declare -a packages
+        while read -r package; do
+            packages+=($package)
+        done < .govendor_packages
+        local index=0
 
         shopt -s extglob
         while (( ${#packages[@]} > index )); do

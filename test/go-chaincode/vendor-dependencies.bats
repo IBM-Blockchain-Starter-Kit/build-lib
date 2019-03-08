@@ -8,6 +8,13 @@ setup() {
     testcase_dirname="$(mktemp -d)"
 
     setup_script_dir "${src_dir}" "${testcase_dirname}"
+
+    testcase_gopath=${testcase_dirname}/go
+    echo "export GOPATH=${testcase_gopath}" >> "${SCRIPT_DIR}/common/env.sh"
+}
+
+teardown() {
+    cleanup_stubs
 }
 
 @test "vendor-dependencies.sh: should exist and be executable" {
@@ -16,7 +23,8 @@ setup() {
 
 @test "vendor-dependencies.sh: fetch_dependencies should run without errors when .govendor_packages file does not exist" {
 
-    cat << EOF > sample-config.json
+    mkdir -p "${testcase_gopath}/src"
+    cat << EOF > "${testcase_gopath}/src/sample-config.json"
 {
   "org1": {
     "chaincode": [
@@ -45,21 +53,18 @@ setup() {
 }
 EOF
 
-    mkdir -p "${PWD}/src/chaincode/contract1"
+    mkdir -p "${testcase_gopath}/src/chaincode/contract1"
     
     stub go \
         "get -u github.com/kardianos/govendor : true"
 
     source "${SCRIPT_DIR}/go-chaincode/vendor-dependencies.sh"
 
-    run fetch_dependencies "sample-config.json"
-
-    # Clean up before assertions
-    rm sample-config.json
-    rm -rf "${PWD}/src/chaincode"
-    unstub go
+    run fetch_dependencies "${testcase_gopath}/src/sample-config.json"
  
     # Assertions
+    echo $output
+    unstub go
     [ $status -eq 0 ]  
     [ "${lines[0]}" = "Processing org 'org1'..." ]
     [ "${lines[1]}" = "About to fetch dependencies for 'chaincode/contract1'" ]
@@ -72,7 +77,8 @@ EOF
 
 @test "vendor-dependencies.sh: fetch_dependencies should run without errors when .govendor_packages file has new lines and white spaces; also testing with multiple .govendor_packages file (one per chaincode component)" {
 
-    cat << EOF > sample-config.json
+    mkdir -p "${testcase_gopath}/src"
+    cat << EOF > "${testcase_gopath}/src/sample-config.json"
 {
   "org1": {
     "chaincode": [
@@ -97,10 +103,10 @@ EOF
 }
 EOF
 
-    mkdir -p "${PWD}/src/chaincode/contract1"
-    mkdir -p "${PWD}/src/chaincode/contract2"
+    mkdir -p "${testcase_gopath}/src/chaincode/contract1"
+    mkdir -p "${testcase_gopath}/src/chaincode/contract2"
 
-    cat << EOF > "${PWD}/src/chaincode/contract1/.govendor_packages"
+    cat << EOF > "${testcase_gopath}/src/chaincode/contract1/.govendor_packages"
 
 
 
@@ -112,11 +118,12 @@ EOF
   
 EOF
 
-     cat << EOF > "${PWD}/src/chaincode/contract2/.govendor_packages"
+     cat << EOF > "${testcase_gopath}/src/chaincode/contract2/.govendor_packages"
 
 
 
-       github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1     
+      github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1
+      github.com/hyperledger/fabric/core/chaincode/lib/conga@v1.5.8   
 
 
 
@@ -130,8 +137,9 @@ EOF
     stub govendor \
       "init : true" \
       "fetch *github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1* : true" \
-       "init : true" \
-      "fetch *github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1* : true"
+      "init : true" \
+      "fetch *github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1* : true" \
+      "fetch *github.com/hyperledger/fabric/core/chaincode/lib/conga@v1.5.8* : true"
 
     stub cp \
       "-r vendor : true" \
@@ -139,17 +147,13 @@ EOF
 
     source "${SCRIPT_DIR}/go-chaincode/vendor-dependencies.sh"
 
-    run fetch_dependencies "sample-config.json"
-
-    # Clean up before assertions
-    rm sample-config.json
-    rm -rf "${PWD}/src/chaincode"
-    unstub cp
-    unstub govendor
-    unstub go
+    run fetch_dependencies "${testcase_gopath}/src/sample-config.json"
  
     # Assertions
     echo $output
+    unstub cp
+    unstub govendor
+    unstub go
     [ $status -eq 0 ]  
     [ "${lines[0]}" = "Processing org 'org1'..." ]
     [ "${lines[1]}" = "About to fetch dependencies for 'chaincode/contract1'" ]
@@ -159,9 +163,6 @@ EOF
     [ "${lines[8]}" = "About to fetch dependencies for 'chaincode/contract2'" ]
     [ "${lines[10]}" = "Found .govendor_packages file." ]
     [ "${lines[11]}" = "Fetching github.com/hyperledger/fabric/core/chaincode/lib/cid@v1.2.1" ]
-    [ "${lines[14]}" = "Finished looking up dependencies for chaincode component." ]
-}
-
-teardown() {
-    cleanup_stubs
+    [ "${lines[12]}" = "Fetching github.com/hyperledger/fabric/core/chaincode/lib/conga@v1.5.8" ]
+    [ "${lines[15]}" = "Finished looking up dependencies for chaincode component." ]
 }
