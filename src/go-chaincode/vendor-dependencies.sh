@@ -50,7 +50,7 @@ function _fetch_dependencies_cc {
         govendor init
         # Get list of packages to vendor in
         declare -a packages
-        while read -r package; do
+        while IFS= read -r package || [ "$package" ]; do
             packages+=($package)
         done < .govendor_packages
         local index=0
