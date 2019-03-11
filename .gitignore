@@ -2,3 +2,5 @@ bats/
 bats-mock/
 *.tgz
 **/.DS_Store 
+TEST-report.xml
+tst-output.txt
