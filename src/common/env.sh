@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ROOTDIR=${ROOTDIR:=$PWD}
 
-export GO_VERSION=${GO_VERSION:="1.10.4"}
+export GO_VERSION=${GO_VERSION:="1.11"}
 
 export NODE_VERSION=${NODE_VERSION:="8.9.0"}
 export NVM_VERSION=${NVM_VERSION:="0.33.11"}
@@ -16,7 +16,7 @@ export PATH=${GOPATH}/bin:$PATH
 export CONFIGPATH=${CONFIGPATH:="deploy_config.json"}
 export CHAINCODEPATH=${CHAINCODEPATH:="chaincode"}
 
-export HLF_VERSION=${HLF_VERSION:="1.2.1"}
+export HLF_VERSION=${HLF_VERSION:="1.4.1"}
 export FABRIC_SRC_DIR=${ROOTDIR}/fabric-${HLF_VERSION}
 
 export DEBUG=${DEBUG:=false}
