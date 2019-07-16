@@ -4,6 +4,7 @@ echo "######## Build chaincode ########"
 
 # shellcheck source=src/common/env.sh
 source "${SCRIPT_DIR}/common/env.sh"
+source "${SCRIPT_DIR}/common/utils.sh"
 
 $DEBUG && set -x
 
@@ -15,6 +16,12 @@ source "${SCRIPT_DIR}/go-chaincode/download-fabric.sh"
 
 # shellcheck source=src/go-chaincode/install-go.sh
 source "${SCRIPT_DIR}/go-chaincode/install-go.sh"
+
+install_node $NODE_VERSION $NVM_VERSION
+
+
+echo "######## DEBUG ########"
+echo "ls -a ."
 
 
 echo "######## Placing source in directory expected by go build ########"
