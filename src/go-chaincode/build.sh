@@ -18,10 +18,8 @@ source "${SCRIPT_DIR}/go-chaincode/download-fabric.sh"
 source "${SCRIPT_DIR}/go-chaincode/install-go.sh"
 
 install_node $NODE_VERSION $NVM_VERSION
-
-
-echo "######## DEBUG ########"
-echo "ls -a ."
+echo "npm config get prefix...$(npm config get prefix)"
+install_fabric-cli
 
 
 echo "######## Placing source in directory expected by go build ########"
@@ -36,8 +34,14 @@ mkdir -p "${GOSOURCE}/github.com/hyperledger/"
 mv "${FABRIC_SRC_DIR}" "${GOSOURCE}/github.com/hyperledger/fabric"
 
 
-echo "######## Print current directories ########"
-ls
+echo "######## Print directories ########"
+echo "Current directory...$(pwd)"
+ls -a
+echo "Print env variables"
+env
+echo "Home directory...$HOME"
+ls -a $HOME
+
 
 
 # change to the correct path name \ path should be ./chaincode/go/example ??
