@@ -96,10 +96,22 @@ function install_node {
 # Returns:
 #   None
 #######################################
-function install_fabric-cli {
-  curl -o jq -L https://github.com/abisarvepalli/build-lib/releases/download/v0.6/fabric-cli.tgz # WIP
-  chmod +x jq
-  # export FABRIC_CLI=
+function install_fabric-cli {  
+  local currdir=`pwd`
+
+  mkdir $HOME/fabric-cli
+  curl -fsSL https://github.com/abisarvepalli/build-lib/releases/download/v0.6/fabric-cli.tgz > $HOME/fabric-cli.tgz
+  tar -xvzf $HOME/fabric-cli.tgz -C $HOME/fabric-cli
+  
+  echo `which npm`
+  cd $HOME/fabric-cli
+  npm install
+  npm run build
+  chmod +x fabric-cli.js
+  npm link
+  fabric-cli --version
+
+  cd $currdir
 }
 
 #######################################
