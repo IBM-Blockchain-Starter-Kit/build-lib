@@ -76,6 +76,7 @@ function install_node {
   echo "######## Installing Node.js version ${NODE_VERSION} using nvm ${NVM_VERSION} ########"
   # Can safely ignore nvm.sh since it's not ours
   # shellcheck disable=SC1090
+  
   npm config delete prefix \
     && curl "https://raw.githubusercontent.com/creationix/nvm/v${NVM_VERSION}/install.sh" | bash \
     && . "$HOME/.nvm/nvm.sh" \
@@ -83,6 +84,22 @@ function install_node {
     && nvm use default \
     && node -v \
     && npm -v
+}
+
+#######################################
+# WIP: Update download path for curl
+# Installs fabric-cli using curl and updates path
+# Globals:
+#   set: PATH
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function install_fabric-cli {
+  curl -o jq -L https://github.com/abisarvepalli/build-lib/releases/download/v0.6/fabric-cli.tgz # WIP
+  chmod +x jq
+  # export FABRIC_CLI=
 }
 
 #######################################
