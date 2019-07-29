@@ -11,10 +11,29 @@ $DEBUG && set -x
 
 echo "######## Download dependencies ########"
 
-install_node "$NODE_VERSION" "$NVM_VERSION"
+setup_env
 
-npm install
+
+echo "######## Print Environment ########"
+
+# /root
+echo "=> HOME ${HOME}"
+ls -aGln $HOME
+
+# /home/pipeline/...
+echo "=> ROOT ${ROOTDIR}"
+ls -aGln $ROOTDIR
+
+# path
+echo "=> PATH..."
+echo ${PATH}
+
+# python
+echo "=> python..."
+echo `python --version`
+
 
 echo "######## Building chaincode ########"
 
+npm install
 npm run build
