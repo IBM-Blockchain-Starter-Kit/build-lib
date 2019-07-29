@@ -60,7 +60,7 @@ function install_jq {
 }
 
 #######################################
-# Installs node using mvn
+# Installs node using nvm
 # Globals:
 #   None
 # Arguments:
@@ -87,8 +87,36 @@ function install_node {
 }
 
 #######################################
+# Installs python via curl
+# Globals:
+#   None
+# Arguments:
+#   PYTHON_VERSION: Version of Node.js to install
+# Returns:
+#   None
+#######################################
+function install_python {
+  local PYTHON_VERSION=$1
+  local prevdir=$(pwd)
+
+  echo "######## Installing Python-v${PYTHON_VERSION} ########"  
+
+  mkdir -p ${HOME}/.python \
+    && cd ${HOME}/.python \
+    && curl  "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" > Python-${PYTHON_VERSION}.tgz \
+    && tar -xzvf Python-${PYTHON_VERSION}.tgz \
+    && cd Python-${PYTHON_VERSION} \
+    && ./configure --prefix=${HOME}/.python --enable-optimizations \
+    && make install
+
+    export PATH=${HOME}/.python/bin:$PATH
+    
+    cd $prevdir
+}
+
+#######################################
 # WIP: Update download path for curl
-# Installs fabric-cli using curl and updates path
+# Builds fabric-cli in env set $FABRIC_CLI_DIR path
 # Globals:
 #   set: PATH
 # Arguments:
@@ -96,22 +124,19 @@ function install_node {
 # Returns:
 #   None
 #######################################
-function install_fabric-cli {  
-  local currdir=`pwd`
+function build_fabric_cli {
+  local fabric_cli_dir=${1:-$FABRIC_CLI_DIR}
+  local prevdir=$(pwd)
 
-  mkdir $HOME/fabric-cli
-  curl -fsSL https://github.com/abisarvepalli/build-lib/releases/download/v0.6/fabric-cli.tgz > $HOME/fabric-cli.tgz
-  tar -xvzf $HOME/fabric-cli.tgz -C $HOME/fabric-cli
+  echo "FABRIC_CLI_DIR...$FABRIC_CLI_DIR"
+  cd $FABRIC_CLI_DIR
   
-  echo `which npm`
-  cd $HOME/fabric-cli
   npm install
   npm run build
-  chmod +x fabric-cli.js
+  # chmod +x fabric_cli.js
   npm link
-  fabric-cli --version
 
-  cd $currdir
+  cd $prevdir
 }
 
 #######################################
@@ -172,4 +197,30 @@ function retry_with_backoff {
       return $exitCode
     fi
   done
+}
+
+#######################################
+# 
+# Globals:
+#   
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function setup_env {
+  echo "=> apt-get --fix-missing"
+  apt get --fix-missing
+
+  echo "=> Installing build-essential"
+  echo "Y" | apt-get install build-essential
+
+  echo "=> Install g++" 
+  echo "Y" | apt install g++
+
+  echo "=> Installing python v${PYTHON_VERSION}"
+  install_python "$PYTHON_VERSION"
+
+  echo "=> Installing node v8.9.0"
+  install_node "$NODE_VERSION" "$NVM_VERSION"
 }

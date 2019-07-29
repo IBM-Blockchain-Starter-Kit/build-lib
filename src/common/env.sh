@@ -4,7 +4,10 @@ ROOTDIR=${ROOTDIR:=$PWD}
 export GO_VERSION=${GO_VERSION:="1.11"}
 
 export NODE_VERSION=${NODE_VERSION:="8.9.0"}
+# export NODE_VERSION="8.9.0"
 export NVM_VERSION=${NVM_VERSION:="0.33.11"}
+# export NVM_VERSION="0.33.11"
+export PYTHON_VERSION="2.7.15"
 
 
 # set location for go executables
