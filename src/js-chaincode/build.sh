@@ -10,8 +10,9 @@ source "${SCRIPT_DIR}/common/utils.sh"
 $DEBUG && set -x
 
 echo "######## Download dependencies ########"
+nvm_install_node $NODE_VERSION
+# setup_env
 
-setup_env
 
 
 echo "######## Print Environment ########"
@@ -24,16 +25,8 @@ ls -aGln $HOME
 echo "=> ROOT ${ROOTDIR}"
 ls -aGln $ROOTDIR
 
-# path
-echo "=> PATH..."
-echo ${PATH}
 
-# python
-echo "=> python..."
-echo `python --version`
+# echo "######## Building chaincode ########"
 
-
-echo "######## Building chaincode ########"
-
-npm install
-npm run build
+# npm install
+# npm run build
