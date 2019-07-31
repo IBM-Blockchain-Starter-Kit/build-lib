@@ -86,6 +86,16 @@ function install_node {
     && npm -v
 }
 
+function nvm_install_node {
+  local NODE_VERSION=${1-:NODE_VERSION}
+  if [[ ! -n $(command -v nvm) ]]; then
+    nvm install 8.16 \
+      && nvm alias default "$NODE_VERSION" \
+      && node -v \
+      && nvm -v
+  fi
+}
+
 #######################################
 # Installs python via curl
 # Globals:
@@ -128,12 +138,16 @@ function build_fabric_cli {
   local fabric_cli_dir=${1:-$FABRIC_CLI_DIR}
   local prevdir=$(pwd)
 
-  echo "FABRIC_CLI_DIR...$FABRIC_CLI_DIR"
   cd $FABRIC_CLI_DIR
+  echo "pwd... $(pwd)"
   
+  echo "=> npm install..."
   npm install
+  echo "=> npm run build..."
   npm run build
+  # echo "=> chmod +x"
   # chmod +x fabric_cli.js
+  echo "=> npm link..."
   npm link
 
   cd $prevdir
@@ -209,18 +223,25 @@ function retry_with_backoff {
 #   None
 #######################################
 function setup_env {
+
+
   echo "=> apt-get --fix-missing"
-  apt get --fix-missing
+  apt-get update
+  echo
 
   echo "=> Installing build-essential"
-  echo "Y" | apt-get install build-essential
+  echo "Y" | apt-get install build-essential --fix-missing
+  echo
 
   echo "=> Install g++" 
-  echo "Y" | apt install g++
+  echo "Y" | apt install g++ --fix-missing
+  echo
 
   echo "=> Installing python v${PYTHON_VERSION}"
   install_python "$PYTHON_VERSION"
+  echo
 
-  echo "=> Installing node v8.9.0"
+  echo "=> Installing node v${NODE_VERSION} via nvm v${NVM_VERSION}"
   install_node "$NODE_VERSION" "$NVM_VERSION"
+  echo
 }
