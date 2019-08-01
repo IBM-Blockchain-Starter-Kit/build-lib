@@ -9,48 +9,55 @@ source "${SCRIPT_DIR}/common/utils.sh"
 # shellcheck source=src/common/blockchain.sh
 source "${SCRIPT_DIR}/common/blockchain-v2.sh"
 
-# $DEBUG && set -x
+$DEBUG && set -x
 
-# if [[ ! -f $CONFIGPATH ]]; then
-#   echo "No deploy configuration at specified path: ${CONFIGPATH}"
-#   exit 1
-# fi
-
-echo "######## Print Environment ########"
-
-# /home/pipeline/.../fabric-cli
-echo "=> FABRIC_CLI_DIR ${FABRIC_CLI_DIR}"
-ls -aGln $FABRIC_CLI_DIR
-echo
-
+if [[ ! -f $CONFIGPATH ]]; then
+  echo "No deploy configuration at specified path: ${CONFIGPATH}"
+  exit 1
+fi
 
 echo "######## Download dependencies ########"
-setup_env \
-  && install_jq
+setup_env
+install_python $PYTHON_VERSION
+nvm_install_node $NODE_VERSION
+install_jq
 echo
-
 
 echo "######## Build fabric-cli ########"
-build_fabric_cli ${FABRIC_CLI_DIR}
+build_fabric_cli $FABRIC_CLI_DIR
 echo
 
+echo "=> Validating dependencies..."
 if [[ ! -n $(command -v fabric-cli) ]]; then
   exit_error "fabric-cli interface not found in PATH env variable"
+else
+  which fabric-cli
 fi
 if [[ ! -n $(command -v jq) ]]; then
   exit_error "jq interface not found in PATH env variable"
+else
+  which jq
 fi
 
+echo '$CONFIGPATH...'${CONFIGPATH}
+cat ${CONFIGPATH}
+CONFIGPATH="$(pwd)/deploy_config.json"
+CONFIG=`cat ${CONFIGPATH}`
+echo $CONFIG; echo; echo;
+
+install_cc "${CONFIGPATH}" "node" $(pwd)
+instantiate_cc "${CONFIGPATH}" "node" $(pwd)
+invoke_cc "${CONFIGPATH}" "node" $(pwd)
 
 ####################################
-# #!/usr/bin/env bash
+#!/usr/bin/env bash
 
-# # source "${SCRIPT_DIR}/common/env.sh"
-# # source "${SCRIPT_DIR}/common/util.sh"
-# # source "${SCRIPT_DIR}/common/blockchain-v2.sh"
+# source "${SCRIPT_DIR}/common/env.sh"
+# source "${SCRIPT_DIR}/common/util.sh"
+# source "${SCRIPT_DIR}/common/blockchain-v2.sh"
 # source "config/blockchain-v2.sh"
 
-# ## TEST:
+## TEST:
 
 
 # if [[ ! -n $(command -v fabric-cli) ]]; then
@@ -61,9 +68,7 @@ fi
 # fi
 
 
-# CONFIGPATH="$(pwd)/deploy_config.json"
-# CONFIG=`cat ${CONFIGPATH}`
-# # echo $CONFIG; echo; echo;
+
 
 # # echo $(dirname $0)
 
@@ -74,7 +79,6 @@ fi
 
 # # Install chaincode for all orgs' peers
 # if [[ -z $1 || $1 == "install" ]]; then
-  install_cc "${CONFIG}" "node" $(pwd)
 # fi
 
 # # Instantiate chaincode in channels

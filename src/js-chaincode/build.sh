@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "######## Build chaincode ########"
+echo "======== Build chaincode ========"
 
 # shellcheck source=src/common/env.sh
 source "${SCRIPT_DIR}/common/env.sh"
@@ -10,23 +10,17 @@ source "${SCRIPT_DIR}/common/utils.sh"
 $DEBUG && set -x
 
 echo "######## Download dependencies ########"
+setup_env
+install_python $PYTHON_VERSION
 nvm_install_node $NODE_VERSION
-# setup_env
 
+echo "=> Check #1 -- node"
+node -v
+which node
 
+echo "######## Building fabric-cli ########"
+build_fabric_cli $FABRIC_CLI_DIR
 
-echo "######## Print Environment ########"
-
-# /root
-echo "=> HOME ${HOME}"
-ls -aGln $HOME
-
-# /home/pipeline/...
-echo "=> ROOT ${ROOTDIR}"
-ls -aGln $ROOTDIR
-
-
-# echo "######## Building chaincode ########"
-
-# npm install
-# npm run build
+echo "######## Building chaincode ########"
+npm install
+npm run build
