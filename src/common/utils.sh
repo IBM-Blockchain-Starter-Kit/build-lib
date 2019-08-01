@@ -88,12 +88,16 @@ function install_node {
 
 function nvm_install_node {
   local NODE_VERSION=${1-:NODE_VERSION}
-  if [[ ! -n $(command -v nvm) ]]; then
-    nvm install 8.16 \
-      && nvm alias default "$NODE_VERSION" \
-      && node -v \
-      && nvm -v
-  fi
+
+  echo "=> Installing node v${NODE_VERSION} via nvm v${NVM_VERSION}"
+
+  
+  nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default \
+    && nvm current \
+    && node -v \
+    && npm -v
 }
 
 #######################################
@@ -109,7 +113,7 @@ function install_python {
   local PYTHON_VERSION=$1
   local prevdir=$(pwd)
 
-  echo "######## Installing Python-v${PYTHON_VERSION} ########"  
+  echo "=> Installing Python-v${PYTHON_VERSION} ########"  
 
   mkdir -p ${HOME}/.python \
     && cd ${HOME}/.python \
@@ -119,9 +123,9 @@ function install_python {
     && ./configure --prefix=${HOME}/.python --enable-optimizations \
     && make install
 
-    export PATH=${HOME}/.python/bin:$PATH
-    
-    cd $prevdir
+  export PATH=${HOME}/.python/bin:$PATH
+
+  cd $prevdir
 }
 
 #######################################
@@ -223,25 +227,15 @@ function retry_with_backoff {
 #   None
 #######################################
 function setup_env {
-
-
-  echo "=> apt-get --fix-missing"
+  echo "=> apt-get update"
   apt-get update
   echo
 
-  echo "=> Installing build-essential"
+  echo "=> apt-get install build-essential"
   echo "Y" | apt-get install build-essential --fix-missing
   echo
 
-  echo "=> Install g++" 
+  echo "=> apt install g++" 
   echo "Y" | apt install g++ --fix-missing
-  echo
-
-  echo "=> Installing python v${PYTHON_VERSION}"
-  install_python "$PYTHON_VERSION"
-  echo
-
-  echo "=> Installing node v${NODE_VERSION} via nvm v${NVM_VERSION}"
-  install_node "$NODE_VERSION" "$NVM_VERSION"
   echo
 }
