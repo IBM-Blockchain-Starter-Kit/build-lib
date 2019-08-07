@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Go chaincode specific deploy script
+# JS chaincode specific deploy script
 
 # shellcheck source=src/common/env.sh
 source "${SCRIPT_DIR}/common/env.sh"
@@ -45,9 +45,36 @@ CONFIGPATH="$(pwd)/deploy_config.json"
 CONFIG=`cat ${CONFIGPATH}`
 echo $CONFIG; echo; echo;
 
-install_cc "${CONFIGPATH}" "node" $(pwd)
-instantiate_cc "${CONFIGPATH}" "node" $(pwd)
-invoke_cc "${CONFIGPATH}" "node" $(pwd)
+for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
+  for ccindex in $(cat ${CONFIGPATH} | jq ".${org}.chaincode | keys | .[]"); do
+    cc=$(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}]")
+    for channel in $(echo ${cc} | jq '.channels | .[]'); do
+      conn_profile="$(pwd)/config/${org}-${channel}.json"
+      admin_identity="$(pwd)/config/${org}-admin.json"
+      cc_name=$(cat ${SRC_DIR}/package.json | jq '.name')
+      cc_version=$(cat ${SRC_DIR}/package.json | jq '.version')
+
+      # should install
+      if [[ "true" == $(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}] | .install") ]]; then
+        install_cc_standalone "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "node" "$(pwd)"
+      fi
+
+      # should instantiate
+      if [[ "true" == $(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}] | .instantiate") ]]; then
+        init_fn=$(cat $CONFIGPATH | jq ".${org}.chaincode | .[${ccindex}] | .init_fn?")
+        if [[ init_fn == null ]]; then unset init_fn; fi
+
+        init_args=$(cat $CONFIGPATH | jq ".${org}.chaincode | .[${ccindex}] | .init_args?")
+        if [[ init_args == null ]]; then unset init_args; fi
+
+        instantiate_cc_standalone "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "${channel}" "node" "${init_fn}" "${init_args}"
+
+        # # test invokation of init method
+        # invoke_cc_standalone $org $admin_identity
+      fi      
+    done
+  done
+done
 
 ####################################
 #!/usr/bin/env bash
