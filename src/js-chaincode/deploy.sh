@@ -16,12 +16,11 @@ if [[ ! -f $CONFIGPATH ]]; then
   exit 1
 fi
 
-echo "######## Download dependencies ########"
-setup_env
-install_python $PYTHON_VERSION
+# echo "######## Download dependencies ########"
+# setup_env
 nvm_install_node $NODE_VERSION
 install_jq
-echo
+# echo
 
 echo "######## Build fabric-cli ########"
 build_fabric_cli $FABRIC_CLI_DIR
@@ -29,21 +28,18 @@ echo
 
 echo "=> Validating dependencies..."
 if [[ ! -n $(command -v fabric-cli) ]]; then
-  exit_error "fabric-cli interface not found in PATH env variable"
+  error_exit "fabric-cli interface not found in PATH env variable"
 else
   which fabric-cli
 fi
 if [[ ! -n $(command -v jq) ]]; then
-  exit_error "jq interface not found in PATH env variable"
+  error_exit "jq interface not found in PATH env variable"
 else
   which jq
 fi
 
 echo '$CONFIGPATH...'${CONFIGPATH}
 cat ${CONFIGPATH}
-CONFIGPATH="$(pwd)/deploy_config.json"
-CONFIG=`cat ${CONFIGPATH}`
-echo $CONFIG; echo; echo;
 
 for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
   for ccindex in $(cat ${CONFIGPATH} | jq ".${org}.chaincode | keys | .[]"); do
@@ -51,12 +47,12 @@ for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
     for channel in $(echo ${cc} | jq '.channels | .[]'); do
       conn_profile="$(pwd)/config/${org}-${channel}.json"
       admin_identity="$(pwd)/config/${org}-admin.json"
-      cc_name=$(cat ${SRC_DIR}/package.json | jq '.name')
-      cc_version=$(cat ${SRC_DIR}/package.json | jq '.version')
+      cc_name=$(echo ${cc} | jq '.name')
+      cc_version=$(echo ${cc} | jq '.version')
 
       # should install
       if [[ "true" == $(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}] | .install") ]]; then
-        install_cc_standalone "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "node" "$(pwd)"
+        install_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "node" "$(pwd)"
       fi
 
       # should instantiate
@@ -67,10 +63,10 @@ for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
         init_args=$(cat $CONFIGPATH | jq ".${org}.chaincode | .[${ccindex}] | .init_args?")
         if [[ init_args == null ]]; then unset init_args; fi
 
-        instantiate_cc_standalone "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "${channel}" "node" "${init_fn}" "${init_args}"
+        instantiate_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "${channel}" "node" "${init_fn}" "${init_args}"
 
-        # # test invokation of init method
-        # invoke_cc_standalone $org $admin_identity
+        # test invocation of init method
+        # invoke_cc $org $admin_identity
       fi      
     done
   done

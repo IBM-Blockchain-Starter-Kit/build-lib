@@ -23,4 +23,5 @@ build_fabric_cli $FABRIC_CLI_DIR
 
 echo "######## Building chaincode ########"
 npm install
+# transpile from typescript to javascript
 npm run build
