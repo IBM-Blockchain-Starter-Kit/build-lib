@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #######################################
 # Install chaincode provided specified parameters
 # Globals:
@@ -10,7 +12,7 @@
 # Returns:
 #   None
 #######################################
-function install_cc {
+function install_cc_auto {
   local DEPLOY_CONFIG=$1
   local PLATFORM=$2
   local SRC_DIR=$3
@@ -28,10 +30,10 @@ function install_cc {
         # echo "conn_profile...${conn_profile//\"}"
         # less ${conn_profile//\"}
 
-        echo "fabric-cli chaincode install --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${PLATFORM//\"} --src-dir ${SRC_DIR//\"}"
+        local cmd="fabric-cli chaincode install --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${PLATFORM//\"} --src-dir ${SRC_DIR//\"}"
+        echo $cmd
         echo
-        echo
-        echo "fabric-cli chaincode install --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${PLATFORM//\"} --src-dir ${SRC_DIR//\"}" | bash
+        echo $cmd | bash
       done
     done
   done
@@ -52,7 +54,7 @@ function install_cc {
 # Returns:
 #   None
 #######################################
-function install_cc_standalone {
+function install_cc {
   local org=$1
   local admin_identity=$2
   local conn_profile=$3
@@ -65,7 +67,7 @@ function install_cc_standalone {
   
   echo ${cmd}
   echo
-  echo ${cmd} | bash
+  retry_with_backoff 5 ${cmd}
 }
 
 #######################################
@@ -79,7 +81,7 @@ function install_cc_standalone {
 # Returns:
 #   None
 #######################################
-function instantiate_cc {
+function instantiate_cc_auto {
   # echo "still in development..."
   local DEPLOY_CONFIG=$1
   local PLATFORM=$2
@@ -103,10 +105,10 @@ function instantiate_cc {
         # echo $init_args
 
         # TEST: how to format multiple init_args into cli
-        if [[ -z $init_args || ${init_args} == "[]" ]]; then
+        if [[ -z $init_args || ${init_args} == [] ]]; then
           local cmd="fabric-cli chaincode instantiate --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${PLATFORM//\"} --channel ${channel//\"} --init-function ${init_fn//\"}"
         else
-          local cmd="fabric-cli chaincode instantiate --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${PLATFORM//\"} --channel ${channel//\"} --init-function ${init_fn//\"} --init-args ${init_args//\"}"
+          local cmd="fabric-cli chaincode instantiate --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${PLATFORM//\"} --channel ${channel//\"} --init-function ${init_fn//\"} --init-args \"${init_args//\"}\""
         fi
         echo ${cmd}; echo; echo
 
@@ -133,7 +135,7 @@ function instantiate_cc {
 # Returns:
 #   None
 #######################################
-function instantiate_cc_standalone {
+function instantiate_cc {
   local org=$1
   local admin_identity=$2
   local conn_profile=$3
@@ -148,7 +150,7 @@ function instantiate_cc_standalone {
 
   echo ${cmd}
   echo
-  echo ${cmd} | bash
+  retry_with_backoff 5 ${cmd}
 }
 
 #######################################
@@ -162,7 +164,7 @@ function instantiate_cc_standalone {
 # Returns:
 #   None
 #######################################
-function invoke_cc {
+function invoke_cc_auto {
   local DEPLOY_CONFIG=$1
   local PLATFORM=$2
   local SRC_DIR=$3
@@ -213,7 +215,7 @@ function invoke_cc {
 # Returns:
 #   None
 #######################################
-function invoke_cc_standalone {
+function invoke_cc {
   local org=$1
   local admin_identity=$2
   local conn_profile=$3
@@ -228,5 +230,5 @@ function invoke_cc_standalone {
 
   echo ${cmd}
   echo
-  echo ${cmd} | bash
+  retry_with_backoff 5 ${cmd}
 }
