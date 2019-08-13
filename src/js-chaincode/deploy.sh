@@ -52,7 +52,7 @@ for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
 
       # should install
       if [[ "true" == $(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}] | .install") ]]; then
-        install_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "node" "$(pwd)"
+        retry_with_backoff 5 install_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "node" "$(pwd)"
       fi
 
       # should instantiate
@@ -63,7 +63,7 @@ for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
         init_args=$(cat $CONFIGPATH | jq ".${org}.chaincode | .[${ccindex}] | .init_args?")
         if [[ init_args == null ]]; then unset init_args; fi
 
-        instantiate_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "${channel}" "node" "${init_fn}" "${init_args}"
+        retry_with_backoff 5 instantiate_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "${channel}" "node" "${init_fn}" "${init_args}"
 
         # test invocation of init method
         # invoke_cc $org $admin_identity
