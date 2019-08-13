@@ -140,12 +140,12 @@ function install_python {
 #######################################
 function build_fabric_cli {
   local fabric_cli_dir=${1:-$FABRIC_CLI_DIR}
-  local prevdir=$(pwd)
 
+  local prevdir=$(pwd)
   cd $FABRIC_CLI_DIR
   echo "pwd... $(pwd)"
   
-  echo "=> npm install..."
+  echo "=> npm -v ... $(npm -v)"
   npm install
   echo "=> npm run build..."
   npm run build
