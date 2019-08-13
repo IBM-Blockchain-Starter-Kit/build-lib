@@ -67,7 +67,7 @@ function install_cc {
   
   echo ${cmd}
   echo
-  retry_with_backoff 5 ${cmd}
+  echo ${cmd} | bash
 }
 
 #######################################
@@ -150,7 +150,7 @@ function instantiate_cc {
 
   echo ${cmd}
   echo
-  retry_with_backoff 5 ${cmd}
+  echo ${cmd} | bash
 }
 
 #######################################
@@ -230,5 +230,5 @@ function invoke_cc {
 
   echo ${cmd}
   echo
-  retry_with_backoff 5 ${cmd}
+  echo ${cmd} | bash
 }
