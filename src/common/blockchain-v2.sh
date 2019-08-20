@@ -60,6 +60,9 @@ function instantiate_cc {
   local platform=$7
   local init_fn=${8:-""}
   local init_args=${9:-""}
+  local collections_config=${10:-""}
+
+  echo "collections config...${collections_config}"
 
   local cmd="fabric-cli chaincode instantiate --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${platform//\"} --channel ${channel//\"}"
 
@@ -69,11 +72,14 @@ function instantiate_cc {
   if [[ -n $init_args ]]; then
     local init_args_flag=" --init-args ${init_args//\"}"
   fi
+  if [[ -n $collections_config ]]; then
+    local collections_config_flag=" --collections-config ${collections_config}"
+  fi
 
   echo 
-  echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""}
+  echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""} ${collections_config_flag:-""}
   echo
-  echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""} | bash
+  # echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""} ${collections_config_flag:-""} | bash
 }
 
 
