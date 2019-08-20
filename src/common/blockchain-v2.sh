@@ -70,7 +70,7 @@ function instantiate_cc {
     local init_args_flag=" --init-args ${init_args//\"}"
   fi
 
-  echo "instantiating..."
+  echo 
   echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""}
   echo
   echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""} | bash
