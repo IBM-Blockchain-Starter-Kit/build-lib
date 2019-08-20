@@ -41,29 +41,32 @@ fi
 echo '$CONFIGPATH...'${CONFIGPATH}
 cat ${CONFIGPATH}
 
-for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
-  for ccindex in $(cat ${CONFIGPATH} | jq ".${org}.chaincode | keys | .[]"); do
-    cc=$(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}]")
-    for channel in $(echo ${cc} | jq '.channels | .[]'); do
+for org in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
+  for ccindex in $(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | keys | .[]"); do
+    cc=$(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | .[${ccindex}]")
+    for channel in $(echo ${cc} | jq -r '.channels | .[]'); do
       conn_profile="$(pwd)/config/${org}-${channel}.json"
       admin_identity="$(pwd)/config/${org}-admin.json"
-      cc_name=$(echo ${cc} | jq '.name')
-      cc_version=$(echo ${cc} | jq '.version')
+      cc_name=$(echo ${cc} | jq -r '.name')
+      cc_version=$(echo ${cc} | jq -r '.version')
 
       # should install
-      if [[ "true" == $(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}] | .install") ]]; then
+      if [[ "true" == $(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | .[${ccindex}] | .install") ]]; then
         retry_with_backoff 5 install_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "node" "$(pwd)"
       fi
 
       # should instantiate
-      if [[ "true" == $(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}] | .instantiate") ]]; then
-        init_fn=$(cat $CONFIGPATH | jq ".${org}.chaincode | .[${ccindex}] | .init_fn?")
-        if [[ init_fn == null ]]; then unset init_fn; fi
+      if [[ "true" == $(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | .[${ccindex}] | .instantiate") ]]; then
+        init_fn=$(cat $CONFIGPATH | jq -r ".${org}.chaincode | .[${ccindex}] | .init_fn?")
+        if [[ $init_fn == null ]]; then unset init_fn; fi
 
-        init_args=$(cat $CONFIGPATH | jq ".${org}.chaincode | .[${ccindex}] | .init_args?")
-        if [[ init_args == null ]]; then unset init_args; fi
+        init_args=$(cat $CONFIGPATH | jq -r ".${org}.chaincode | .[${ccindex}] | .init_args?")
+        if [[ $init_args == null ]]; then unset init_args; fi
 
-        retry_with_backoff 5 instantiate_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "${channel}" "node" "${init_fn}" "${init_args}"
+        collections_config=$(cat $CONFIGPATH | jq -r ".${org}.chaincode | .[${ccindex}] .collections_config?")
+        if [[ $collections_config == null ]]; then unset collections_config; fi
+
+        instantiate_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "${channel}" "node" "${init_fn}" "${init_args}" "$(pwd)/${collections_config}"
 
         # test invocation of init method
         # invoke_cc $org $admin_identity
