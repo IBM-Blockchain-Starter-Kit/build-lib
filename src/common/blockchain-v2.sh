@@ -25,7 +25,8 @@ function install_cc {
   local src_dir=$7
 
   cmd="fabric-cli chaincode install --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${platform//\"} --src-dir ${src_dir//\"}"
-  
+
+  echo
   echo ${cmd}
   echo
   echo ${cmd} | bash
@@ -57,14 +58,22 @@ function instantiate_cc {
   local cc_version=$5
   local channel=$6
   local platform=$7
-  local init_fn=${8:-"init"}
-  local init_args=${9:-"[]"}
+  local init_fn=${8:-""}
+  local init_args=${9:-""}
 
-  local cmd="fabric-cli chaincode instantiate --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${platform//\"} --channel ${channel//\"} --init-fn ${init_fn//\"} --init-args ${init_args//\"}"
+  local cmd="fabric-cli chaincode instantiate --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${platform//\"} --channel ${channel//\"}"
 
-  echo ${cmd}
+  if [[ -n $init_fn ]]; then
+    local init_fn_flag=" --init-fn ${init_fn//\"}"
+  fi
+  if [[ -n $init_args ]]; then
+    local init_args_flag=" --init-args ${init_args//\"}"
+  fi
+
+  echo "instantiating..."
+  echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""}
   echo
-  echo ${cmd} | bash
+  echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""} | bash
 }
 
 
