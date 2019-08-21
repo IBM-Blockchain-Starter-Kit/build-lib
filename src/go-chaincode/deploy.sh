@@ -27,7 +27,7 @@ build_fabric_cli $FABRIC_CLI_DIR
 
 echo "=> Validating dependencies..."
 if [[ ! -n $(command -v fabric-cli) ]]; then
-  error_exit "fabric-cli interface not found in PATH env variable"  
+  error_exit "fabric-cli interface not found in PATH env variable"
 fi
 if [[ ! -n $(command -v jq) ]]; then
   error_exit "jq interface not found in PATH env variable"
@@ -41,7 +41,7 @@ for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
       admin_identity="$(pwd)/config/${org}-admin.json"
       cc_name=$(echo ${cc} | jq -r '.name')
       cc_version=$(echo ${cc} | jq -r '.version')
-      cc_src=$(echo ${cc} | jq -r '.path')  
+      cc_src=$(echo ${cc} | jq -r '.path')
 
       # check chaincode path exists in GOPATH/src directory
       echo "-> reviewing chaincode path...${cc_src}"
@@ -51,8 +51,8 @@ for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
       fi
 
       # should install
-      if [[ "true" == $(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}] | .install") ]]; then
-        echo "=> installing...${cc_src}"        
+      if [[ "true" == $(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | .[${ccindex}] | .install") ]]; then
+        echo "=> installing...${cc_src}"
         retry_with_backoff 5 install_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "golang" ${cc_src}
       fi
 
@@ -69,7 +69,7 @@ for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
 
         # # test invokation of init method
         # invoke_cc $org $admin_identity
-      fi      
+      fi
     done
   done
 done

@@ -39,7 +39,6 @@ else
 fi
 
 echo '$CONFIGPATH...'${CONFIGPATH}
-cat ${CONFIGPATH}
 
 for org in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
   for ccindex in $(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | keys | .[]"); do
@@ -66,54 +65,11 @@ for org in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
         collections_config=$(cat $CONFIGPATH | jq -r ".${org}.chaincode | .[${ccindex}] .collections_config?")
         if [[ $collections_config == null ]]; then unset collections_config; fi
 
-        instantiate_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "${channel}" "node" "${init_fn}" "${init_args}" "$(pwd)/${collections_config}"
+        instantiate_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "${channel}" "node" "${init_fn}" "${init_args}" "${collections_config}"
 
         # test invocation of init method
         # invoke_cc $org $admin_identity
-      fi      
+      fi
     done
   done
 done
-
-####################################
-#!/usr/bin/env bash
-
-# source "${SCRIPT_DIR}/common/env.sh"
-# source "${SCRIPT_DIR}/common/util.sh"
-# source "${SCRIPT_DIR}/common/blockchain-v2.sh"
-# source "config/blockchain-v2.sh"
-
-## TEST:
-
-
-# if [[ ! -n $(command -v fabric-cli) ]]; then
-#   exit_error "fabric-cli interface not found in PATH env variable"
-# fi
-# if [[ ! -n $(command -v jq) ]]; then
-#   exit_error "jq interface not found in PATH env variable"
-# fi
-
-
-
-
-# # echo $(dirname $0)
-
-# # for org in $(echo $CONFIG | jq 'keys | .[]'); do
-# #   echo $org
-# # done
-
-
-# # Install chaincode for all orgs' peers
-# if [[ -z $1 || $1 == "install" ]]; then
-# fi
-
-# # Instantiate chaincode in channels
-# if [[ -z $1 || $1 == "instantiate" ]]; then
-#   instantiate_cc "${CONFIG}" node $(pwd)
-# fi
-
-# # Invoke init func on installed channels by installed organizations
-# if [[ -z $1 || $1 == "invoke" ]]; then
-#   invoke_cc "${CONFIG}" node $(pwd)
-# fi
-####################################
