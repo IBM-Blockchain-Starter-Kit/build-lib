@@ -40,12 +40,18 @@ fi
 
 echo '$CONFIGPATH...'${CONFIGPATH}
 
+conn_profile_file=`mktemp`
+echo ${CONNECTION_PROFILE_STRING} > $conn_profile_file
+
+admin_identity_file=`mktemp`
+echo ${ADMIN_IDENTITY_STRING} > $admin_identity
+
 for org in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
   for ccindex in $(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | keys | .[]"); do
     cc=$(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | .[${ccindex}]")
     for channel in $(echo ${cc} | jq -r '.channels | .[]'); do
-      conn_profile="$(pwd)/config/${org}-${channel}.json"
-      admin_identity="$(pwd)/config/${org}-admin.json"
+      conn_profile="${conn_profile_file}"
+      admin_identity="${admin_identity_file}"
       cc_name=$(echo ${cc} | jq -r '.name')
       cc_version=$(echo ${cc} | jq -r '.version')
 
