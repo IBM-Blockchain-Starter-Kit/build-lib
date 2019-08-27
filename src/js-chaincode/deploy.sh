@@ -38,26 +38,26 @@ else
   which jq
 fi
 
-echo '$CONFIGPATH...'${CONFIGPATH}
 
-conn_profile_file=`mktemp`
-echo ${CONNECTION_PROFILE_STRING} > $conn_profile_file
+# Load profiles from toolchain ENV variables (from creation)
+profiles_path=$(pwd)/profiles/
+mkdir -p "${profiles_path}"
+conn_profile_file=$(pwd)/profiles/conn_profile_file.json
+admin_identity_file=$(pwd)/profiles/admin_identity_file.json
 
-admin_identity_file=`mktemp`
-echo ${ADMIN_IDENTITY_STRING} > $admin_identity
 
 for org in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
   for ccindex in $(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | keys | .[]"); do
     cc=$(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | .[${ccindex}]")
     for channel in $(echo ${cc} | jq -r '.channels | .[]'); do
-      conn_profile="${conn_profile_file}"
-      admin_identity="${admin_identity_file}"
+    #   conn_profile="${conn_profile_file}"
+    #   admin_identity="${admin_identity_file}"
       cc_name=$(echo ${cc} | jq -r '.name')
       cc_version=$(echo ${cc} | jq -r '.version')
 
       # should install
       if [[ "true" == $(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | .[${ccindex}] | .install") ]]; then
-        retry_with_backoff 5 install_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "node" "$(pwd)"
+        retry_with_backoff 5 install_cc "${org}" "${admin_identity_file}" "${conn_profile_file}" "${cc_name}" "${cc_version}" "node" "$(pwd)"
       fi
 
       # should instantiate
@@ -71,7 +71,7 @@ for org in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
         collections_config=$(cat $CONFIGPATH | jq -r ".${org}.chaincode | .[${ccindex}] .collections_config?")
         if [[ $collections_config == null ]]; then unset collections_config; fi
 
-        retry_with_backoff 5 instantiate_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "${channel}" "node" "${init_fn}" "${init_args}" "${collections_config}"
+        retry_with_backoff 5 instantiate_cc "${org}" "${admin_identity_file}" "${conn_profile_file}" "${cc_name}" "${cc_version}" "${channel}" "node" "${init_fn}" "${init_args}" "${collections_config}"
 
         # test invocation of init method
         # invoke_cc $org $admin_identity
@@ -79,3 +79,5 @@ for org in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
     done
   done
 done
+
+rm -rf "${profiles_path}"

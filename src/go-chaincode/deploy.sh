@@ -33,12 +33,25 @@ if [[ ! -n $(command -v jq) ]]; then
   error_exit "jq interface not found in PATH env variable"
 fi
 
+
+# Load profiles from toolchain ENV variables (from creation)
+
+profiles_path=$(pwd)/profiles/
+mkdir -p "${profiles_path}"
+
+conn_profile_file=$(pwd)/profiles/conn_profile_file.json
+admin_identity_file=$(pwd)/profiles/admin_identity_file.json
+
+
+# Deploying based on configuration options
+echo "######### Reading 'deploy_config.json' for deployment options #########"
+
 for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
   for ccindex in $(cat ${CONFIGPATH} | jq ".${org}.chaincode | keys | .[]"); do
     cc=$(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}]")
     for channel in $(echo ${cc} | jq '.channels | .[]'); do
-      conn_profile="$(pwd)/config/${org}-${channel}.json"
-      admin_identity="$(pwd)/config/${org}-admin.json"
+    #   conn_profile="$(pwd)/config/${org}-${channel}.json"
+    #   admin_identity="$(pwd)/config/${org}-admin.json"
       cc_name=$(echo ${cc} | jq -r '.name')
       cc_version=$(echo ${cc} | jq -r '.version')
       cc_src=$(echo ${cc} | jq -r '.path')
@@ -53,7 +66,7 @@ for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
       # should install
       if [[ "true" == $(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | .[${ccindex}] | .install") ]]; then
         echo "=> installing...${cc_src}"
-        retry_with_backoff 5 install_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "golang" ${cc_src}
+        retry_with_backoff 5 install_cc "${org}" "${admin_identity_file}" "${conn_profile_file}" "${cc_name}" "${cc_version}" "golang" ${cc_src}
       fi
 
       # should instantiate
@@ -65,7 +78,7 @@ for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
         if [[ -z $init_args ]]; then init_args="[]"; fi
 
         echo "=> instantiating...${cc_src}"
-        retry_with_backoff 5 instantiate_cc "${org}" "${admin_identity}" "${conn_profile}" "${cc_name}" "${cc_version}" "${channel}" "golang" "${init_fn}" "${init_args}"
+        retry_with_backoff 5 instantiate_cc "${org}" "${admin_identity_file}" "${conn_profile_file}" "${cc_name}" "${cc_version}" "${channel}" "golang" "${init_fn}" "${init_args}"
 
         # # test invokation of init method
         # invoke_cc $org $admin_identity
