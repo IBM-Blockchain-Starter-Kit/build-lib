@@ -75,9 +75,9 @@ function instantiate_cc {
   fi
 
   echo 
-  echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""} ${collections_config_flag:-""}
+  echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""} ${collections_config_flag:-""} "--timeout 360000"
   echo
-  echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""} ${collections_config_flag:-""} | bash
+  echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""} ${collections_config_flag:-""} "--timeout 360000" | bash
 }
 
 
@@ -115,4 +115,81 @@ function invoke_cc {
   echo ${cmd}
   echo
   echo ${cmd} | bash
+}
+
+#######################################
+# Retrieve api access token
+# Globals:
+#   None
+# Arguments:
+#   - apikey: 
+# Returns:
+#   None
+#######################################
+function retrieve_access_token {
+    local apikey=$1
+
+    if [[ ! -n $(command -v jq) ]]; then
+        error_exit "jq interface not found in PATH env variable"
+    fi
+
+    curl -X POST \
+        https://iam.cloud.ibm.com/identity/token \
+        -H "Content-Type: application/x-www-form-urlencoded" \
+        -H "Accept: application/json" \
+        --data-urlencode "grant_type=urn:ibm:params:oauth:grant-type:apikey" \
+        --data-urlencode "apikey=${apikey}" \
+    | jq -r ."access_token"
+}
+
+#######################################
+# 
+# Globals:
+#   None
+# Arguments:
+#   - apikey: 
+# Returns:
+#   None
+#######################################
+function validate_component {
+    local api_endpoint=$1
+    # test apikey: mSeo7VrFtt228viF1tWniIFbp4w21NynnXV7rB6eVFZn
+    local apikey=${2:-"mSeo7VrFtt228viF1tWniIFbp4w21NynnXV7rB6eVFZn"}
+    local component_id=$3
+
+    
+    local access_token=$(retrieve_access_token ${apikey}) 
+    # echo "access token...${access_token}"   
+
+    # echo $components
+    local response=$(curl -X GET "https://${api_endpoint}/ak/api/v1/components" \
+        -H "Authorization: Bearer ${access_token}")
+
+
+    for compindex in $(echo ${response} | jq -r "keys | .[]"); do
+        # echo "compindex...$compindex"
+        local component=$(echo ${response} | jq -r ".[${compindex}]")
+        # for component in $(echo ${response} | jq ".[${compindex}]"); do
+        # echo "component...$component"
+        # echo $component | jq -r ".id"            
+        # continue
+
+        #LOGS:        
+        if [[ $(echo $component | jq -r ".msp_id?") != null ]]; then
+            local id=$(echo $component | jq -r ".msp_id?")
+        else
+            local id=$(echo ${component} | jq -r ".id")
+        fi
+
+        if [[ $id == $component_id ]]; then
+            return 0
+        fi
+        # done
+    done
+
+    error_exit "cannot find requested component: ${component_id}"
+
+    # for compindex in $(echo ${response} | jq -r "keys | .[]"); do
+    #     echo $(echo ${response} | jq -r "keys | .[${compindex}]")
+    # done
 }
