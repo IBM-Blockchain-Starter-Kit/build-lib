@@ -5,31 +5,33 @@
 # Globals:
 #   None
 # Arguments:
-#   - org: org msp name
-#   - admin_identity: abs path to associated admin identity
-#   - conn_profile: abs path to the connection profile
-#   - cc_name: chaincode name to be installed
-#   - cc_version: chaincode version to be installed
-#   - platform: [ golang, node, java ]
-#   - src_dir: absolute path to chaincode directory
+#   - ORG: org msp name
+#   - ADMIN_IDENTITY: abs path to associated admin identity
+#   - CONN_PROFILE: abs path to the connection profile
+#   - CC_NAME: chaincode name to be installed
+#   - CC_VERSION: chaincode version to be installed
+#   - PLATFORM: [ golang, node, java ]
+#   - SRC_DIR: absolute path to chaincode directory
 # Returns:
 #   None
 #######################################
 function install_cc {
-  local org=$1
-  local admin_identity=$2
-  local conn_profile=$3
-  local cc_name=$4
-  local cc_version=$5
-  local platform=$6
-  local src_dir=$7
+  local ORG=$1
+  local ADMIN_IDENTITY=$2
+  local CONN_PROFILE=$3
+  local CC_NAME=$4
+  local CC_VERSION=$5
+  local PLATFORM=$6
+  local SRC_DIR=$7
 
-  cmd="fabric-cli chaincode install --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${platform//\"} --src-dir ${src_dir//\"}"
+  CMD="fabric-cli chaincode install --conn-profile ${CONN_PROFILE} --org ${ORG} \
+  --admin-identity ${ADMIN_IDENTITY} --cc-name ${CC_NAME} --cc-version ${CC_VERSION} \
+  --cc-type ${PLATFORM} --src-dir ${SRC_DIR}"
 
   echo
-  echo ${cmd}
+  echo ${CMD}
   echo
-  echo ${cmd} | bash
+  echo ${CMD} | bash
 }
 
 
@@ -38,46 +40,48 @@ function install_cc {
 # Globals:
 #   None
 # Arguments:
-#   - org: org msp name
-#   - admin_identity: abs path to associated admin identity
-#   - conn_profile: abs path to the connection profile
-#   - cc_name: chaincode name to be instantiated on the channel
-#   - cc_version: chaincode version to be instantiated on the channel
-#   - channel: channel name that chaincode will be instantiated on
-#   - platform: [ golang, node, java ]
-#   (-) init_fn: name of function to be instantiated on (default: init)
-#   (-) init_args: args passed into the init function (default: [])
+#   - ORG: org msp name
+#   - ADMIN_IDENTITY: abs path to associated admin identity
+#   - CONN_PROFILE: abs path to the connection profile
+#   - CC_NAME: chaincode name to be installed
+#   - CC_VERSION: chaincode version to be installed
+#   - CHANNEL: channel name that chaincode will be instantiated on
+#   - PLATFORM: [ golang, node, java ]
+#  (-) INIT_FN: name of function to be instantiated on (default: init)
+#  (-) INIT_ARGS: args passed into the init function (default: [])
 # Returns:
 #   None
 #######################################
 function instantiate_cc {
-  local org=$1
-  local admin_identity=$2
-  local conn_profile=$3
-  local cc_name=$4
-  local cc_version=$5
-  local channel=$6
-  local platform=$7
-  local init_fn=${8:-""}
-  local init_args=${9:-""}
-  local collections_config=${10:-""}
+  local ORG=$1
+  local ADMIN_IDENTITY=$2
+  local CONN_PROFILE=$3
+  local CC_NAME=$4
+  local CC_VERSION=$5
+  local CHANNEL=$6
+  local PLATFORM=$7
+  local INIT_FN=${8:-""}
+  local INIT_ARGS=${9:-""}
+  local COLLECTIONS_CONFIG=${10:-""}
 
-  local cmd="fabric-cli chaincode instantiate --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${platform//\"} --channel ${channel//\"}"
+  local CMD="fabric-cli chaincode instantiate --conn-profile ${CONN_PROFILE} --org ${ORG} \
+  --admin-identity ${ADMIN_IDENTITY} --cc-name ${CC_NAME} --cc-version ${CC_VERSION} \
+  --cc-type ${PLATFORM} --channel ${CHANNEL}"
 
-  if [[ -n $init_fn ]]; then
-    local init_fn_flag=" --init-fn ${init_fn//\"}"
+  if [[ -n $INIT_FN ]]; then
+    local INIT_FN_FLAG=" --init-fn ${INIT_FN//\"}"
   fi
-  if [[ -n $init_args ]]; then
-    local init_args_flag=" --init-args ${init_args//\"}"
+  if [[ -n $INIT_ARGS ]]; then
+    local INIT_ARGS_FLAG=" --init-args ${INIT_ARGS//\"}"
   fi
-  if [[ -n $collections_config ]]; then
-    local collections_config_flag=" --collections-config $(pwd)/${collections_config}"
+  if [[ -n $COLLECTIONS_CONFIG ]]; then
+    local COLLECTIONS_CONFIG_FLAG=" --collections-config $(pwd)/${COLLECTIONS_CONFIG}"
   fi
 
   echo 
-  echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""} ${collections_config_flag:-""} "--timeout 360000"
+  echo ${CMD} ${INIT_FN_FLAG:-""} ${INIT_ARGS_FLAG:-""} ${COLLECTIONS_CONFIG_FLAG:-""} "--timeout 360000"
   echo
-  echo ${cmd} ${init_fn_flag:-""} ${init_args_flag:-""} ${collections_config_flag:-""} "--timeout 360000" | bash
+  echo ${CMD} ${INIT_FN_FLAG:-""} ${INIT_ARGS_FLAG:-""} ${COLLECTIONS_CONFIG_FLAG:-""} "--timeout 360000" | bash
 }
 
 
@@ -86,110 +90,35 @@ function instantiate_cc {
 # Globals:
 #   None
 # Arguments:
-#   - org: org msp name
-#   - admin_identity: abs path to associated admin identity
-#   - conn_profile: abs path to the connection profile
-#   - cc_name: chaincode name to be instantiated on the channel
-#   - cc_version: chaincode version to be instantiated on the channel
-#   - channel: channel name that chaincode will be instantiated on
-#   - platform: [ golang, node, java ]
-#   (-) init_fn: name of function to be instantiated on (default: init)
-#   (-) init_args: args passed into the init function (default: [])
+#   - ORG: org msp name
+#   - ADMIN_IDENTITY: abs path to associated admin identity
+#   - CONN_PROFILE: abs path to the connection profile
+#   - CC_NAME: chaincode name to be instantiated on the channel
+#   - CC_VERSION: chaincode version to be instantiated on the channel
+#   - CHANNEL: channel name that chaincode will be instantiated on
+#   - PLATFORM: [ golang, node, java ]
+#  (-) INVOKE_FN: name of function to be instantiated on (default: init)
+#  (-) INVOKE_ARGS: args passed into the init function (default: [])
 # Returns:
 #   None
 #######################################
 #TODO: Properly integrate invoke_cc
 function invoke_cc {
-  local org=$1
-  local admin_identity=$2
-  local conn_profile=$3
-  local cc_name=$4
-  local cc_version=$5
-  local channel=$6
-  local platform=$7
-  local invoke_fn=${8:-"queryAllCars"}
-  local invoke_args=${9:-"[]"}
+  local ORG=$1
+  local ADMIN_IDENTITY=$2
+  local CONN_PROFILE=$3
+  local CC_NAME=$4
+  local CC_VERSION=$5
+  local CHANNEL=$6
+  local PLATFORM=$7
+  local INVOKE_FN=${8:-""}
+  local INVOKE_ARGS=${9:-""}  
 
-  local cmd="fabric-cli chaincode invoke --conn-profile ${conn_profile//\"} --org ${org//\"} --admin-identity ${admin_identity//\"} --cc-name ${cc_name//\"} --cc-version ${cc_version//\"} --cc-type ${platform//\"} --channel ${channel//\"} --invoke-fn ${invoke_fn//\"} --invoke-args ${invoke_args//\"}"
+  local CMD="fabric-cli chaincode invoke --conn-profile ${CONN_PROFILE} --org ${ORG} \
+  --admin-identity ${ADMIN_IDENTITY} --cc-name ${CC_NAME} --cc-version ${CC_VERSION} \
+  --cc-type ${PLATFORM} --channel ${CHANNEL} --invoke-fn ${INVOKE_FN} --invoke-args ${INVOKE_ARGS}"
 
-  echo ${cmd}
+  echo ${CMD}
   echo
-  echo ${cmd} | bash
-}
-
-#######################################
-# Retrieve api access token
-# Globals:
-#   None
-# Arguments:
-#   - apikey: 
-# Returns:
-#   None
-#######################################
-function retrieve_access_token {
-    local apikey=$1
-
-    if [[ ! -n $(command -v jq) ]]; then
-        error_exit "jq interface not found in PATH env variable"
-    fi
-
-    curl -X POST \
-        https://iam.cloud.ibm.com/identity/token \
-        -H "Content-Type: application/x-www-form-urlencoded" \
-        -H "Accept: application/json" \
-        --data-urlencode "grant_type=urn:ibm:params:oauth:grant-type:apikey" \
-        --data-urlencode "apikey=${apikey}" \
-    | jq -r ."access_token"
-}
-
-#######################################
-# 
-# Globals:
-#   None
-# Arguments:
-#   - apikey: 
-# Returns:
-#   None
-#######################################
-function validate_component {
-    local api_endpoint=$1
-    # test apikey: mSeo7VrFtt228viF1tWniIFbp4w21NynnXV7rB6eVFZn
-    local apikey=${2:-"mSeo7VrFtt228viF1tWniIFbp4w21NynnXV7rB6eVFZn"}
-    local component_id=$3
-
-    
-    local access_token=$(retrieve_access_token ${apikey}) 
-    # echo "access token...${access_token}"   
-
-    # echo $components
-    local response=$(curl -X GET "https://${api_endpoint}/ak/api/v1/components" \
-        -H "Authorization: Bearer ${access_token}")
-
-
-    for compindex in $(echo ${response} | jq -r "keys | .[]"); do
-        # echo "compindex...$compindex"
-        local component=$(echo ${response} | jq -r ".[${compindex}]")
-        # for component in $(echo ${response} | jq ".[${compindex}]"); do
-        # echo "component...$component"
-        # echo $component | jq -r ".id"            
-        # continue
-
-        #LOGS:        
-        if [[ $(echo $component | jq -r ".msp_id?") != null ]]; then
-            local id=$(echo $component | jq -r ".msp_id?")
-        else
-            local id=$(echo ${component} | jq -r ".id")
-        fi
-
-        if [[ $id == $component_id ]]; then
-            return 0
-        fi
-        # done
-    done
-
-    error_exit "cannot find requested component: ${component_id}"
-
-    # for compindex in $(echo ${response} | jq -r "keys | .[]"); do
-    #     echo $(echo ${response} | jq -r "keys | .[${compindex}]")
-    # done
+  echo ${CMD} | bash
 }
