@@ -7,7 +7,7 @@ source "${SCRIPT_DIR}/common/env.sh"
 # shellcheck source=src/common/utils.sh
 source "${SCRIPT_DIR}/common/utils.sh"
 # shellcheck source=src/common/blockchain.sh
-source "${SCRIPT_DIR}/common/blockchain-v2.sh"
+source "${SCRIPT_DIR}/common/blockchain.sh"
 
 source "${SCRIPT_DIR}/go-chaincode/vendor-dependencies.sh"
 
