@@ -11,7 +11,7 @@ $DEBUG && set -x
 
 echo "######## Download dependencies ########"
 setup_env
-install_python $PYTHON_VERSION
+install_python ${PYTHON_VERSION}
 
 echo "=> download hfl-v${HLF_VERSION} source code"
 # shellcheck source=src/go-chaincode/download-fabric.sh
@@ -47,8 +47,5 @@ for org in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
   done
 done
 cd ${ROOTDIR}
+
 # go build -v -x "chaincode/..."
-
-
-echo "######## Building fabric-cli ########"
-build_fabric_cli ${FABRIC_CLI_DIR}
