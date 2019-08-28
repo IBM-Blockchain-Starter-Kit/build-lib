@@ -89,8 +89,7 @@ function install_node {
 function nvm_install_node {
   local NODE_VERSION=${1-:NODE_VERSION}
 
-  echo "=> Installing node v${NODE_VERSION} via nvm v${NVM_VERSION}"
-
+  echo "######## Installing Node.js version ${NODE_VERSION} using nvm $(nvm -v) ########"
   
   nvm install $NODE_VERSION \
     && nvm alias default $NODE_VERSION \
@@ -111,9 +110,9 @@ function nvm_install_node {
 #######################################
 function install_python {
   local PYTHON_VERSION=$1
-  local prevdir=$(pwd)
+  local PREVDIR=$(pwd)
 
-  echo "=> Installing Python-v${PYTHON_VERSION} ########"  
+  echo "######## Installing Python-v${PYTHON_VERSION} ########"
 
   mkdir -p ${HOME}/.python \
     && cd ${HOME}/.python \
@@ -125,11 +124,10 @@ function install_python {
 
   export PATH=${HOME}/.python/bin:$PATH
 
-  cd $prevdir
+  cd $PREVDIR
 }
 
 #######################################
-# WIP: Update download path for curl
 # Builds fabric-cli in env set $FABRIC_CLI_DIR path
 # Globals:
 #   set: PATH
@@ -139,22 +137,21 @@ function install_python {
 #   None
 #######################################
 function build_fabric_cli {
-  local fabric_cli_dir=${1:-$FABRIC_CLI_DIR}
+  local BUILD_DIR=${1:-$FABRIC_CLI_DIR}
 
-  local prevdir=$(pwd)
-  cd $FABRIC_CLI_DIR
-  echo "pwd... $(pwd)"
+  local PREVDIR=$(pwd)
+  cd $BUILD_DIR
+
+  echo "######## Building Fabric-CLI ########"
   
   echo "=> npm -v ... $(npm -v)"
   npm install
   echo "=> npm run build..."
   npm run build
-  # echo "=> chmod +x"
-  # chmod +x fabric_cli.js
   echo "=> npm link..."
   npm link
 
-  cd $prevdir
+  cd $PREVDIR
 }
 
 #######################################
@@ -218,13 +215,9 @@ function retry_with_backoff {
 }
 
 #######################################
-# 
-# Globals:
-#   
-# Arguments:
-#   None
-# Returns:
-#   None
+# Download and install
+#   - gcc compiler
+#   - make binaries
 #######################################
 function setup_env {
   echo "=> apt-get update"

@@ -35,59 +35,55 @@ fi
 
 
 # Load profiles from toolchain ENV variables (from creation)
+PROFILES_PATH=$(pwd)/profiles
+mkdir -p "${PROFILES_PATH}"
 
-profiles_path=$(pwd)/profiles/
-mkdir -p "${profiles_path}"
+CONN_PROFILE_FILE=${PROFILES_PATH}/CONN_PROFILE.json
+echo "${CONNECTION_PROFILE_STRING}" > "${CONN_PROFILE_FILE}"
 
-conn_profile_file=$(pwd)/profiles/conn_profile_file.json
-admin_identity_file=$(pwd)/profiles/admin_identity_file.json
+ADMIN_IDENTITY_FILE=${PROFILES_PATH}/ADMIN_IDENTITY.json
+echo "${ADMIN_IDENTITY_STRING}" > "${ADMIN_IDENTITY_FILE}"
 
 
 # Deploying based on configuration options
 echo "######### Reading 'deploy_config.json' for deployment options #########"
 
-for org in $(cat ${CONFIGPATH} | jq 'keys | .[]'); do
-  for ccindex in $(cat ${CONFIGPATH} | jq ".${org}.chaincode | keys | .[]"); do
-    cc=$(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}]")
-    for channel in $(echo ${cc} | jq '.channels | .[]'); do
-    #   conn_profile="$(pwd)/config/${org}-${channel}.json"
-    #   admin_identity="$(pwd)/config/${org}-admin.json"
-      cc_name=$(echo ${cc} | jq -r '.name')
-      cc_version=$(echo ${cc} | jq -r '.version')
-      cc_src=$(echo ${cc} | jq -r '.path')
+PARSED_DEPLOY_CONFIG=False
+for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do    
+  for CCINDEX in $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | keys | .[]' ); do        
+    CC=$(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}']' )    
+    for CHANNEL in $(echo ${CC} | jq -r '.channels | .[]'); do
+      PARSED_DEPLOY_CONFIG=True
 
-      # check chaincode path exists in GOPATH/src directory
-      echo "-> reviewing chaincode path...${cc_src}"
-      ls ${GOPATH}/src/${cc_src}
-      if [[! -n $(ls ${GOPATH}/src/${cc_src}) ]]; then
-        error_exit "cannot locate chaincode path for ${cc_src}"
-      fi
+      CC_NAME=$(echo ${CC} | jq -r '.name')
+      CC_VERSION=$(echo ${CC} | jq -r '.version')
+      CC_SRC=$(echo ${CC} | jq -r '.path')
 
       # should install
-      if [[ "true" == $(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | .[${ccindex}] | .install") ]]; then
-        echo "=> installing...${cc_src}"
-        retry_with_backoff 5 install_cc "${org}" "${admin_identity_file}" "${conn_profile_file}" "${cc_name}" "${cc_version}" "golang" ${cc_src}
+      if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
+        install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "golang" "${CC_SRC}"
       fi
 
       # should instantiate
-      if [[ "true" == $(cat ${CONFIGPATH} | jq ".${org}.chaincode | .[${ccindex}] | .instantiate") ]]; then
-        init_fn=$(cat $CONFIGPATH | jq ".${org}.chaincode | .[${ccindex}] | .init_fn?")
-        if [[ -z $init_fn ]]; then init_fn="init"; fi
+      if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .instantiate' ) ]]; then
+        init_fn=$(cat $CONFIGPATH | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .init_fn?')
+        if [[ $init_fn == null ]]; then unset init_fn; fi
 
-        init_args=$(cat $CONFIGPATH | jq ".${org}.chaincode | .[${ccindex}] | .init_args?")
-        if [[ -z $init_args ]]; then init_args="[]"; fi
+        init_args=$(cat $CONFIGPATH | jq -r '.['\"${org}\"'].chaincode | .['${CCINDEX}'] | .init_args?')
+        if [[ $init_args == null ]]; then unset init_args; fi
 
-        echo "=> instantiating...${cc_src}"
-        retry_with_backoff 5 instantiate_cc "${org}" "${admin_identity_file}" "${conn_profile_file}" "${cc_name}" "${cc_version}" "${channel}" "golang" "${init_fn}" "${init_args}"
+        collections_config=$(cat $CONFIGPATH | jq -r '.['\"${org}\"'].chaincode | .['${CCINDEX}'] | .collections_config?')
+        if [[ $collections_config == null ]]; then unset collections_config; fi
 
-        # # test invokation of init method
-        # invoke_cc $org $admin_identity
-      fi
+        instantiate_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "golang" "${init_fn}" "${init_args}" "${collections_config}"
+      fi      
     done
   done
 done
 
-# setup_service_constants
-# provision_blockchain
-# fetch_dependencies $CONFIGPATH
-# deploy_fabric_chaincode golang $CONFIGPATH
+if [[ ! PARSED_DEPLOY_CONFIG ]]; then
+    exit 1
+fi
+
+
+rm -rf "${PROFILES_PATH}"
