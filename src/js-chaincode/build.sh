@@ -18,9 +18,6 @@ echo "=> Check #1 -- node"
 node -v
 which node
 
-echo "######## Building fabric-cli ########"
-build_fabric_cli $FABRIC_CLI_DIR
-
 echo "######## Building chaincode ########"
 npm install
 # transpile from typescript to javascript
