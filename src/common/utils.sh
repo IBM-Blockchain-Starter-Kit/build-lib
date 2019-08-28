@@ -89,7 +89,7 @@ function install_node {
 function nvm_install_node {
   local NODE_VERSION=${1-:NODE_VERSION}
 
-  echo "######## Installing Node.js version ${NODE_VERSION} using nvm $(nvm -v) ########"
+  echo "######## Installing Node.js version ${NODE_VERSION} using nvm $(nvm --version) ########"
   
   nvm install $NODE_VERSION \
     && nvm alias default $NODE_VERSION \
