@@ -7,7 +7,7 @@ source "${SCRIPT_DIR}/common/env.sh"
 # shellcheck source=src/common/utils.sh
 source "${SCRIPT_DIR}/common/utils.sh"
 # shellcheck source=src/common/blockchain.sh
-source "${SCRIPT_DIR}/common/blockchain-v2.sh"
+source "${SCRIPT_DIR}/common/blockchain.sh"
 
 $DEBUG && set -x
 
@@ -65,7 +65,7 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
 
       # should install
       if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
-        install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "node" "$(pwd)"
+        retry_with_backoff 5 install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "node" "$(pwd)"
       fi
 
       # should instantiate
@@ -79,7 +79,7 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
         collections_config=$(cat $CONFIGPATH | jq -r '.['\"${org}\"'].chaincode | .['${CCINDEX}'] | .collections_config?')
         if [[ $collections_config == null ]]; then unset collections_config; fi
 
-        instantiate_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "node" "${init_fn}" "${init_args}" "${collections_config}"
+        retry_with_backoff 5 instantiate_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "node" "${init_fn}" "${init_args}" "${collections_config}"
       fi      
     done
   done
