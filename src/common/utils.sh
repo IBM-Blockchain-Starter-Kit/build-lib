@@ -117,7 +117,7 @@ function install_python {
   mkdir -p ${HOME}/.python \
     && cd ${HOME}/.python \
     && curl  "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" > Python-${PYTHON_VERSION}.tgz \
-    && tar -xzvf Python-${PYTHON_VERSION}.tgz > /dev/null  \
+    && tar -xzvf Python-${PYTHON_VERSION}.tgz  \
     && cd Python-${PYTHON_VERSION} \
     && ./configure --prefix=${HOME}/.python --enable-optimizations \
     && make install
