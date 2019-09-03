@@ -57,16 +57,22 @@ PARSED_DEPLOY_CONFIG=False
 for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do    
   for CCINDEX in $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | keys | .[]' ); do        
     CC=$(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}']' )    
+
+    # collect chaincode metadata
+    CC_NAME=$(echo ${CC} | jq -r '.name')
+    if [[ $(echo ${CC} | jq -r '.version?') == null ]]; then
+        CC_VERSION="$(date '+%Y%m%d.%H%M%S')"
+    else
+        CC_VERSION=$(echo ${CC} | jq -r '.version')
+    fi
+
+    # should install
+    if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
+        retry_with_backoff 5 install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "node" "$(pwd)"
+    fi
+
     for CHANNEL in $(echo ${CC} | jq -r '.channels | .[]'); do
       PARSED_DEPLOY_CONFIG=True
-
-      CC_NAME=$(echo ${CC} | jq -r '.name')
-      CC_VERSION=$(echo ${CC} | jq -r '.version')
-
-      # should install
-      if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
-        retry_with_backoff 5 install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "node" "$(pwd)"
-      fi
 
       # should instantiate
       if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .instantiate' ) ]]; then
