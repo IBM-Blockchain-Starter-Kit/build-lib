@@ -17,11 +17,11 @@ fi
 echo "${stage} stage selected"
 
 if [ "${platform}" = "go" ]; then
-    executable_script="${SCRIPT_DIR}go-chaincode/${stage}.sh"
+    executable_script="${SCRIPT_DIR}/src/go-chaincode/${stage}.sh"
     echo "Go selected"
     echo "$executable_script"
 elif [ "${platform}" = "js" ]; then
-    executable_script="${SCRIPT_DIR}js-chaincode/${stage}.sh"
+    executable_script="${SCRIPT_DIR}/src/js-chaincode/${stage}.sh"
     echo "JS selected"
     echo "${executable_script}"
 else 
