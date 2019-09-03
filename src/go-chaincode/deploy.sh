@@ -52,17 +52,23 @@ PARSED_DEPLOY_CONFIG=False
 for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do    
   for CCINDEX in $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | keys | .[]' ); do        
     CC=$(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}']' )    
+
+    # collect chaincode metadata
+    CC_NAME=$(echo ${CC} | jq -r '.name')
+    if [[ $(echo ${CC} | jq -r '.version?') == null ]]; then
+        CC_VERSION="$(date '+%Y%m%d.%H%M%S')"
+    else
+        CC_VERSION=$(echo ${CC} | jq -r '.version')
+    fi
+    CC_SRC=$(echo ${CC} | jq -r '.path')
+
+    # should install
+    if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
+        retry_with_backoff 5 install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "golang" "${CC_SRC}"
+    fi
+
     for CHANNEL in $(echo ${CC} | jq -r '.channels | .[]'); do
       PARSED_DEPLOY_CONFIG=True
-
-      CC_NAME=$(echo ${CC} | jq -r '.name')
-      CC_VERSION=$(echo ${CC} | jq -r '.version')
-      CC_SRC=$(echo ${CC} | jq -r '.path')
-
-      # should install
-      if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
-        install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "golang" "${CC_SRC}"
-      fi
 
       # should instantiate
       if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .instantiate' ) ]]; then
@@ -75,7 +81,7 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
         collections_config=$(cat $CONFIGPATH | jq -r '.['\"${org}\"'].chaincode | .['${CCINDEX}'] | .collections_config?')
         if [[ $collections_config == null ]]; then unset collections_config; fi
 
-        instantiate_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "golang" "${init_fn}" "${init_args}" "${collections_config}"
+        retry_with_backoff 5 instantiate_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "golang" "${init_fn}" "${init_args}" "${collections_config}"
       fi      
     done
   done
