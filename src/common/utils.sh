@@ -117,7 +117,7 @@ function install_python {
   mkdir -p ${HOME}/.python \
     && cd ${HOME}/.python \
     && curl  "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" > Python-${PYTHON_VERSION}.tgz \
-    && tar -xzvf Python-${PYTHON_VERSION}.tgz \
+    && tar -xzvf Python-${PYTHON_VERSION}.tgz > /dev/null  \
     && cd Python-${PYTHON_VERSION} \
     && ./configure --prefix=${HOME}/.python --enable-optimizations \
     && make install
@@ -221,14 +221,14 @@ function retry_with_backoff {
 #######################################
 function setup_env {
   echo "=> apt-get update"
-  apt-get update
+  apt-get update > /dev/null
   echo
 
   echo "=> apt-get install build-essential"
-  echo "Y" | apt-get install build-essential --fix-missing
+  echo "Y" | apt-get install build-essential --fix-missing > /dev/null
   echo
 
   echo "=> apt install g++" 
-  echo "Y" | apt install g++ --fix-missing
+  echo "Y" | apt install g++ --fix-missing > /dev/null
   echo
 }
