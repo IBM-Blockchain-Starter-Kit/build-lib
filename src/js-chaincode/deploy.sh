@@ -22,6 +22,10 @@ nvm_install_node $NODE_VERSION
 install_jq
 # echo
 
+echo "######## Build fabric-cli ########"
+build_fabric_cli $FABRIC_CLI_DIR
+echo
+
 echo "=> Validating dependencies..."
 if [[ ! -n $(command -v fabric-cli) ]]; then
   error_exit "fabric-cli interface not found in PATH env variable"
