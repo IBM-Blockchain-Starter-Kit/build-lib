@@ -14,9 +14,9 @@ setup_env
 install_python $PYTHON_VERSION
 nvm_install_node $NODE_VERSION
 
-echo "=> Check #1 -- node"
-node -v
-which node
+echo "######## Build fabric-cli ########"
+build_fabric_cli $FABRIC_CLI_DIR
+echo
 
 echo "######## Building chaincode ########"
 npm install
