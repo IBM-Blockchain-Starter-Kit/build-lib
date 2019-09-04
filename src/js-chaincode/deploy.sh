@@ -17,9 +17,12 @@ if [[ ! -f $CONFIGPATH ]]; then
 fi
 
 # echo "######## Download dependencies ########"
-# setup_env
+which python
 nvm_install_node $NODE_VERSION
-# install_python
+if [[ ! $(command -v python) ]]; then
+    setup_env
+    install_python
+fi
 install_jq
 # echo
 
