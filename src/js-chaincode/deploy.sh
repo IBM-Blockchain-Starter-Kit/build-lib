@@ -17,7 +17,6 @@ if [[ ! -f $CONFIGPATH ]]; then
 fi
 
 # echo "######## Download dependencies ########"
-which python
 nvm_install_node $NODE_VERSION
 if [[ ! $(command -v python) ]]; then
     setup_env
