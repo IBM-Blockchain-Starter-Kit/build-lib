@@ -19,6 +19,7 @@ fi
 # echo "######## Download dependencies ########"
 # setup_env
 nvm_install_node $NODE_VERSION
+# install_python
 install_jq
 # echo
 
