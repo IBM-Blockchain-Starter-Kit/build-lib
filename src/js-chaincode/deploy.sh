@@ -16,29 +16,15 @@ if [[ ! -f $CONFIGPATH ]]; then
   exit 1
 fi
 
-# echo "######## Download dependencies ########"
-nvm_install_node $NODE_VERSION
-if [[ ! $(command -v python) ]]; then
-    setup_env
-    install_python ${PYTHON_VERSION}
+echo "######## Validating dependencies ########"
+nvm_install_node ${NODE_VERSION}
+if [[ -z $(command -v fabric-cli) ]]; then
+  echo "######## Build fabric-cli ########"
+  build_fabric_cli $FABRIC_CLI_DIR
 fi
-install_jq
-# echo
-
-echo "######## Build fabric-cli ########"
-build_fabric_cli $FABRIC_CLI_DIR
-echo
-
-echo "=> Validating dependencies..."
-if [[ ! -n $(command -v fabric-cli) ]]; then
-  error_exit "fabric-cli interface not found in PATH env variable"
-else
-  which fabric-cli
-fi
-if [[ ! -n $(command -v jq) ]]; then
-  error_exit "jq interface not found in PATH env variable"
-else
-  which jq
+if [[ -z $(command -v jq) ]]; then
+  echo "######## Install jq ########"
+  install_jq
 fi
 
 
