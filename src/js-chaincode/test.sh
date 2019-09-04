@@ -22,7 +22,7 @@ npm run test
 
 # echo "######## Run deploy_config tests ########"
 
-# if [[ $(command -v jq) ]]; then
+# if [[ -z $(command -v jq) ]]; then
 #     install_jq
 # fi
 
