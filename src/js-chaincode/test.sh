@@ -12,7 +12,7 @@ $DEBUG && set -x
 
 echo "######## Download dependencies ########"
 
-install_node "$NODE_VERSION" "$NVM_VERSION"
+nvm_install_node "$NODE_VERSION"
 npm install
 npm run build
 
