@@ -148,11 +148,10 @@ function link_python {
     local PYTHON_PATH=$1
 
     export PATH=${PYTHON_PATH}/bin:$PATH
-    echo '$PATH'...$PATH
-    
-    echo '$PYTHON'...`python --version`
-
     echo "export PATH=${PYTHON_PATH}/bin:$PATH" >> ${HOME}/.bashrc
+    
+    # echo '$PATH'...$PATH
+    # echo '$PYTHON'...`python --version`
 }
 
 #######################################
