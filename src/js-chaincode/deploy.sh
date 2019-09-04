@@ -20,7 +20,7 @@ fi
 nvm_install_node $NODE_VERSION
 if [[ ! $(command -v python) ]]; then
     setup_env
-    install_python
+    install_python ${PYTHON_VERSION}
 fi
 install_jq
 # echo
