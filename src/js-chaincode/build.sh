@@ -11,10 +11,12 @@ $DEBUG && set -x
 
 echo "######## Download dependencies ########"
 setup_env
-nvm_install_node $NODE_VERSION
 install_python $PYTHON_VERSION
+nvm_install_node $NODE_VERSION
+
+# build fabric-cli
+build_fabric_cli ${FABRIC_CLI_DIR}
 
 echo "######## Building chaincode ########"
 npm install
-# transpile from typescript to javascript
-npm run build
+npm run build # transpile from typescript to javascript
