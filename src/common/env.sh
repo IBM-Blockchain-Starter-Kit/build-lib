@@ -26,4 +26,4 @@ export HLF_VERSION=${HLF_VERSION:="1.4.1"}
 export FABRIC_SRC_DIR=${ROOTDIR}/fabric-${HLF_VERSION}
 
 # fabric-cli dir
-export FABRIC_CLI_DIR=${FABRIC_CLI_DIR}
+export FABRIC_CLI_DIR=${FABRIC_CLI_DIR:="./fabric-cli"}
