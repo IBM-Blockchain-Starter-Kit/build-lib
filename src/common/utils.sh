@@ -110,21 +110,49 @@ function nvm_install_node {
 #######################################
 function install_python {
   local PYTHON_VERSION=$1
+  local PYTHON_PATH=$HOME/python
   local PREVDIR=$(pwd)
 
   echo "######## Installing Python-v${PYTHON_VERSION} ########"
+  echo '=> $PYTHON_PATH'...${PYTHON_PATH}
 
-  mkdir -p ${HOME}/.python \
-    && cd ${HOME}/.python \
+  python_dir=$(mktemp -d) \
+    && cd $python_dir \
     && curl  "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" > Python-${PYTHON_VERSION}.tgz \
     && tar -xzvf Python-${PYTHON_VERSION}.tgz  \
     && cd Python-${PYTHON_VERSION} \
-    && ./configure --prefix=${HOME}/.python --enable-optimizations \
+    && ./configure --prefix=${PYTHON_PATH} --enable-optimizations \
     && make install
 
-  export PATH=${HOME}/.python/bin:$PATH
+  link_python ${PYTHON_PATH}
+
+  echo '$PYTHON_PATH'...
+  ls -agln $PYTHON_PATH/bin
+
+  # echo "export PATH=${HOME}/.python/bin:$PATH" >> ${HOME}/.bashrc
+  # source ~/.bashrc
 
   cd $PREVDIR
+}
+
+#######################################
+# Relinks python by updating PATH variable
+# Globals:
+#   None
+# Arguments:
+#   PYTHON_VERSION: Version of Node.js to install
+# Returns:
+#   None
+#######################################
+function link_python {
+    local PYTHON_PATH=$1
+
+    export PATH=${PYTHON_PATH}/bin:$PATH
+    echo '$PATH'...$PATH
+    
+    echo '$PYTHON'...`python --version`
+
+    echo "export PATH=${PYTHON_PATH}/bin:$PATH" >> ${HOME}/.bashrc
 }
 
 #######################################
@@ -142,7 +170,7 @@ function build_fabric_cli {
   local PREVDIR=$(pwd)
   cd $BUILD_DIR
 
-  echo "######## Building Fabric-CLI ########"
+  echo "######## Building fabric-cli ########"
   
   echo "=> npm -v ... $(npm -v)"
   npm install
@@ -221,14 +249,22 @@ function retry_with_backoff {
 #######################################
 function setup_env {
   echo "=> apt-get update"
-  apt-get update > /dev/null
+  echo "Y" | apt-get update
   echo
 
   echo "=> apt-get install build-essential"
-  echo "Y" | apt-get install build-essential --fix-missing > /dev/null
+  echo " (usually takes a few minutes...)"
+  echo "Y" | apt-get install build-essential --fix-missing
   echo
 
-  echo "=> apt install g++" 
-  echo "Y" | apt install g++ --fix-missing > /dev/null
-  echo
+  # echo "=> apt install g++" 
+  # echo "Y" | apt install g++ --fix-missing
+  # echo
+
+  # echo "=> apt-get install python2.7" 
+  # echo "Y" | apt-get install python2.7 --fix-missing > /dev/null
+  # echo
+  # echo 'which python'...`which python`
+  # echo 'npm config get python'...`npm config get python`
+
 }
