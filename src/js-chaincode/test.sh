@@ -13,6 +13,8 @@ $DEBUG && set -x
 echo "######## Download dependencies ########"
 
 install_node "$NODE_VERSION" "$NVM_VERSION"
+npm install
+npm run build
 
 echo "######## Run cc tests ########"
 
