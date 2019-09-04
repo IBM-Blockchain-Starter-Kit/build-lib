@@ -11,8 +11,8 @@ $DEBUG && set -x
 
 echo "######## Download dependencies ########"
 setup_env
-install_python $PYTHON_VERSION
 nvm_install_node $NODE_VERSION
+install_python $PYTHON_VERSION
 
 echo "######## Building chaincode ########"
 npm install
