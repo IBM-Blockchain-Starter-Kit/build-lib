@@ -4,3 +4,4 @@ bats-mock/
 **/.DS_Store 
 TEST-report.xml
 tst-output.txt
+package-build.sh
