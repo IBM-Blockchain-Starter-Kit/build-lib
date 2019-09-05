@@ -11,10 +11,10 @@ source "${SCRIPT_DIR}/common/blockchain.sh"
 $DEBUG && set -x
 
 echo "######## Download dependencies ########"
-
-nvm_install_node "$NODE_VERSION"
-npm install
-npm run build
+cd $CHAINCODEPATH
+# nvm_install_node "$NODE_VERSION"
+# npm install
+# npm run build
 
 echo "######## Run cc tests ########"
 
