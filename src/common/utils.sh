@@ -248,12 +248,20 @@ function retry_with_backoff {
 #######################################
 function setup_env {
   echo "=> apt-get update"
-  echo "Y" | apt-get update
+  if [[ ! $DEBUG ]]; then
+    echo "Y" | apt-get update > /dev/null
+  else
+    echo "Y" | apt-get update
+  fi
   echo
 
   echo "=> apt-get install build-essential"
   echo " (usually takes a few minutes...)"
-  echo "Y" | apt-get install build-essential --fix-missing
+  if [[ ! $DEBUG ]]; then
+    echo "Y" | apt-get install build-essential --fix-missing > /dev/null
+  else
+    echo "Y" | apt-get install build-essential --fix-missing
+  fi
   echo
 
   # echo "=> apt install g++" 
