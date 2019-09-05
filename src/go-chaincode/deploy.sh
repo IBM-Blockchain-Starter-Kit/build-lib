@@ -18,19 +18,16 @@ if [[ ! -f $CONFIGPATH ]]; then
   exit 1
 fi
 
-echo "######## Download dependencies ########"
-nvm_install_node $NODE_VERSION
-install_jq
 
-echo "######## Link fabric-cli ########"
-build_fabric_cli $FABRIC_CLI_DIR
-
-echo "=> Validating dependencies..."
-if [[ ! -n $(command -v fabric-cli) ]]; then
-  error_exit "fabric-cli interface not found in PATH env variable"
+echo "######## Validating dependencies ########"
+nvm_install_node ${NODE_VERSION}
+if [[ -z $(command -v fabric-cli) ]]; then
+  echo "######## Build fabric-cli ########"
+  build_fabric_cli $FABRIC_CLI_DIR
 fi
-if [[ ! -n $(command -v jq) ]]; then
-  error_exit "jq interface not found in PATH env variable"
+if [[ -z $(command -v jq) ]]; then
+  echo "######## Install jq ########"
+  install_jq
 fi
 
 
@@ -43,7 +40,6 @@ echo "${CONNECTION_PROFILE_STRING}" > "${CONN_PROFILE_FILE}"
 
 ADMIN_IDENTITY_FILE=${PROFILES_PATH}/ADMIN_IDENTITY.json
 echo "${ADMIN_IDENTITY_STRING}" > "${ADMIN_IDENTITY_FILE}"
-
 
 # Deploying based on configuration options
 echo "######### Reading 'deploy_config.json' for deployment options #########"
