@@ -17,11 +17,11 @@ if [[ ! -f $CONFIGPATH ]]; then
 fi
 
 echo "######## Validating dependencies ########"
-nvm_install_node ${NODE_VERSION}
-if [[ -z $(command -v fabric-cli) ]]; then
-  echo "######## Build fabric-cli ########"
-  build_fabric_cli $FABRIC_CLI_DIR
-fi
+build_fabric_cli ${FABRIC_CLI_DIR}
+# if [[ -z $(command -v fabric-cli) ]]; then
+#   echo "######## Build fabric-cli ########"
+#   build_fabric_cli $FABRIC_CLI_DIR
+# fi
 if [[ -z $(command -v jq) ]]; then
   echo "######## Install jq ########"
   install_jq
@@ -56,7 +56,7 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
 
     # should install
     if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
-        retry_with_backoff 5 install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "node" "$(pwd)"
+        retry_with_backoff 5 install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "node" "$CHAINCODEPATH"
     fi
 
     for CHANNEL in $(echo ${CC} | jq -r '.channels | .[]'); do
