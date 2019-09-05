@@ -29,7 +29,7 @@ function install_cc {
   --cc-type ${PLATFORM} --src-dir ${SRC_DIR}"
 
   echo
-  echo ${CMD}
+  echo ">>>" ${CMD}
   echo
   echo ${CMD} | bash
 }
@@ -80,7 +80,7 @@ function instantiate_cc {
   fi
 
   echo 
-  echo ${CMD} ${INIT_FN_FLAG:-""} ${INIT_ARGS_FLAG:-""} ${COLLECTIONS_CONFIG_FLAG:-""} "--timeout 360000"
+  echo ">>>" ${CMD} ${INIT_FN_FLAG:-""} ${INIT_ARGS_FLAG:-""} ${COLLECTIONS_CONFIG_FLAG:-""} "--timeout 360000"
   echo
   echo ${CMD} ${INIT_FN_FLAG:-""} ${INIT_ARGS_FLAG:-""} ${COLLECTIONS_CONFIG_FLAG:-""} "--timeout 360000" | bash
 }
@@ -118,7 +118,7 @@ function invoke_cc {
   --admin-identity ${ADMIN_IDENTITY} --cc-name ${CC_NAME} --cc-version ${CC_VERSION} \
   --cc-type ${PLATFORM} --channel ${CHANNEL} --invoke-fn ${INVOKE_FN} --invoke-args ${INVOKE_ARGS}"
 
-  echo ${CMD}
+  echo ">>>" ${CMD}
   echo
   echo ${CMD} | bash
 }
