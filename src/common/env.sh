@@ -18,12 +18,12 @@ export GOPATH=${ROOTDIR}
 export PATH=${GOPATH}/bin:$PATH
 
 # chaincode dir
-export CONFIGPATH=${CONFIGPATH:="$(pwd)/deploy_config.json"}
-export CHAINCODEPATH=${CHAINCODEPATH:="chaincode"}
+export CHAINCODEPATH=${CHAINCODEPATH:="${ROOTDIR}/chaincode"}
+export CONFIGPATH=${CONFIGPATH:="${CHAINCODEPATH}/deploy_config.json"}
 
 # hfl dir
 export HLF_VERSION=${HLF_VERSION:="1.4.1"}
 export FABRIC_SRC_DIR=${ROOTDIR}/fabric-${HLF_VERSION}
 
 # fabric-cli dir
-export FABRIC_CLI_DIR=${FABRIC_CLI_DIR:="./fabric-cli"}
+export FABRIC_CLI_DIR=${FABRIC_CLI_DIR:="${ROOTDIR}/fabric-cli"}
