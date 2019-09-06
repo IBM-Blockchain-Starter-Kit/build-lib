@@ -18,7 +18,15 @@ fi
 
 echo "======== Validating dependencies ========"
 nvm_install_node ${NODE_VERSION}
-# build_fabric_cli ${FABRIC_CLI_DIR}
+if [[ -z $(command -v fabric-cli) ]]; then
+  echo "-------- Attemping to Link Fabric-Cli --------"
+  cd ${FABRIC_CLI_DIR}
+  npm link
+fi
+if [[ -z $(command -v fabric-cli) ]]; then
+  echo "-------- Rebuilding Fabric-Cli --------"
+  build_fabric_cli ${FABRIC_CLI_DIR}
+fi
 if [[ -z $(command -v jq) ]]; then
   echo "=> Installing jq ..."
   install_jq
