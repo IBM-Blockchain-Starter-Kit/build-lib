@@ -249,20 +249,24 @@ function retry_with_backoff {
 # Download and install ubuntu build-essential package
 #######################################
 function setup_env {
+  # sudo add-apt-repository ppa:saiarcot895/myppa
+  # sudo apt-get update
+  # sudo apt-get -y install apt-fast
+
   echo "=> apt-get update"
   if [[ ! $DEBUG ]]; then
-    echo "Y" | apt-get update > /dev/null
+    apt-get -y update > /dev/null
   else
-    echo "Y" | apt-get update
+    apt-get -y update
   fi
   echo
 
   echo "=> apt-get install build-essential"
   echo " (usually takes a few minutes...)"
   if [[ ! $DEBUG ]]; then
-    echo "Y" | apt-get install build-essential --fix-missing > /dev/null
+    apt-get -y install build-essential --fix-missing > /dev/null
   else
-    echo "Y" | apt-get install build-essential --fix-missing
+    apt-get -y install build-essential --fix-missing
   fi
   echo
 
