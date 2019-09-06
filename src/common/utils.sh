@@ -116,28 +116,26 @@ function nvm_install_node {
 #######################################
 function install_python {
   local PYTHON_VERSION=$1
-  local PYTHON_PATH=$ROOTDIR/python
+  if [ -n $PYTHONPATH ]; then
+    export PYTHONPATH=/opt/python/$PYTHON_VERSION
+  fi    
   local PREVDIR=$(pwd)
 
   echo "######## Installing Python-v${PYTHON_VERSION} ########"
-  echo '=> $PYTHON_PATH'...${PYTHON_PATH}
+  echo '=> $PYTHONPATH'...${PYTHONPATH}
 
-  python_dir=$(mktemp -d) \
+  local python_dir=$(mktemp -d) \
     && cd $python_dir \
     && curl  "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" > Python-${PYTHON_VERSION}.tgz \
     && tar -xzvf Python-${PYTHON_VERSION}.tgz  \
     && cd Python-${PYTHON_VERSION} \
-    && ./configure --prefix=${PYTHON_PATH} --enable-optimizations \
+    && ./configure --prefix=${PYTHONPATH} --enable-optimizations \
     && make install
 
-  link_python ${PYTHON_PATH}
+  rm -rf python_dir
 
-  echo '$PYTHON_PATH'...
-  ls -agln $PYTHON_PATH/bin
-
-  # echo "export PATH=${HOME}/.python/bin:$PATH" >> ${HOME}/.bashrc
-  # source ~/.bashrc
-
+  link_python ${PYTHONPATH}
+  
   cd $PREVDIR
 }
 
