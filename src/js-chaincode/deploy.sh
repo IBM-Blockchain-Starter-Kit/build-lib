@@ -55,8 +55,9 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
     # collect chaincode metadata
     CC_NAME=$(echo ${CC} | jq -r '.name')    
     CC_VERSION="$(date '+%Y%m%d.%H%M%S')"
-    if [[ $(echo ${CC} | jq -r '.version?') != null ]]; then
-        CC_VERSION=$(echo ${CC} | jq -r '.version?')
+    json_version=$(echo ${CC} | jq -r '.version?')
+    if [[ $json_version != null && $json_version != "" ]]; then
+        CC_VERSION=$json_version
     fi
     echo "check condition"...$(echo ${CC} | jq -r '.version?')
     echo "CC_VERSION"...$CC_VERSION
