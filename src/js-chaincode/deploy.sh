@@ -56,7 +56,7 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
     CC_NAME=$(echo ${CC} | jq -r '.name')    
     CC_VERSION="$(date '+%Y%m%d.%H%M%S')"
     if [[ $(echo ${CC} | jq -r '.version?') != null ]]; then
-        CC_VERSION=$(echo ${CC} | jq -r '.version?')
+        CC_VERSION=$(echo ${CC} | jq -r '.version?')${CC_VERSION}
     fi
 
     # should install
