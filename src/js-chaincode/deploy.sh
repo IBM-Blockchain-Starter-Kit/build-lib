@@ -16,15 +16,11 @@ if [[ ! -f $CONFIGPATH ]]; then
   exit 1
 fi
 
-echo "######## Validating dependencies ########"
+echo "======== Validating dependencies ========"
 nvm_install_node ${NODE_VERSION}
-build_fabric_cli ${FABRIC_CLI_DIR}
-# if [[ -z $(command -v fabric-cli) ]]; then
-#   echo "######## Build fabric-cli ########"
-#   build_fabric_cli $FABRIC_CLI_DIR
-# fi
+# build_fabric_cli ${FABRIC_CLI_DIR}
 if [[ -z $(command -v jq) ]]; then
-  echo "######## Install jq ########"
+  echo "=> Installing jq ..."
   install_jq
 fi
 
