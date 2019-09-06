@@ -19,7 +19,7 @@ echo "======== Building fabric-cli tool ========"
 cd ${FABRIC_CLI_DIR}
 npm install
 npm run build
-npm link #?
+# npm link
 
 echo "======== Building chaincode ========"
 cd ${CHAINCODEPATH}
