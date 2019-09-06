@@ -58,10 +58,12 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
     if [[ $(echo ${CC} | jq -r '.version?') != null ]]; then
         CC_VERSION=$(echo ${CC} | jq -r '.version?')
     fi
+    echo "check condition"...$(echo ${CC} | jq -r '.version?')
+    echo "CC_VERSION"...$CC_VERSION
 
     # should install
     if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
-        retry_with_backoff 5 install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "node" "$CHAINCODEPATH"
+        retry_with_backoff 5 install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "node" "${CHAINCODEPATH}"
     fi
 
     for CHANNEL in $(echo ${CC} | jq -r '.channels | .[]'); do
