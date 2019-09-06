@@ -17,6 +17,7 @@ if [[ ! -f $CONFIGPATH ]]; then
 fi
 
 echo "######## Validating dependencies ########"
+nvm_install_node ${NODE_VERSION}
 build_fabric_cli ${FABRIC_CLI_DIR}
 # if [[ -z $(command -v fabric-cli) ]]; then
 #   echo "######## Build fabric-cli ########"
@@ -51,7 +52,7 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
     CC_NAME=$(echo ${CC} | jq -r '.name')    
     CC_VERSION="$(date '+%Y%m%d.%H%M%S')"
     if [[ $(echo ${CC} | jq -r '.version?') != null ]]; then
-        CC_VERSION=${CC_VERSION}-$(echo ${CC} | jq -r '.version?')
+        CC_VERSION=$(echo ${CC} | jq -r '.version?')
     fi
 
     # should install
