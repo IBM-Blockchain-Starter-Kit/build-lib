@@ -9,6 +9,11 @@ source "${SCRIPT_DIR}/common/utils.sh"
 
 $DEBUG && set -x
 
+echo "======== Verify Env Variables ========"
+echo '$CHAINCODEPATH'...$CHAINCODEPATH
+ls -agln $CHAINCODEPATH
+
+
 echo "======== Download dependencies ========"
 setup_env
 install_python $PYTHON_VERSION
