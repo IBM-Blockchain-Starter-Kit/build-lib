@@ -73,7 +73,7 @@ function install_node {
   local NODE_VERSION=$1
   local NVM_VERSION=$2
 
-  echo "######## Installing Node.js version ${NODE_VERSION} using nvm ${NVM_VERSION} ########"
+  echo "=> Installing Node.js version ${NODE_VERSION} using nvm ${NVM_VERSION} ..."
   # Can safely ignore nvm.sh since it's not ours
   # shellcheck disable=SC1090
   
@@ -89,7 +89,7 @@ function install_node {
 function nvm_install_node {
   local NODE_VERSION=${1-:NODE_VERSION}
 
-  echo "######## Installing Node.js version ${NODE_VERSION} using nvm $(nvm --version) ########"
+  echo "=> Installing Node.js version ${NODE_VERSION} using nvm $(nvm --version) ..."
 
   if [[ -n $(nvm ls | grep "$NODE_VERSION") ]]; then
     echo "node v$NODE_VERSION found"
@@ -121,8 +121,8 @@ function install_python {
   fi    
   local PREVDIR=$(pwd)
 
-  echo "######## Installing Python-v${PYTHON_VERSION} ########"
-  echo '=> $PYTHONPATH'...${PYTHONPATH}
+  echo "=> Installing Python-v${PYTHON_VERSION} ..."
+  # echo '$PYTHONPATH'...${PYTHONPATH}
 
   local python_dir=$(mktemp -d) \
     && cd $python_dir \
@@ -173,7 +173,7 @@ function build_fabric_cli {
   local PREVDIR=$(pwd)
   cd $BUILD_DIR
 
-  echo "######## Building fabric-cli ########"
+  echo "=> Building fabric-cli ..."
   
   echo "=> npm -v ... $(npm -v)"
   npm install
@@ -246,9 +246,7 @@ function retry_with_backoff {
 }
 
 #######################################
-# Download and install
-#   - gcc compiler
-#   - make binaries
+# Download and install ubuntu build-essential package
 #######################################
 function setup_env {
   echo "=> apt-get update"
