@@ -10,18 +10,16 @@ source "${SCRIPT_DIR}/common/blockchain.sh"
 
 $DEBUG && set -x
 
-echo "######## Download dependencies ########"
+echo "======== Download dependencies ========"
 cd $CHAINCODEPATH
-# nvm_install_node "$NODE_VERSION"
+nvm_install_node "$NODE_VERSION"
 # npm install
 # npm run build
 
-echo "######## Run cc tests ########"
-
+echo "======== Run cc tests ========"
 npm run test
 
-# echo "######## Run deploy_config tests ########"
-
+# echo "======== Run deploy_config tests ========"
 # if [[ -z $(command -v jq) ]]; then
 #     install_jq
 # fi
