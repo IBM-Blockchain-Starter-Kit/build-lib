@@ -9,8 +9,6 @@ source "${SCRIPT_DIR}/common/utils.sh"
 # shellcheck source=src/common/blockchain.sh
 source "${SCRIPT_DIR}/common/blockchain.sh"
 
-source "${SCRIPT_DIR}/go-chaincode/vendor-dependencies.sh"
-
 $DEBUG && set -x
 
 if [[ ! -f $CONFIGPATH ]]; then
@@ -18,15 +16,14 @@ if [[ ! -f $CONFIGPATH ]]; then
   exit 1
 fi
 
-
-echo "######## Validating dependencies ########"
+echo "======== Validating dependencies ========"
 nvm_install_node ${NODE_VERSION}
 if [[ -z $(command -v fabric-cli) ]]; then
-  echo "######## Build fabric-cli ########"
-  build_fabric_cli $FABRIC_CLI_DIR
+  echo "-------- Building Fabric-Cli --------"
+  build_fabric_cli ${FABRIC_CLI_DIR}
 fi
 if [[ -z $(command -v jq) ]]; then
-  echo "######## Install jq ########"
+  echo "-------- Installing jq --------"
   install_jq
 fi
 
