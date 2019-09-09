@@ -17,34 +17,6 @@ function error_exit {
 }
 
 #######################################
-# Creates and displays a name that is likely to be unique and suitable for use
-# when deploying apps to bluemix
-# Globals:
-#   None
-# Arguments:
-#   uuid: Universally unique identifier
-#   name: Additional name arguments
-# Returns:
-#   None
-#######################################
-function get_deploy_name {
-  uuid="${1:?get_deploy_name must be called with at least one argument}"
-  shift
-
-  old_ifs="$IFS"
-  IFS='_'
-  name="$*"
-  IFS=$old_ifs
-
-  unique_name="${name}_${uuid}"
-
-  short_hash=$(echo "${unique_name}" | git hash-object --stdin | head -c 7)
-
-  deploy_name=$(echo "${name}" | head -c 43)${short_hash}
-  echo "${deploy_name}"
-}
-
-#######################################
 # Installs jq using curl and updates path
 # Globals:
 #   set: PATH
@@ -119,8 +91,9 @@ function install_python {
   if [ -n $PYTHONPATH ]; then
     export PYTHONPATH=/opt/python/$PYTHON_VERSION
   fi    
-  local PREVDIR=$(pwd)
 
+  pushd $(pwd)
+  
   echo "=> Installing Python-v${PYTHON_VERSION} ..."
   # echo '$PYTHONPATH'...${PYTHONPATH}
 
@@ -136,7 +109,7 @@ function install_python {
 
   link_python ${PYTHONPATH}
   
-  cd $PREVDIR
+  popd
 }
 
 #######################################
@@ -153,9 +126,6 @@ function link_python {
 
     export PATH=${PYTHON_PATH}/bin:$PATH
     echo "export PATH=${PYTHON_PATH}/bin:$PATH" >> ${HOME}/.bashrc
-    
-    # echo '$PATH'...$PATH
-    # echo '$PYTHON'...`python --version`
 }
 
 #######################################
@@ -170,19 +140,14 @@ function link_python {
 function build_fabric_cli {
   local BUILD_DIR=${1:-$FABRIC_CLI_DIR}
 
-  local PREVDIR=$(pwd)
+  pushd $(pwd)
   cd $BUILD_DIR
 
-  echo "=> Building fabric-cli ..."
-  
-  echo "=> npm -v ... $(npm -v)"
   npm install
-  echo "=> npm run build..."
   npm run build
-  echo "=> npm link..."
   npm link
 
-  cd $PREVDIR
+  popd
 }
 
 #######################################
