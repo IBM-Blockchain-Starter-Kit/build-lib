@@ -31,6 +31,17 @@ Executing the `install.sh` script should result in the creation of a `bats` fold
 
 ### bats-mock
 To install `bats-mock`, first create an empty folder named `bats-mock` under the `build-lib` repository. Then clone the [bats-mock](https://github.com/jasonkarns/bats-mock) repository into the directory of your choosing; navigate to that folder, copy the `binstub` and `stub.bash` files into the `bats-mock` you created under the `build-lib` repository.
+```
+mkdir <absolute path to the build-lib repository>/bats-mock
+cp binstub stub.bash <<absolute path to the build-lib repository>/bats-mock
+```
+
+
+### Issues with running bats command
+If running on a Mac OS machine, you may have to use a package installer (i.e. Homebrew) to install the greadlink binary.
+```
+brew install coreutils
+```
 
 ### Running test cases
 Once you have installed `bats-core` and `bats-mock` as described the sections above, you can then run the following command from the root directory of this repository:
