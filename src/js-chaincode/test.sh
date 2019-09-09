@@ -18,13 +18,3 @@ nvm_install_node "$NODE_VERSION"
 
 echo "======== Run cc tests ========"
 npm run test
-
-# echo "======== Run deploy_config tests ========"
-# if [[ -z $(command -v jq) ]]; then
-#     install_jq
-# fi
-
-# for component in $(cat ${CONFIGPATH} | jq -r "keys | .[]"); do
-#     validate_component "https://8eed4b94936d41a6aac17bdac8a2d7f8-optools.uss02.blockchain.cloud.ibm.com" \
-#         "mSeo7VrFtt228viF1tWniIFbp4w21NynnXV7rB6eVFZn" ${component}
-# done
