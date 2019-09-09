@@ -60,7 +60,7 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
 
     # should install
     if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
-        retry_with_backoff 5 install_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "golang" "${CC_SRC}"
+        retry_with_backoff 5 install_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "golang" "${CC_SRC}"
     fi
 
     for CHANNEL in $(echo ${CC} | jq -r '.channels | .[]'); do
@@ -77,7 +77,7 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
         collections_config=$(cat $CONFIGPATH | jq -r '.['\"${org}\"'].chaincode | .['${CCINDEX}'] | .collections_config?')
         if [[ $collections_config == null ]]; then unset collections_config; fi
 
-        retry_with_backoff 5 instantiate_cc "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "golang" "${init_fn}" "${init_args}" "${collections_config}"
+        retry_with_backoff 5 instantiate_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "golang" "${init_fn}" "${init_args}" "${collections_config}"
       fi      
     done
   done
