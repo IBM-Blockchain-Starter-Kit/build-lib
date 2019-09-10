@@ -39,13 +39,11 @@ if [[ ${ADMIN_IDENTITY_STRING::1} == "[" ]]; then
         echo $(echo ${ADMIN_IDENTITY_STRING} | jq -r ".[$IDENTITYINDEX]") > "${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
 
         echo "-> ${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
-        cat ${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json
     done
 else
     echo "${ADMIN_IDENTITY_STRING}" > "${PROFILES_PATH}/ADMINIDENTITY_0.json"
 
     echo "-> ${PROFILES_PATH}/ADMINIDENTITY_0.json"
-    cat ${PROFILES_PATH}/ADMINIDENTITY_0.json
 fi
 
 if [[ ${CONNECTION_PROFILE_STRING::1} == "[" ]]; then
@@ -53,7 +51,6 @@ if [[ ${CONNECTION_PROFILE_STRING::1} == "[" ]]; then
         echo $(echo ${CONNECTION_PROFILE_STRING} | jq -r ".[$PROFILEINDEX]") > "${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
         
         echo "-> ${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
-        cat ${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json
     done
 else 
     echo "${CONNECTION_PROFILE_STRING}" > "${PROFILES_PATH}/CONNPROFILE_0.json"
