@@ -29,20 +29,42 @@ fi
 
 
 # Load profiles from toolchain ENV variables (from creation)
+echo "======== Loading identity profiles and certificates ========"
 PROFILES_PATH=$(pwd)/profiles
 mkdir -p "${PROFILES_PATH}"
 
-CONN_PROFILE_FILE=${PROFILES_PATH}/CONN_PROFILE.json
-echo "${CONNECTION_PROFILE_STRING}" > "${CONN_PROFILE_FILE}"
+# handle single identity/certificate or an array of information
+if [[ ${ADMIN_IDENTITY_STRING::1} == "[" ]]; then
+    for IDENTITYINDEX in $(echo ${ADMIN_IDENTITY_STRING} | jq -r "keys | .[]"); do
+        echo $(echo ${ADMIN_IDENTITY_STRING} | jq -r ".[$IDENTITYINDEX]") > "${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
 
-ADMIN_IDENTITY_FILE=${PROFILES_PATH}/ADMIN_IDENTITY.json
-echo "${ADMIN_IDENTITY_STRING}" > "${ADMIN_IDENTITY_FILE}"
+        echo "-> ${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
+        cat ${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json
+    done
+else
+    echo "${ADMIN_IDENTITY_STRING}" > "${PROFILES_PATH}/ADMINIDENTITY_0.json"
+
+    echo "-> ${PROFILES_PATH}/ADMINIDENTITY_0.json"
+    cat ${PROFILES_PATH}/ADMINIDENTITY_0.json
+fi
+
+if [[ ${CONNECTION_PROFILE_STRING::1} == "[" ]]; then
+    for PROFILEINDEX in $(echo ${CONNECTION_PROFILE_STRING} | jq -r "keys | .[]"); do
+        echo $(echo ${CONNECTION_PROFILE_STRING} | jq -r ".[$PROFILEINDEX]") > "${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
+        
+        echo "-> ${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
+        cat ${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json
+    done
+else 
+    echo "${CONNECTION_PROFILE_STRING}" > "${PROFILES_PATH}/CONNPROFILE_0.json"
+    
+    echo "-> ${PROFILES_PATH}/CONNPROFILE_0.json"
+fi
 
 
 # Deploying based on configuration options
-echo "######### Reading 'deploy_config.json' for deployment options #########"
+echo "======== Reading 'deploy_config.json' ========"
 
-PARSED_DEPLOY_CONFIG=False
 for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do    
   for CCINDEX in $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | keys | .[]' ); do        
     CC=$(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}']' )    
@@ -54,8 +76,10 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
     if [[ $json_version != null && $json_version != "" ]]; then
         CC_VERSION=$json_version
     fi
-    echo "check condition"...$(echo ${CC} | jq -r '.version?')
-    echo "CC_VERSION"...$CC_VERSION
+    
+    ADMIN_IDENTITY_FILE="${PROFILES_PATH}/ADMINIDENTITY_${CCINDEX}.json"    
+    CONN_PROFILE_FILE="${PROFILES_PATH}/CONNPROFILE_${CCINDEX}.json"
+
 
     # should install
     if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
@@ -63,8 +87,6 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
     fi
 
     for CHANNEL in $(echo ${CC} | jq -r '.channels | .[]'); do
-      PARSED_DEPLOY_CONFIG=True
-
       # should instantiate
       if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .instantiate' ) ]]; then
         init_fn=$(cat $CONFIGPATH | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .init_fn?')
@@ -81,10 +103,6 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
     done
   done
 done
-
-if [[ ! PARSED_DEPLOY_CONFIG ]]; then
-    exit 1
-fi
 
 
 rm -rf "${PROFILES_PATH}"
