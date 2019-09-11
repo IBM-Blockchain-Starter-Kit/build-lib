@@ -96,6 +96,7 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
       fi      
     done
   done
+done
 
 rm -rf "${PROFILES_PATH}"
 
