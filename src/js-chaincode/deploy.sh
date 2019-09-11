@@ -62,6 +62,7 @@ fi
 # Deploying based on configuration options
 echo "======== Reading 'deploy_config.json' ========"
 
+ORGINDEX=0
 for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do    
   for CCINDEX in $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | keys | .[]' ); do        
     CC=$(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}']' )    
@@ -74,8 +75,8 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
         CC_VERSION=$json_version
     fi
     
-    ADMIN_IDENTITY_FILE="${PROFILES_PATH}/ADMINIDENTITY_${CCINDEX}.json"    
-    CONN_PROFILE_FILE="${PROFILES_PATH}/CONNPROFILE_${CCINDEX}.json"
+    ADMIN_IDENTITY_FILE="${PROFILES_PATH}/ADMINIDENTITY_${ORGINDEX}.json"    
+    CONN_PROFILE_FILE="${PROFILES_PATH}/CONNPROFILE_${ORGINDEX}.json"
 
 
     # should install
@@ -99,6 +100,8 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
       fi      
     done
   done
+
+  ORGINDEX=$(($ORGINDEX + 1))
 done
 
 
