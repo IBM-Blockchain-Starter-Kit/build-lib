@@ -63,14 +63,14 @@ function nvm_install_node {
 
   echo "=> Installing Node.js version ${NODE_VERSION} using nvm $(nvm --version) ..."
 
-  if [[ -n $(nvm ls | grep "$NODE_VERSION") ]]; then
+  if [[ -n $(nvm ls | grep -q "$NODE_VERSION") ]]; then
     echo "node v$NODE_VERSION found"
   else
     echo "node v$NODE_VERSION not found"
   fi
 
-  nvm install $NODE_VERSION \
-    && nvm alias default $NODE_VERSION \
+  nvm install "$NODE_VERSION" \
+    && nvm alias default "$NODE_VERSION" \
     && nvm use default \
     && nvm current \
     && node -v \
@@ -88,11 +88,11 @@ function nvm_install_node {
 #######################################
 function install_python {
   local PYTHON_VERSION=$1
-  if [ -n $PYTHONPATH ]; then
+  if [ -n "$PYTHONPATH" ]; then
     export PYTHONPATH=/opt/python/$PYTHON_VERSION
   fi    
 
-  pushd $(pwd)
+  pushd "$(pwd)"
   
   echo "=> Installing Python-v${PYTHON_VERSION} ..."
   # echo '$PYTHONPATH'...${PYTHONPATH}
