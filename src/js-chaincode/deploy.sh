@@ -42,7 +42,6 @@ echo "${ADMIN_IDENTITY_STRING}" > "${ADMIN_IDENTITY_FILE}"
 # Deploying based on configuration options
 echo "######### Reading 'deploy_config.json' for deployment options #########"
 
-PARSED_DEPLOY_CONFIG=False
 for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do    
   for CCINDEX in $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | keys | .[]' ); do        
     CC=$(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}']' )    
@@ -63,8 +62,6 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
     fi
 
     for CHANNEL in $(echo ${CC} | jq -r '.channels | .[]'); do
-      PARSED_DEPLOY_CONFIG=True
-
       # should instantiate
       if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .instantiate' ) ]]; then
         init_fn=$(cat $CONFIGPATH | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .init_fn?')
@@ -81,10 +78,5 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
     done
   done
 done
-
-if [[ ! PARSED_DEPLOY_CONFIG ]]; then
-    exit 1
-fi
-
 
 rm -rf "${PROFILES_PATH}"
