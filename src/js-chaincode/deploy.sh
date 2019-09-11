@@ -42,6 +42,7 @@ echo "${ADMIN_IDENTITY_STRING}" > "${ADMIN_IDENTITY_FILE}"
 # Deploying based on configuration options
 echo "######### Reading 'deploy_config.json' for deployment options #########"
 
+EXIT_CODE=1
 for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do    
   for CCINDEX in $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | keys | .[]' ); do        
     CC=$(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}']' )    
@@ -74,9 +75,13 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
         if [[ $collections_config == null ]]; then unset collections_config; fi
 
         retry_with_backoff 5 instantiate_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "node" "${init_fn}" "${init_args}" "${collections_config}"
+
+        EXIT_CODE=0
       fi      
     done
   done
 done
 
 rm -rf "${PROFILES_PATH}"
+
+exit $EXIT_CODE
