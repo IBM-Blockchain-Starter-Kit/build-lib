@@ -34,29 +34,23 @@ PROFILES_PATH=$(pwd)/profiles
 mkdir -p "${PROFILES_PATH}"
 
 # handle single identity/certificate or an array of information
-if [[ ${ADMIN_IDENTITY_STRING::1} == "[" ]]; then
-    for IDENTITYINDEX in $(echo ${ADMIN_IDENTITY_STRING} | jq -r "keys | .[]"); do
-        echo $(echo ${ADMIN_IDENTITY_STRING} | jq -r ".[$IDENTITYINDEX]") > "${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
-
-        echo "-> ${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
-    done
-else
-    echo "${ADMIN_IDENTITY_STRING}" > "${PROFILES_PATH}/ADMINIDENTITY_0.json"
-
-    echo "-> ${PROFILES_PATH}/ADMINIDENTITY_0.json"
+if [[ ${ADMIN_IDENTITY_STRING::1} != "[" ]]; then
+    ADMIN_IDENTITY_STRING=[$ADMIN_IDENTITY_STRING]
 fi
+for IDENTITYINDEX in $(echo ${ADMIN_IDENTITY_STRING} | jq -r "keys | .[]"); do
+    echo $(echo ${ADMIN_IDENTITY_STRING} | jq -r ".[$IDENTITYINDEX]") > "${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
 
-if [[ ${CONNECTION_PROFILE_STRING::1} == "[" ]]; then
-    for PROFILEINDEX in $(echo ${CONNECTION_PROFILE_STRING} | jq -r "keys | .[]"); do
-        echo $(echo ${CONNECTION_PROFILE_STRING} | jq -r ".[$PROFILEINDEX]") > "${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
-        
-        echo "-> ${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
-    done
-else 
-    echo "${CONNECTION_PROFILE_STRING}" > "${PROFILES_PATH}/CONNPROFILE_0.json"
+    echo "-> ${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
+done
+
+if [[ ${CONNECTION_PROFILE_STRING::1} != "[" ]]; then
+    CONNECTION_PROFILE_STRING=[$CONNECTION_PROFILE_STRING]
+fi
+for PROFILEINDEX in $(echo ${CONNECTION_PROFILE_STRING} | jq -r "keys | .[]"); do
+    echo $(echo ${CONNECTION_PROFILE_STRING} | jq -r ".[$PROFILEINDEX]") > "${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
     
-    echo "-> ${PROFILES_PATH}/CONNPROFILE_0.json"
-fi
+    echo "-> ${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
+done
 
 
 # Deploying based on configuration options
