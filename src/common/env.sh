@@ -21,8 +21,10 @@ export PYTHON_VERSION="2.7.15"
 export PYTHONPATH=/opt/python/${PYTHON_VERSION}
 
 # chaincode dir
-export CHAINCODEPATH=$ROOTDIR/${CHAINCODEPATH:="/chaincode"}
-export CONFIGPATH=${CONFIGPATH:="${CHAINCODEPATH}/deploy_config.json"}
+export CC_REPO_DIR=${CC_REPO_DIR:-"${ROOTDIR}/chaincode-repo"}
+export CONFIGPATH=${CONFIGPATH:-"${CC_REPO_DIR}/deploy_config.json"}
+# - only for golang chaincode projects
+export CHAINCODEPATH=${CHAINCODEPATH:-"$CC_REPO_DIR/chaincode"}
 
 # hlf dir
 export HLF_VERSION=${HLF_VERSION:="1.4.1"}
