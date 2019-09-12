@@ -26,6 +26,8 @@ teardown() {
 }
 
 @test "cloudant.sh: provision_cloudant should provision a new cloudant sevice and create a service key if the service does not already exist" {
+  skip
+
   stub cf \
     "create-service cloudantNoSQLDB Lite cloudant-service-instance : echo 'Creating service instance...'" \
     "create-service-key cloudant-service-instance Credentials-1 : echo 'Creating service key...'" \
@@ -47,6 +49,8 @@ teardown() {
 }
 
 @test "cloudant.sh: provision_cloudant should exit 1 if service exists but is not a cloudant service" {
+  skip
+  
   stub cf \
     "create-service cloudantNoSQLDB Lite cloudant-service-instance : echo 'The service instance name is taken...' && false"
   
@@ -62,6 +66,8 @@ teardown() {
 }
 
 @test "cloudant.sh: provision_cloudant should exit 1 if the create service key command fails" {
+  skip
+  
   stub cf \
     "create-service cloudantNoSQLDB Lite cloudant-service-instance : echo 'Creating service instance...'" \
     "create-service-key cloudant-service-instance Credentials-1 : echo 'Could not create service key...' && false"
@@ -78,6 +84,8 @@ teardown() {
 }
 
 @test "cloudant.sh: provision_cloudant should exit 1 if the service key command fails" {
+  skip
+  
   stub cf \
     "create-service cloudantNoSQLDB Lite cloudant-service-instance : echo 'Creating service instance...'" \
     "create-service-key cloudant-service-instance Credentials-1 : echo 'Creating service key...'" \
@@ -95,7 +103,9 @@ teardown() {
 }
 
 @test "cloudant.sh: provision_cloudant should exit 1 if the CLOUDANT_CREDS variable cannot be created" {
-stub cf \
+  skip
+
+  stub cf \
     "create-service cloudantNoSQLDB Lite cloudant-service-instance : echo 'Creating service instance...'" \
     "create-service-key cloudant-service-instance Credentials-1 : echo 'Creating service key...'" \
     "service-key cloudant-service-instance Credentials-1 : echo 'Getting key...'"
@@ -116,7 +126,9 @@ stub cf \
 }
 
 @test "cloudant.sh: provision_cloudant should exit 1 if the CLOUDANT_URL variable cannot be created" {
-stub cf \
+  skip
+
+  stub cf \
     "create-service cloudantNoSQLDB Lite cloudant-service-instance : echo 'Creating service instance...'" \
     "create-service-key cloudant-service-instance Credentials-1 : echo 'Creating service key...'" \
     "service-key cloudant-service-instance Credentials-1 : echo 'Getting key...'"
@@ -138,6 +150,8 @@ stub cf \
 }
 
 @test "cloudant.sh: create_cloudant_database should create a new database if it does not already exist" {
+  skip
+  
   stub do_curl \
     "https://cloudant.example.org/TestDatabase : false" \
     "-X PUT https://cloudant.example.org/TestDatabase : true"
@@ -153,6 +167,8 @@ stub cf \
 }
 
 @test "cloudant.sh: create_cloudant_database should not create a new database if it already exists" {
+  skip
+  
   stub do_curl "https://cloudant.example.org/TestDatabase : true"
 
   CLOUDANT_URL="https://cloudant.example.org" \

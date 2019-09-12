@@ -27,13 +27,14 @@ setup() {
   ROOTDIR="test"
   GO_VERSION="1.0.0"
   HLF_VERSION="2.0.0"
-  CHAINCODEPATH="ccpath"
+  CHAINCODEPATH="ccpath"  
   CONFIGPATH="path"
   DEBUG=true
 
   source "${SCRIPT_DIR}/common/env.sh"
-
-  [[ "${CHAINCODEPATH}" == "$(pwd)/ccpath" ]]
+  
+  echo $CHAINCODEPATH
+  [ "${CHAINCODEPATH}" == "ccpath" ]
   [ "${CONFIGPATH}" = "path" ]
   [ "${GOPATH}" = "test" ]
   [ "${GOROOT}" = "test/go" ]
@@ -48,8 +49,8 @@ setup() {
   
   source "${SCRIPT_DIR}/common/env.sh"
 
-  [[ "${CHAINCODEPATH}" = "$(pwd)/chaincode" ]]
-  [ "${CONFIGPATH}" = "${CHAINCODEPATH}/deploy_config.json" ]
+  [[ "${CC_REPO_DIR}" = "test/chaincode-repo/chaincode" ]]   
+  [ "${CONFIGPATH}" = "${CC_REPO_DIR}/deploy_config.json" ]  
   [ "${GOPATH}" = "${PWD}" ]
   [ "${GOROOT}" = "${PWD}/go" ]
   [ "${GO_VERSION}" = "1.11" ]
