@@ -17,10 +17,10 @@ if [[ ! -f $CONFIGPATH ]]; then
 fi
 
 echo "======== Validating dependencies ========"
-nvm_install_node ${NODE_VERSION}
+nvm_install_node "${NODE_VERSION}"
 if [[ -z $(command -v fabric-cli) ]]; then
   echo "-------- Building Fabric-Cli --------"
-  build_fabric_cli ${FABRIC_CLI_DIR}
+  build_fabric_cli "${FABRIC_CLI_DIR}"
 fi
 if [[ -z $(command -v jq) ]]; then
   echo "-------- Installing jq --------"
@@ -35,19 +35,19 @@ mkdir -p "${PROFILES_PATH}"
 
 # handle single identity/certificate or an array of information
 if [[ ${ADMIN_IDENTITY_STRING::1} != "[" ]]; then
-    ADMIN_IDENTITY_STRING=[$ADMIN_IDENTITY_STRING]
+    ADMIN_IDENTITY_STRING=["$ADMIN_IDENTITY_STRING"]
 fi
-for IDENTITYINDEX in $(echo ${ADMIN_IDENTITY_STRING} | jq -r "keys | .[]"); do
-    echo $(echo ${ADMIN_IDENTITY_STRING} | jq -r ".[$IDENTITYINDEX]") > "${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
+for IDENTITYINDEX in $(jq -n "${ADMIN_IDENTITY_STRING}" | jq -r "keys | .[]"); do
+    echo $(jq -n "${ADMIN_IDENTITY_STRING}" | jq -r ".[$IDENTITYINDEX]") > "${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
 
     echo "-> ${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
 done
 
 if [[ ${CONNECTION_PROFILE_STRING::1} != "[" ]]; then
-    CONNECTION_PROFILE_STRING=[$CONNECTION_PROFILE_STRING]
+    CONNECTION_PROFILE_STRING=["$CONNECTION_PROFILE_STRING"]
 fi
-for PROFILEINDEX in $(echo ${CONNECTION_PROFILE_STRING} | jq -r "keys | .[]"); do
-    echo $(echo ${CONNECTION_PROFILE_STRING} | jq -r ".[$PROFILEINDEX]") > "${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
+for PROFILEINDEX in $(jq -n "${CONNECTION_PROFILE_STRING}" | jq -r "keys | .[]"); do
+    echo $(jq -n "${CONNECTION_PROFILE_STRING}" | jq -r ".[$PROFILEINDEX]") > "${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
 
     echo "-> ${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
 done
