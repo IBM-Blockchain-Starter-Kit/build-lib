@@ -75,7 +75,7 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
 
     # should install
     if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
-        retry_with_backoff 5 install_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "node" "${CHAINCODEPATH}"
+        retry_with_backoff 5 install_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "node" "${CC_REPO_DIR}"
     fi
 
     for CHANNEL in $(echo ${CC} | jq -r '.channels | .[]'); do
