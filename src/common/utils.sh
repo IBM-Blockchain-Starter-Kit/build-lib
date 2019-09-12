@@ -63,7 +63,7 @@ function nvm_install_node {
 
   echo "=> Installing Node.js version ${NODE_VERSION} using nvm $(nvm --version) ..."
 
-  if [[ -n $(nvm ls | grep -q "$NODE_VERSION") ]]; then
+  if [[ $(nvm ls) == *"$NODE_VERSION"* ]]; then
     echo "node v$NODE_VERSION found"
   else
     echo "node v$NODE_VERSION not found"
@@ -92,24 +92,25 @@ function install_python {
     export PYTHONPATH=/opt/python/$PYTHON_VERSION
   fi    
 
-  pushd "$(pwd)"
+  pushd "$(pwd)" || exit
   
   echo "=> Installing Python-v${PYTHON_VERSION} ..."
   # echo '$PYTHONPATH'...${PYTHONPATH}
 
-  local python_dir=$(mktemp -d) \
-    && cd $python_dir \
-    && curl  "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" > Python-${PYTHON_VERSION}.tgz \
-    && tar -xzvf Python-${PYTHON_VERSION}.tgz  \
-    && cd Python-${PYTHON_VERSION} \
-    && ./configure --prefix=${PYTHONPATH} --enable-optimizations \
+  local python_dir=$(mktemp -d)
+  
+  cd "${python_dir}" \
+    && curl  "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" > "Python-${PYTHON_VERSION}.tgz" \
+    && tar -xzvf "Python-${PYTHON_VERSION}.tgz"  \
+    && cd "Python-${PYTHON_VERSION}" \
+    && ./configure "--prefix=${PYTHONPATH}" "--enable-optimizations" \
     && make install
 
-  rm -rf python_dir
+  rm -rf "${python_dir}"
 
-  link_python ${PYTHONPATH}
+  link_python "${PYTHONPATH}"
   
-  popd
+  popd || exit
 }
 
 #######################################
@@ -122,10 +123,10 @@ function install_python {
 #   None
 #######################################
 function link_python {
-    local PYTHON_PATH=$1
+    local PYTHONPATH=$1
 
-    export PATH=${PYTHON_PATH}/bin:$PATH
-    echo "export PATH=${PYTHON_PATH}/bin:$PATH" >> ${HOME}/.bashrc
+    export PATH=${PYTHONPATH}/bin:$PATH
+    echo "export PATH=${PYTHONPATH}/bin:$PATH" >> "${HOME}/.bashrc"
 }
 
 #######################################
@@ -140,14 +141,14 @@ function link_python {
 function build_fabric_cli {
   local BUILD_DIR=${1:-$FABRIC_CLI_DIR}
 
-  pushd $(pwd)
-  cd $BUILD_DIR
+  pushd $(pwd) || exit
+  cd "$BUILD_DIR"
 
   npm install
   npm run build
   npm link
 
-  popd
+  popd || exit
 }
 
 #######################################

@@ -17,10 +17,10 @@ if [[ ! -f $CONFIGPATH ]]; then
 fi
 
 echo "======== Validating dependencies ========"
-nvm_install_node ${NODE_VERSION}
+nvm_install_node "${NODE_VERSION}"
 if [[ -z $(command -v fabric-cli) ]]; then
   echo "-------- Building Fabric-Cli --------"
-  build_fabric_cli ${FABRIC_CLI_DIR}
+  build_fabric_cli "${FABRIC_CLI_DIR}"
 fi
 if [[ -z $(command -v jq) ]]; then
   echo "-------- Installing jq --------"
@@ -29,52 +29,76 @@ fi
 
 
 # Load profiles from toolchain ENV variables (from creation)
-PROFILES_PATH=$(pwd)/profiles
+echo "======== Loading identity profiles and certificates ========"
+PROFILES_PATH=$(mktemp -d)
 mkdir -p "${PROFILES_PATH}"
 
-CONN_PROFILE_FILE=${PROFILES_PATH}/CONN_PROFILE.json
-echo "${CONNECTION_PROFILE_STRING}" > "${CONN_PROFILE_FILE}"
+# handle single identity/certificate or an array of information
+if [[ ${ADMIN_IDENTITY_STRING::1} != "[" ]]; then
+    ADMIN_IDENTITY_STRING=[$ADMIN_IDENTITY_STRING]
+fi
+for IDENTITYINDEX in $(echo ${ADMIN_IDENTITY_STRING} | jq -r "keys | .[]"); do
+    echo $(echo ${ADMIN_IDENTITY_STRING} | jq -r ".[$IDENTITYINDEX]") > "${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
 
-ADMIN_IDENTITY_FILE=${PROFILES_PATH}/ADMIN_IDENTITY.json
-echo "${ADMIN_IDENTITY_STRING}" > "${ADMIN_IDENTITY_FILE}"
+    echo "-> ${PROFILES_PATH}/ADMINIDENTITY_${IDENTITYINDEX}.json"
+done
+
+if [[ ${CONNECTION_PROFILE_STRING::1} != "[" ]]; then
+    CONNECTION_PROFILE_STRING=[$CONNECTION_PROFILE_STRING]
+fi
+for PROFILEINDEX in $(echo ${CONNECTION_PROFILE_STRING} | jq -r "keys | .[]"); do
+    echo $(echo ${CONNECTION_PROFILE_STRING} | jq -r ".[$PROFILEINDEX]") > "${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
+
+    echo "-> ${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
+done
+
 
 # Deploying based on configuration options
 echo "######### Reading 'deploy_config.json' for deployment options #########"
-
-for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do    
-  for CCINDEX in $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | keys | .[]' ); do        
-    CC=$(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}']' )    
+ECODE=1
+for ORG in $(jq -r "keys | .[]" "${CONFIGPATH}"); do    
+  for CCINDEX in $(jq -r ".[\"${ORG}\"].chaincode | keys | .[]" "${CONFIGPATH}"); do
+    CC=$(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}]" "${CONFIGPATH}")    
 
     # collect chaincode metadata
-    CC_NAME=$(echo ${CC} | jq -r '.name')    
+    CC_NAME=$(jq -n "${CC}" | jq -r '.name')
     CC_VERSION="$(date '+%Y%m%d.%H%M%S')"
-    json_version=$(echo ${CC} | jq -r '.version?')
+    json_version=$(jq -n "${CC}" | jq -r '.version?')
     if [[ $json_version != null && $json_version != "" ]]; then
         CC_VERSION=$json_version
     fi
-    CC_SRC=$(echo ${CC} | jq -r '.path')
+    CC_SRC=$(jq -n "${CC}" | jq -r '.path')
+
+    ADMIN_IDENTITY_FILE="${PROFILES_PATH}/ADMINIDENTITY_0.json"
+    CONN_PROFILE_FILE="${PROFILES_PATH}/CONNPROFILE_0.json"
 
     # should install
-    if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
-        retry_with_backoff 5 install_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "golang" "${CC_SRC}"
+    if [[ "true" == $(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .install" "${CONFIGPATH}") ]]; then
+        install_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" \
+          "${CC_NAME}" "${CC_VERSION}" "golang" "${CC_SRC}"
     fi
 
-    for CHANNEL in $(echo ${CC} | jq -r '.channels | .[]'); do
+    ECODE=0
+
+    for CHANNEL in $(jq -n "${CC}" | jq -r '.channels | .[]'); do
       # should instantiate
-      if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .instantiate' ) ]]; then
-        init_fn=$(cat $CONFIGPATH | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .init_fn?')
+      if [[ "true" == $(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .instantiate" "${CONFIGPATH}") ]]; then
+        init_fn=$(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .init_fn?" "${CONFIGPATH}")
         if [[ $init_fn == null ]]; then unset init_fn; fi
 
-        init_args=$(cat $CONFIGPATH | jq -r '.['\"${org}\"'].chaincode | .['${CCINDEX}'] | .init_args?')
+        init_args=$(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .init_args?" "${CONFIGPATH}")
         if [[ $init_args == null ]]; then unset init_args; fi
 
-        collections_config=$(cat $CONFIGPATH | jq -r '.['\"${org}\"'].chaincode | .['${CCINDEX}'] | .collections_config?')
+        collections_config=$(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .collections_config?" "${CONFIGPATH}")
         if [[ $collections_config == null ]]; then unset collections_config; fi
 
-        retry_with_backoff 5 instantiate_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "golang" "${init_fn}" "${init_args}" "${collections_config}"
+        instantiate_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" \
+          "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "golang" "${init_fn}" "${init_args}" "${collections_config}"
       fi      
     done
   done
 done
 
 rm -rf "${PROFILES_PATH}"
+
+if [[ ! $ECODE ]]; then error_exit "ERROR: please check the deploy_config.json to set deploy jobs" fi

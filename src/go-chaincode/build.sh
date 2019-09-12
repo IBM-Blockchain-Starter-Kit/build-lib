@@ -4,6 +4,7 @@ echo "######## Build chaincode ########"
 
 # shellcheck source=src/common/env.sh
 source "${SCRIPT_DIR}/common/env.sh"
+# shellcheck source=src/common/utils.sh
 source "${SCRIPT_DIR}/common/utils.sh"
 
 $DEBUG && set -x
@@ -40,12 +41,12 @@ mv "${FABRIC_SRC_DIR}" "${GOSOURCE}/github.com/hyperledger/fabric"
 # change to the correct path name \ path should be ./chaincode/go/example ??
 echo "######## Building chaincode ########"
 install_jq
-for org in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
-  for cc_path in $(cat ${CONFIGPATH} | jq -r ".${org}.chaincode | .[] | .path"); do    
-    cd ${GOSOURCE}/${cc_path}
-    go build -v -x $cc_path
+for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
+  for cc_path in $(jq -r ".${org}.chaincode | .[] | .path" "${CONFIGPATH}"); do    
+    cd "${GOSOURCE}/${cc_path}" || exit
+    go build -v -x "$cc_path"
   done
 done
-cd ${ROOTDIR}
+cd "${ROOTDIR}"
 
 # go build -v -x "chaincode/..."

@@ -2,12 +2,11 @@
 
 echo "######## Test chaincode ########"
 
-
-
 # shellcheck source=src/common/env.sh
 source "${SCRIPT_DIR}/common/env.sh"
-# source "${SCRIPT_DIR}/go-chaincode/install-go.sh"
+# shellcheck source=src/common/utils.sh
 source "${SCRIPT_DIR}/common/utils.sh"
+# source "${SCRIPT_DIR}/go-chaincode/install-go.sh"
 
 echo "######## Download dependencies ########"
 setup_env
@@ -23,7 +22,7 @@ echo "=> go get go-junit-report"
 go get -u github.com/jstemmer/go-junit-report
 
 # Run test cases and send results to go-junit-report
-echo '=> check $GOPATH/src/chaincode directory'
+echo '=> check GOPATH/src/chaincode directory'
 ls "$GOPATH/src/chaincode"
 
 
