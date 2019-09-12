@@ -10,8 +10,8 @@ source "${SCRIPT_DIR}/common/utils.sh"
 $DEBUG && set -x
 
 echo "======== Verify Env Variables ========"
-echo "CHAINCODEPATH...$CHAINCODEPATH"
-ls -agln "$CHAINCODEPATH"
+echo "CC_REPO_DIR...$CC_REPO_DIR"
+ls -agln "$CC_REPO_DIR"
 
 
 echo "======== Download dependencies ========"
@@ -27,6 +27,6 @@ npm run build
 # npm link
 
 echo "======== Building chaincode ========"
-cd "$CHAINCODEPATH" || exit 1
+cd "$CC_REPO_DIR" || exit 1
 npm install
 npm run build # transpile from typescript to javascript
