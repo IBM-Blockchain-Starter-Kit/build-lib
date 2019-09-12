@@ -2,6 +2,8 @@
 
 echo "######## Test chaincode ########"
 
+
+
 # shellcheck source=src/common/env.sh
 source "${SCRIPT_DIR}/common/env.sh"
 # shellcheck source=src/common/utils.sh
