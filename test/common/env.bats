@@ -33,7 +33,7 @@ setup() {
 
   source "${SCRIPT_DIR}/common/env.sh"
 
-  [ "${CHAINCODEPATH}" = "ccpath" ]
+  [[ "${CHAINCODEPATH}" == "$(pwd)/ccpath" ]]
   [ "${CONFIGPATH}" = "path" ]
   [ "${GOPATH}" = "test" ]
   [ "${GOROOT}" = "test/go" ]
@@ -48,13 +48,13 @@ setup() {
   
   source "${SCRIPT_DIR}/common/env.sh"
 
-  [ "${CHAINCODEPATH}" = "chaincode" ]
-  [ "${CONFIGPATH}" = "deploy_config.json" ]
+  [[ "${CHAINCODEPATH}" = "$(pwd)/chaincode" ]]
+  [ "${CONFIGPATH}" = "${CHAINCODEPATH}/deploy_config.json" ]
   [ "${GOPATH}" = "${PWD}" ]
   [ "${GOROOT}" = "${PWD}/go" ]
-  [ "${GO_VERSION}" = "1.10.4" ]
-  [ "${HLF_VERSION}" = "1.2.1" ]
-  [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.2.1" ]
+  [ "${GO_VERSION}" = "1.11" ]
+  [ "${HLF_VERSION}" = "1.4.1" ]
+  [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.4.1" ]
   [ "${DEBUG}" = false ]
 
 }
