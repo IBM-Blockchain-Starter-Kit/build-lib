@@ -10,7 +10,7 @@ source "${SCRIPT_DIR}/common/env.sh"
 source "${SCRIPT_DIR}/common/utils.sh"
 # source "${SCRIPT_DIR}/go-chaincode/install-go.sh"
 
-echo "######## Download dependencies ########"
+echo "======== Download dependencies ========"
 setup_env
 
 $DEBUG && set -x
@@ -29,6 +29,6 @@ ls "$GOPATH/src/chaincode"
 
 
 # TODO: 
-# - try running just go test
+echo "======== Run cc tests ========"
 go test -v "chaincode/..." 2>&1 | tee tst-output.txt | go-junit-report > TEST-report.xml
 cat tst-output.txt
