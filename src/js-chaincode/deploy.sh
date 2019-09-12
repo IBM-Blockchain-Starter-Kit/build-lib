@@ -30,7 +30,7 @@ fi
 
 # Load profiles from toolchain ENV variables (from creation)
 echo "======== Loading identity profiles and certificates ========"
-PROFILES_PATH=$(pwd)/profiles
+PROFILES_PATH=$(mktemp -d)
 mkdir -p "${PROFILES_PATH}"
 
 # handle single identity/certificate or an array of information
@@ -48,7 +48,7 @@ if [[ ${CONNECTION_PROFILE_STRING::1} != "[" ]]; then
 fi
 for PROFILEINDEX in $(echo ${CONNECTION_PROFILE_STRING} | jq -r "keys | .[]"); do
     echo $(echo ${CONNECTION_PROFILE_STRING} | jq -r ".[$PROFILEINDEX]") > "${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
-    
+
     echo "-> ${PROFILES_PATH}/CONNPROFILE_${PROFILEINDEX}.json"
 done
 
@@ -56,27 +56,30 @@ done
 # Deploying based on configuration options
 echo "======== Reading 'deploy_config.json' ========"
 
-EXIT_CODE=1
-for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do    
-  for CCINDEX in $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | keys | .[]' ); do        
-    CC=$(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}']' )    
+ECODE=1
+for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
+  for CCINDEX in $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | keys | .[]' ); do
+    CC=$(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}']' )
+    echo $CC
 
     # collect chaincode metadata
-    CC_NAME=$(echo ${CC} | jq -r '.name')    
+    CC_NAME=$(echo ${CC} | jq -r '.name')
     CC_VERSION="$(date '+%Y%m%d.%H%M%S')"
     json_version=$(echo ${CC} | jq -r '.version?')
     if [[ $json_version != null && $json_version != "" ]]; then
         CC_VERSION=$json_version
     fi
-    
-    ADMIN_IDENTITY_FILE="${PROFILES_PATH}/ADMINIDENTITY_${ORGINDEX}.json"    
-    CONN_PROFILE_FILE="${PROFILES_PATH}/CONNPROFILE_${ORGINDEX}.json"
+
+    ADMIN_IDENTITY_FILE="${PROFILES_PATH}/ADMINIDENTITY_0.json"
+    CONN_PROFILE_FILE="${PROFILES_PATH}/CONNPROFILE_0.json"
 
 
     # should install
     if [[ "true" == $(cat ${CONFIGPATH} | jq -r '.['\"${ORG}\"'].chaincode | .['${CCINDEX}'] | .install' ) ]]; then
         install_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "node" "${CHAINCODEPATH}"
     fi
+
+    ECODE=0
 
     for CHANNEL in $(echo ${CC} | jq -r '.channels | .[]'); do
       # should instantiate
@@ -92,12 +95,12 @@ for ORG in $(cat ${CONFIGPATH} | jq -r 'keys | .[]'); do
 
         instantiate_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "node" "${init_fn}" "${init_args}" "${collections_config}"
 
-        EXIT_CODE=0
-      fi      
+        ECODE=0
+      fi
     done
   done
 done
 
 rm -rf "${PROFILES_PATH}"
 
-exit $EXIT_CODE
+if [[ ! $ECODE ]]; then error_exit "ERROR: please check the deploy_config.json to set deploy jobs"
