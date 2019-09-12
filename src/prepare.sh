@@ -17,7 +17,7 @@ set -ex
 
 # move chaincode git repo to separate directory
 if [ -n "${CC_REPO_DIR}" ]; then
-  chaincode_files=`ls`
+  chaincode_files="$(ls)"
   mkdir "${CC_REPO_DIR}"
   mv -f "$chaincode_files" "${CC_REPO_DIR}"
 fi

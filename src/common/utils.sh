@@ -97,7 +97,7 @@ function install_python {
   echo "=> Installing Python-v${PYTHON_VERSION} ..."
   # echo '$PYTHONPATH'...${PYTHONPATH}
 
-  local python_dir=$(mktemp -d)
+  python_dir=$(mktemp -d) || exit
   
   cd "${python_dir}" \
     && curl  "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" > "Python-${PYTHON_VERSION}.tgz" \
@@ -141,8 +141,8 @@ function link_python {
 function build_fabric_cli {
   local BUILD_DIR=${1:-$FABRIC_CLI_DIR}
 
-  pushd $(pwd) || exit
-  cd "$BUILD_DIR"
+  pushd "$(pwd)" || exit
+  cd "$BUILD_DIR" || exit
 
   npm install
   npm run build

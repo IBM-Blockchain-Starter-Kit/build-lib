@@ -10,7 +10,7 @@ source "${SCRIPT_DIR}/common/utils.sh"
 source "${SCRIPT_DIR}/common/blockchain.sh"
 
 $DEBUG && set -x
-cd "$CHAINCODEPATH"
+cd "$CHAINCODEPATH" || exit 1
 
 echo "======== Download dependencies ========"
 nvm_install_node "${NODE_VERSION}"

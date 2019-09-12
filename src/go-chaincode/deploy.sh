@@ -101,4 +101,4 @@ done
 
 rm -rf "${PROFILES_PATH}"
 
-if [[ ! $ECODE ]]; then error_exit "ERROR: please check the deploy_config.json to set deploy jobs" fi
+if [[ ! $ECODE ]]; then error_exit "ERROR: please check the deploy_config.json to set deploy jobs"; fi
