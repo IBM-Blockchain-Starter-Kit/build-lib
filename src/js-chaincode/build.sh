@@ -9,12 +9,24 @@ source "${SCRIPT_DIR}/common/utils.sh"
 
 $DEBUG && set -x
 
-echo "######## Download dependencies ########"
+echo "======== Verify Env Variables ========"
+echo '$CHAINCODEPATH'...$CHAINCODEPATH
+ls -agln $CHAINCODEPATH
 
-install_node "$NODE_VERSION" "$NVM_VERSION"
 
+echo "======== Download dependencies ========"
+setup_env
+install_python $PYTHON_VERSION
+# echo "Y" | apt-get install python2.7
+nvm_install_node ${NODE_VERSION}
+
+echo "======== Building fabric-cli tool ========"
+cd ${FABRIC_CLI_DIR}
 npm install
-
-echo "######## Building chaincode ########"
-
 npm run build
+# npm link
+
+echo "======== Building chaincode ========"
+cd ${CHAINCODEPATH}
+npm install
+npm run build # transpile from typescript to javascript

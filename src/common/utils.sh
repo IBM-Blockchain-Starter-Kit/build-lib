@@ -17,34 +17,6 @@ function error_exit {
 }
 
 #######################################
-# Creates and displays a name that is likely to be unique and suitable for use
-# when deploying apps to bluemix
-# Globals:
-#   None
-# Arguments:
-#   uuid: Universally unique identifier
-#   name: Additional name arguments
-# Returns:
-#   None
-#######################################
-function get_deploy_name {
-  uuid="${1:?get_deploy_name must be called with at least one argument}"
-  shift
-
-  old_ifs="$IFS"
-  IFS='_'
-  name="$*"
-  IFS=$old_ifs
-
-  unique_name="${name}_${uuid}"
-
-  short_hash=$(echo "${unique_name}" | git hash-object --stdin | head -c 7)
-
-  deploy_name=$(echo "${name}" | head -c 43)${short_hash}
-  echo "${deploy_name}"
-}
-
-#######################################
 # Installs jq using curl and updates path
 # Globals:
 #   set: PATH
@@ -60,7 +32,7 @@ function install_jq {
 }
 
 #######################################
-# Installs node using mvn
+# Installs node using nvm
 # Globals:
 #   None
 # Arguments:
@@ -73,9 +45,10 @@ function install_node {
   local NODE_VERSION=$1
   local NVM_VERSION=$2
 
-  echo "######## Installing Node.js version ${NODE_VERSION} using nvm ${NVM_VERSION} ########"
+  echo "=> Installing Node.js version ${NODE_VERSION} using nvm ${NVM_VERSION} ..."
   # Can safely ignore nvm.sh since it's not ours
   # shellcheck disable=SC1090
+  
   npm config delete prefix \
     && curl "https://raw.githubusercontent.com/creationix/nvm/v${NVM_VERSION}/install.sh" | bash \
     && . "$HOME/.nvm/nvm.sh" \
@@ -83,6 +56,98 @@ function install_node {
     && nvm use default \
     && node -v \
     && npm -v
+}
+
+function nvm_install_node {
+  local NODE_VERSION=${1-:NODE_VERSION}
+
+  echo "=> Installing Node.js version ${NODE_VERSION} using nvm $(nvm --version) ..."
+
+  if [[ -n $(nvm ls | grep -q "$NODE_VERSION") ]]; then
+    echo "node v$NODE_VERSION found"
+  else
+    echo "node v$NODE_VERSION not found"
+  fi
+
+  nvm install "$NODE_VERSION" \
+    && nvm alias default "$NODE_VERSION" \
+    && nvm use default \
+    && nvm current \
+    && node -v \
+    && npm -v
+}
+
+#######################################
+# Installs python via curl
+# Globals:
+#   None
+# Arguments:
+#   PYTHON_VERSION: Version of Node.js to install
+# Returns:
+#   None
+#######################################
+function install_python {
+  local PYTHON_VERSION=$1
+  if [ -n "$PYTHONPATH" ]; then
+    export PYTHONPATH=/opt/python/$PYTHON_VERSION
+  fi    
+
+  pushd "$(pwd)"
+  
+  echo "=> Installing Python-v${PYTHON_VERSION} ..."
+  # echo '$PYTHONPATH'...${PYTHONPATH}
+
+  local python_dir=$(mktemp -d) \
+    && cd $python_dir \
+    && curl  "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" > Python-${PYTHON_VERSION}.tgz \
+    && tar -xzvf Python-${PYTHON_VERSION}.tgz  \
+    && cd Python-${PYTHON_VERSION} \
+    && ./configure --prefix=${PYTHONPATH} --enable-optimizations \
+    && make install
+
+  rm -rf python_dir
+
+  link_python ${PYTHONPATH}
+  
+  popd
+}
+
+#######################################
+# Relinks python by updating PATH variable
+# Globals:
+#   None
+# Arguments:
+#   PYTHON_VERSION: Version of Node.js to install
+# Returns:
+#   None
+#######################################
+function link_python {
+    local PYTHON_PATH=$1
+
+    export PATH=${PYTHON_PATH}/bin:$PATH
+    echo "export PATH=${PYTHON_PATH}/bin:$PATH" >> ${HOME}/.bashrc
+}
+
+#######################################
+# Builds fabric-cli in env set $FABRIC_CLI_DIR path
+# Globals:
+#   set: PATH
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function build_fabric_cli {
+  local BUILD_DIR=${1:-$FABRIC_CLI_DIR}
+
+  pushd $(pwd)
+  cd $BUILD_DIR
+
+  npm install
+  npm run build
+  npm link
+
+  popd
 }
 
 #######################################
@@ -143,4 +208,41 @@ function retry_with_backoff {
       return $exitCode
     fi
   done
+}
+
+#######################################
+# Download and install ubuntu build-essential package
+#######################################
+function setup_env {
+  # sudo add-apt-repository ppa:saiarcot895/myppa
+  # sudo apt-get update
+  # sudo apt-get -y install apt-fast
+
+  echo "=> apt-get update"
+  if [[ ! $DEBUG ]]; then
+    apt-get -y update > /dev/null
+  else
+    apt-get -y update
+  fi
+  echo
+
+  echo "=> apt-get install build-essential"
+  echo " (usually takes a few minutes...)"
+  if [[ ! $DEBUG ]]; then
+    apt-get -y install build-essential --fix-missing > /dev/null
+  else
+    apt-get -y install build-essential --fix-missing
+  fi
+  echo
+
+  # echo "=> apt install g++" 
+  # echo "Y" | apt install g++ --fix-missing
+  # echo
+
+  # echo "=> apt-get install python2.7" 
+  # echo "Y" | apt-get install python2.7 --fix-missing > /dev/null
+  # echo
+  # echo 'which python'...`which python`
+  # echo 'npm config get python'...`npm config get python`
+
 }
