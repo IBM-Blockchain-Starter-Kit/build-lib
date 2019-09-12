@@ -94,7 +94,7 @@ for ORG in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
 
         instantiate_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" \
           "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "node" "${init_fn}" "${init_args}" "${collections_config}"
-      fi      
+      fi
     done
   done
 done

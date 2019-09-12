@@ -41,6 +41,7 @@ mv "${FABRIC_SRC_DIR}" "${GOSOURCE}/github.com/hyperledger/fabric"
 # change to the correct path name \ path should be ./chaincode/go/example ??
 echo "######## Building chaincode ########"
 install_jq
+
 for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
   for cc_path in $(jq -r ".${org}.chaincode | .[] | .path" "${CONFIGPATH}"); do    
     cd "${GOSOURCE}/${cc_path}" || exit
