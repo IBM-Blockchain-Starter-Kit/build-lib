@@ -48,8 +48,7 @@ setup() {
 @test "env.sh: should accept default values" {
   
   source "${SCRIPT_DIR}/common/env.sh"
-
-  [[ "${CC_REPO_DIR}" = "test/chaincode-repo/chaincode" ]]   
+  
   [ "${CONFIGPATH}" = "${CC_REPO_DIR}/deploy_config.json" ]  
   [ "${GOPATH}" = "${PWD}" ]
   [ "${GOROOT}" = "${PWD}/go" ]
