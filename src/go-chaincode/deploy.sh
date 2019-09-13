@@ -53,6 +53,7 @@ done
 
 # Deploying based on configuration options
 echo "######### Reading 'deploy_config.json' for deployment options #########"
+ORGINDEX=0
 ECODE=1
 for ORG in $(jq -r "keys | .[]" "${CONFIGPATH}"); do    
   for CCINDEX in $(jq -r ".[\"${ORG}\"].chaincode | keys | .[]" "${CONFIGPATH}"); do
@@ -67,8 +68,9 @@ for ORG in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
     fi
     CC_SRC=$(jq -n "${CC}" | jq -r '.path')
 
-    ADMIN_IDENTITY_FILE="${PROFILES_PATH}/ADMINIDENTITY_0.json"
-    CONN_PROFILE_FILE="${PROFILES_PATH}/CONNPROFILE_0.json"
+    ADMIN_IDENTITY_FILE="${PROFILES_PATH}/ADMINIDENTITY_${ORGINDEX}.json"
+    CONN_PROFILE_FILE="${PROFILES_PATH}/CONNPROFILE_${ORGINDEX}.json"
+    ORGINDEX=$(($ORGINDEX + 1))
 
     # should install
     if [[ "true" == $(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .install" "${CONFIGPATH}") ]]; then
