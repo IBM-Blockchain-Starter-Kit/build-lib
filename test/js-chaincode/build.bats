@@ -22,21 +22,35 @@ teardown() {
 }
 
 @test "build.sh: should run without errors" {
-  echo "unset -f install_node" >> "${SCRIPT_DIR}/common/utils.sh"
+  echo "true" > "${SCRIPT_DIR}/common/env.sh"
+  echo "unset -f setup_env" >> "${SCRIPT_DIR}/common/utils.sh"  
+  echo "unset -f install_python" >> "${SCRIPT_DIR}/common/utils.sh"  
+  echo "unset -f nvm_install_node" >> "${SCRIPT_DIR}/common/utils.sh"  
 
+  source "${SCRIPT_DIR}/common/env.sh"
   source "${SCRIPT_DIR}/common/utils.sh"
 
-  stub install_node \
-    "9.9.9 1.1.1 : true"
+  stub setup_env "true"
+  stub install_python "2.7.15 : true"
+  stub nvm_install_node "8.16.0 : true"
   stub npm \
+    "install : true" \
+    "run build : true" \
     "install : true" \
     "run build : true"
 
+  export CC_REPO_DIR="."
+  export PYTHON_VERSION="2.7.15"
+  export NODE_VERSION="8.16.0"
+  export FABRIC_CLI_DIR="."
+  
   run ${SCRIPT_DIR}/js-chaincode/build.sh
 
   echo $output
   [ $status -eq 0 ]
 
-  unstub install_node
-  unstub npm
+  unstub setup_env
+  unstub install_python
+  unstub nvm_install_node
+  unstub npm  
 }

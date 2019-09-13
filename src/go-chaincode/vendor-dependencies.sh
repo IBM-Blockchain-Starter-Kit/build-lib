@@ -51,7 +51,7 @@ function _fetch_dependencies_cc {
         # Get list of packages to vendor in
         declare -a packages
         while IFS= read -r package || [ "$package" ]; do
-            packages+=($package)
+            packages+=("$package")
         done < .govendor_packages
         local index=0
 
@@ -65,7 +65,7 @@ function _fetch_dependencies_cc {
             ### Trim trailing whitespaces
             package="${package%%*( )}"
             # echo "=${package}="
-            if ! [[ -z "$package" ]]; then
+            if [[ -n "$package" ]]; then
                 echo "Fetching ${package}"
                 govendor fetch "${package}"
             fi

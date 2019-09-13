@@ -72,13 +72,13 @@ function instantiate_fabric_chaincode {
   --cc-type ${PLATFORM} --channel ${CHANNEL}"
 
   if [[ -n $INIT_FN ]]; then
-    local INIT_FN_FLAG=" --init-fn ${INIT_FN//\"}"
+    INIT_FN_FLAG=" --init-fn ${INIT_FN//\"}"
   fi
   if [[ -n $INIT_ARGS ]]; then
-    local INIT_ARGS_FLAG=" --init-args ${INIT_ARGS//\"}"
+    INIT_ARGS_FLAG=" --init-args ${INIT_ARGS//\"}"
   fi
   if [[ -n $COLLECTIONS_CONFIG ]]; then
-    local COLLECTIONS_CONFIG_FLAG=" --collections-config $(pwd)/${COLLECTIONS_CONFIG}"
+    COLLECTIONS_CONFIG_FLAG=" --collections-config $(pwd)/${COLLECTIONS_CONFIG}"
   fi
 
   echo ">>> ${CMD} ${INIT_FN_FLAG} ${INIT_ARGS_FLAG} ${COLLECTIONS_CONFIG_FLAG} --timeout 360000"
