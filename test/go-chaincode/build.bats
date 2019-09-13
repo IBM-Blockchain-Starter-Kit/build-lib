@@ -19,20 +19,71 @@ teardown() {
 }
 
 @test "build.sh: should run without errors" {
+  echo "unset -f setup_env" >> ${SCRIPT_DIR}/common/utils.sh
+  echo "unset -f install_python" >> ${SCRIPT_DIR}/common/utils.sh
+  echo "unset -f nvm_install_node" >> ${SCRIPT_DIR}/common/utils.sh
+  echo "unset -f install_jq" >> ${SCRIPT_DIR}/common/utils.sh
+
+  source "${SCRIPT_DIR}/common/utils.sh"
+
+  stub setup_env "true"
+  stub install_python "2.7.15 : true"
   stub curl \
     "true" \
     "true"
-  stub go "build -v -x chaincode/... : true"
   stub tar \
     "true" \
     "true"
+  stub nvm_install_node "8.16.0 : true"
+  stub mkdir \
+    "true" \
+    "true"
+  stub cp "true"
+  stub mv "true"
+  stub npm \
+    "install : true" \
+    "run build : true"
+  stub install_jq "true"
+  stub go \
+    "build -v -x chaincode/ping : true" \
+    "build -v -x chaincode/woo : true"
 
-  pushd ${SCRIPT_DIR}
-  run "./go-chaincode/build.sh"
+  echo "{
+    \"org1msp\": {
+        \"chaincode\": [
+            {
+                \"path\": \"chaincode/ping\",
+            },
+            {
+              \"path\: \"chaincode/woo\"
+            }
+        ],
+      }
+    }" > ${SCRIPT_DIR}/deploy_config.json
+
+  mkdir -p ${SCRIPT_DIR}/chaincode/ping
+  mkdir -p ${SCRIPT_DIR}/chaincode/woo
+
+  export DEBUG=True
+  export GOPATH=""
+  export GOSOURCE="."
+  export CHAINCODEPATH="chaincode"
+  export FABRIC_CLI_DIR='.' 
+  export CONFIGPATH="${SCRIPT_DIR}/deploy_config.json" 
+
+  run ${SCRIPT_DIR}/go-chaincode/build.sh
+  
+  echo $output
   [ $status -eq 0 ]
-  popd
 
+  unstub setup_env
+  unstub install_python
   unstub curl
-  unstub go
   unstub tar
+  unstub nvm_install_node
+  unstub mkdir
+  unstub cp
+  unstub mv
+  unstub npm
+  unstub install_jq
 }

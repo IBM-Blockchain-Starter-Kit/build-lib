@@ -27,13 +27,13 @@ setup() {
   ROOTDIR="test"
   GO_VERSION="1.0.0"
   HLF_VERSION="2.0.0"
-  CHAINCODEPATH="ccpath"
+  CHAINCODEPATH="ccpath"  
   CONFIGPATH="path"
   DEBUG=true
 
   source "${SCRIPT_DIR}/common/env.sh"
-
-  [ "${CHAINCODEPATH}" = "ccpath" ]
+    
+  [ "${CHAINCODEPATH}" == "${CC_REPO_DIR}/ccpath" ]
   [ "${CONFIGPATH}" = "path" ]
   [ "${GOPATH}" = "test" ]
   [ "${GOROOT}" = "test/go" ]
@@ -47,14 +47,13 @@ setup() {
 @test "env.sh: should accept default values" {
   
   source "${SCRIPT_DIR}/common/env.sh"
-
-  [ "${CHAINCODEPATH}" = "chaincode" ]
-  [ "${CONFIGPATH}" = "deploy_config.json" ]
+  
+  [ "${CONFIGPATH}" = "${CC_REPO_DIR}/deploy_config.json" ]  
   [ "${GOPATH}" = "${PWD}" ]
   [ "${GOROOT}" = "${PWD}/go" ]
-  [ "${GO_VERSION}" = "1.10.4" ]
-  [ "${HLF_VERSION}" = "1.2.1" ]
-  [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.2.1" ]
+  [ "${GO_VERSION}" = "1.11" ]
+  [ "${HLF_VERSION}" = "1.4.1" ]
+  [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.4.1" ]
   [ "${DEBUG}" = false ]
 
 }
