@@ -27,7 +27,6 @@ if [[ -z $(command -v jq) ]]; then
   install_jq
 fi
 
-
 # Load profiles from toolchain ENV variables (from creation)
 echo "======== Loading identity profiles and certificates ========"
 PROFILES_PATH=$(mktemp -d)

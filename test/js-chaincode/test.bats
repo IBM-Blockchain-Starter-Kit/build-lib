@@ -22,20 +22,30 @@ teardown() {
 }
 
 @test "test.sh: should run without errors" {
-  echo "unset -f install_node" >> "${SCRIPT_DIR}/common/utils.sh"
+  echo "true" > "${SCRIPT_DIR}/common/env.sh"
+  echo "unset -f nvm_install_node" >> "${SCRIPT_DIR}/common/utils.sh"
+  echo "unset -f install_jq" >> "${SCRIPT_DIR}/common/utils.sh"
 
+  source "${SCRIPT_DIR}/common/env.sh"
   source "${SCRIPT_DIR}/common/utils.sh"
 
-  stub install_node \
-    "9.9.9 1.1.1 : true"
-  stub npm \
-    "run test : true"
+  stub nvm_install_node "8.16.0 : true"
+  stub install_jq "true"
+  stub npm "run test : true"
+
+  export CC_REPO_DIR="."
+  export NODE_VERSION="8.16.0"
+  export ADMIN_IDENTITY_STRING="{}"
+  export CONNECTION_PROFILE_STRING="{}"
+  export CONFIGPATH=$(mktemp)
+  echo "[{}]" >> "$CONFIGPATH"
 
   run ${SCRIPT_DIR}/js-chaincode/test.sh
 
   echo $output
   [ $status -eq 0 ]
 
-  unstub install_node
+  unstub nvm_install_node
+  unstub install_jq
   unstub npm
 }

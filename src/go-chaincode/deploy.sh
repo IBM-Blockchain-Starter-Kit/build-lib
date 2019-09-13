@@ -18,14 +18,12 @@ fi
 
 echo "======== Validating dependencies ========"
 nvm_install_node "${NODE_VERSION}"
-if [[ -z $(command -v fabric-cli) ]]; then
-  echo "-------- Building Fabric-Cli --------"
-  build_fabric_cli "${FABRIC_CLI_DIR}"
-fi
-if [[ -z $(command -v jq) ]]; then
-  echo "-------- Installing jq --------"
-  install_jq
-fi
+
+echo "-------- Building Fabric-Cli --------"
+build_fabric_cli "${FABRIC_CLI_DIR}"
+
+echo "-------- Installing jq --------"
+install_jq
 
 
 # Load profiles from toolchain ENV variables (from creation)
