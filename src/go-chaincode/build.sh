@@ -33,7 +33,7 @@ cp -r "${CHAINCODEPATH}" "${GOSOURCE}/chaincode"
 
 # Let's put fabric source into gopath so that go can resolve dependencies with Fabric libraries 
 mkdir -p "${GOSOURCE}/github.com/hyperledger/"
-mv " ${FABRIC_SRC_DIR}" "${GOSOURCE}/github.com/hyperledger/fabric"
+mv "${FABRIC_SRC_DIR}" "${GOSOURCE}/github.com/hyperledger/fabric"
 
 
 echo "======== Building fabric-cli tool ========"
