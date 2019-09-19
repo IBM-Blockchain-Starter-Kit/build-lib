@@ -90,8 +90,11 @@ for ORG in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
         collections_config=$(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .collections_config?" "${CONFIGPATH}")
         if [[ $collections_config == null ]]; then unset collections_config; fi
 
+        endorsement_policy=$(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .endorsement_policy?" "${CONFIGPATH}")
+        if [[ $endorsement_policy == null ]]; then unset endorsement_policy; fi
+
         instantiate_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" \
-          "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "golang" "${init_fn}" "${init_args}" "${collections_config}"
+          "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "golang" "${init_fn}" "${init_args}" "${collections_config}" "${endorsement_policy}"
       fi      
     done
   done
