@@ -48,6 +48,7 @@ function install_fabric_chaincode {
 #  (-) $8: INIT_FN: name of function to be instantiated on (default: init)
 #  (-) $9: INIT_ARGS: args passed into the init function (default: [])
 #  (-)$10: COLLECTIONS_CONFIG: JSON formatted string of private collections configuration
+#  (-)$11: ENDORSEMENT_POLICY: JSON formatted string of endorsement policy
 # Returns:
 #   None
 #######################################
@@ -62,10 +63,12 @@ function instantiate_fabric_chaincode {
   local INIT_FN=${8:-""}
   local INIT_ARGS=${9:-""}
   local COLLECTIONS_CONFIG=${10:-""}
+  local ENDORSEMENT_POLICY=${11:-""}
 
   local INIT_FN_FLAG=""
   local INIT_ARGS_FLAG=""
   local COLLECTIONS_CONFIG_FLAG=""
+  local ENDORSEMENT_POLICY_FLAG=""
 
   local CMD="fabric-cli chaincode instantiate --conn-profile ${CONN_PROFILE} --org ${ORG} \
   --admin-identity ${ADMIN_IDENTITY} --cc-name ${CC_NAME} --cc-version ${CC_VERSION} \
@@ -80,7 +83,10 @@ function instantiate_fabric_chaincode {
   if [[ -n $COLLECTIONS_CONFIG ]]; then
     COLLECTIONS_CONFIG_FLAG=" --collections-config $(pwd)/${COLLECTIONS_CONFIG}"
   fi
+  if [[ -n $ENDORSEMENT_POLICY ]]; then
+    ENDORSEMENT_POLICY_FLAG="  --endorsement-policy '${ENDORSEMENT_POLICY}'"
+  fi
 
-  echo ">>> ${CMD} ${INIT_FN_FLAG} ${INIT_ARGS_FLAG} ${COLLECTIONS_CONFIG_FLAG} --timeout 360000"
-  echo "${CMD} ${INIT_FN_FLAG} ${INIT_ARGS_FLAG} ${COLLECTIONS_CONFIG_FLAG} --timeout 360000" | bash
+  echo ">>> ${CMD} ${INIT_FN_FLAG} ${INIT_ARGS_FLAG} ${COLLECTIONS_CONFIG_FLAG} ${ENDORSEMENT_POLICY_FLAG} --timeout 360000"
+  echo "${CMD} ${INIT_FN_FLAG} ${INIT_ARGS_FLAG} ${COLLECTIONS_CONFIG_FLAG} ${ENDORSEMENT_POLICY_FLAG} --timeout 360000" | bash
 }
