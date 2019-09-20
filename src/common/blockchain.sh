@@ -84,7 +84,7 @@ function instantiate_fabric_chaincode {
     COLLECTIONS_CONFIG_FLAG=" --collections-config $(pwd)/${COLLECTIONS_CONFIG}"
   fi
   if [[ -n $ENDORSEMENT_POLICY ]]; then
-    ENDORSEMENT_POLICY_FLAG="  --endorsement-policy ${ENDORSEMENT_POLICY}"
+    ENDORSEMENT_POLICY_FLAG="  --endorsement-policy '${ENDORSEMENT_POLICY}'"
   fi
 
   echo ">>> ${CMD} ${INIT_FN_FLAG} ${INIT_ARGS_FLAG} ${COLLECTIONS_CONFIG_FLAG} ${ENDORSEMENT_POLICY_FLAG} --timeout 360000"
