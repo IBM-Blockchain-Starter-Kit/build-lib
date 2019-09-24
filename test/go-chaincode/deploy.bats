@@ -10,6 +10,10 @@ setup() {
     setup_script_dir "${src_dir}" "${testcase_dirname}"
 }
 
+teardown() {
+  cleanup_stubs
+}
+
 @test "deploy.sh: should exist and be executable" {
     [ -x "${SCRIPT_DIR}/go-chaincode/deploy.sh" ]
 }
