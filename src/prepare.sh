@@ -37,11 +37,12 @@ fi
 if [ -n "${FABRIC_CLI_URL}" ]; then
   echo "=> Downloading Fabric-CLI..."
   # download fabric-cli
-  FABRIC_CLI_DIR=$(mktemp -d)
+  fabric_cli_dir=$(mktemp -d)
+  # shellcheck disable=SC2153
   mkdir -p "${FABRIC_CLI_DIR}"
 
-  (curl -fsSL "${FABRIC_CLI_URL}") > "${FABRIC_CLI_DIR}/fabric-cli.tgz"
-  tar --keep-old-files -xvzf "${FABRIC_CLI_DIR}/fabric-cli.tgz" -C "${FABRIC_CLI_DIR}" --strip-components 1 > /dev/null 2>&1 || true
+  (curl -fsSL "${FABRIC_CLI_URL}") > "${fabric_cli_dir}/fabric-cli.tgz"
+  tar --keep-old-files -xvzf "${fabric_cli_dir}/fabric-cli.tgz" -C "${FABRIC_CLI_DIR}" --strip-components 1 > /dev/null 2>&1 || true
 
   # git clone "${FABRIC_CLI_URL}" "${FABRIC_CLI_DIR}" > /dev/null 2>&1 || true
 fi
