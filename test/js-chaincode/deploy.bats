@@ -10,6 +10,10 @@ setup() {
   setup_script_dir "${src_dir}" "${testcase_dirname}"
 }
 
+teardown() {
+  cleanup_stubs
+}
+
 @test "deploy.sh: should exist and be executable" {
   [ -x "${SCRIPT_DIR}/js-chaincode/deploy.sh" ]
 }
@@ -23,27 +27,32 @@ setup() {
 }
 
 @test "deploy.sh: should succeed if deploy configuration exists" {
-  export CONFIGPATH=$(mktemp)
+    export CONFIGPATH=$(mktemp)
 
-  echo "unset -f install_jq" >> "${SCRIPT_DIR}/common/utils.sh"
-  echo "unset -f setup_service_constants" >> "${SCRIPT_DIR}/common/blockchain.sh"
-  echo "unset -f provision_blockchain" >> "${SCRIPT_DIR}/common/blockchain.sh"
-  echo "unset -f deploy_fabric_chaincode" >> "${SCRIPT_DIR}/common/blockchain.sh"
+    echo "true" > "${SCRIPT_DIR}/common/env.sh"
+    echo "unset -f nvm_install_node" >> "${SCRIPT_DIR}/common/utils.sh"
+    echo "unset -f build_fabric_cli" >> "${SCRIPT_DIR}/common/utils.sh"
+    echo "unset -f install_jq" >> "${SCRIPT_DIR}/common/utils.sh"
 
-  source "${SCRIPT_DIR}/common/utils.sh"
-  source "${SCRIPT_DIR}/common/blockchain.sh"
+    source "${SCRIPT_DIR}/common/env.sh"
+    source "${SCRIPT_DIR}/common/utils.sh"
 
-  stub install_jq "true"
-  stub setup_service_constants "true"
-  stub provision_blockchain "true"
-  stub deploy_fabric_chaincode "true"
+    stub nvm_install_node "8.16.0 : true"
+    stub build_fabric_cli "true"
+    stub install_jq "true"
 
-  run ${SCRIPT_DIR}/js-chaincode/deploy.sh
+    stub mkdir "true"
 
-  [ $status -eq 0 ]
+    export ADMIN_IDENTITY_STRING="{}"
+    export CONNECTION_PROFILE_STRING="{}"
 
-  unstub install_jq
-  unstub setup_service_constants
-  unstub provision_blockchain
-  unstub deploy_fabric_chaincode
+    export NODE_VERSION="8.16.0"
+    export FABRIC_CLI_DIR="fabric-cli"
+    run ${SCRIPT_DIR}/go-chaincode/deploy.sh
+    
+    [ $status -eq 0 ]
+
+    unstub nvm_install_node
+    unstub build_fabric_cli
+    unstub install_jq
 }
