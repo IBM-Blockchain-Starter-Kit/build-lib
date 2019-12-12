@@ -34,7 +34,7 @@ teardown() {
   stub tar \
     "true" \
     "true"
-  stub nvm_install_node "8.16.0 : true"
+  stub nvm_install_node "8.16.2 : true"
   stub mkdir \
     "true" \
     "true"

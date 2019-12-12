@@ -52,9 +52,9 @@ setup() {
   [ "${CONFIGPATH}" = "${CC_REPO_DIR}/deploy_config.json" ]  
   [ "${GOPATH}" = "${PWD}" ]
   [ "${GOROOT}" = "${PWD}/go" ]
-  [ "${GO_VERSION}" = "1.11" ]
-  [ "${HLF_VERSION}" = "1.4.1" ]
-  [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.4.1" ]
+  [ "${GO_VERSION}" = "1.12" ]
+  [ "${HLF_VERSION}" = "1.4.4" ]
+  [ "${FABRIC_SRC_DIR}" = "${PWD}/fabric-1.4.4" ]
   [ "${DEBUG}" = false ]
 
 }

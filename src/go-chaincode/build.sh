@@ -9,7 +9,6 @@ source "${SCRIPT_DIR}/common/utils.sh"
 
 $DEBUG && set -x
 
-
 echo "======== Download dependencies ========"
 setup_env
 install_python "${PYTHON_VERSION}"

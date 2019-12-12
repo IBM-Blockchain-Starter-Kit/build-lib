@@ -48,7 +48,7 @@ teardown() {
 
     export NODE_VERSION="8.16.0"
     export FABRIC_CLI_DIR="fabric-cli"
-    run ${SCRIPT_DIR}/go-chaincode/deploy.sh
+    run ${SCRIPT_DIR}/js-chaincode/deploy.sh
     
     [ $status -eq 0 ]
 

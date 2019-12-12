@@ -4,13 +4,13 @@ ROOTDIR=${ROOTDIR:=$(pwd)}
 export DEBUG=${DEBUG:=false}
 
 # set nvm and node expected versions
-# export NODE_VERSION=${NODE_VERSION:="8.16.0"}
-export NODE_VERSION="8.16.0"
+# export NODE_VERSION=${NODE_VERSION:="8.16.2"}
+export NODE_VERSION="8.16.2"
 # export NVM_VERSION="0.33.11"
-export NVM_VERSION=${NVM_VERSION:="0.33.11"}
+export NVM_VERSION=${NVM_VERSION:="0.35.1"}
 
 # set location for go executables
-export GO_VERSION=${GO_VERSION:="1.11"}
+export GO_VERSION=${GO_VERSION:="1.12"}
 export GOROOT=${ROOTDIR}/go
 export PATH=${GOROOT}/bin:$PATH
 export GOPATH=${ROOTDIR}
@@ -27,7 +27,7 @@ export CONFIGPATH=${CONFIGPATH:-"${CC_REPO_DIR}/deploy_config.json"}
 export CHAINCODEPATH=${CHAINCODEPATH:-"$CC_REPO_DIR/chaincode"}
 
 # hlf dir
-export HLF_VERSION=${HLF_VERSION:="1.4.1"}
+export HLF_VERSION=${HLF_VERSION:="1.4.4"}
 export FABRIC_SRC_DIR=${ROOTDIR}/fabric-${HLF_VERSION}
 
 # fabric-cli dir

@@ -33,7 +33,7 @@ Executing the `install.sh` script should result in the creation of a `bats` fold
 To install `bats-mock`, first create an empty folder named `bats-mock` under the `build-lib` repository. Then clone the [bats-mock](https://github.com/jasonkarns/bats-mock) repository into the directory of your choosing; navigate to that folder, copy the `binstub` and `stub.bash` files into the `bats-mock` you created under the `build-lib` repository.
 ```
 mkdir <absolute path to the build-lib repository>/bats-mock
-cp binstub stub.bash <<absolute path to the build-lib repository>/bats-mock
+cp binstub stub.bash <absolute path to the build-lib repository>/bats-mock
 ```
 
 
