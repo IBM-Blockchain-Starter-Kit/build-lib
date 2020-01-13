@@ -13,8 +13,8 @@ $DEBUG && set -x
 ## cd "$CC_REPO_DIR" || exit 1
 
 echo "======== Download dependencies ========"
-nvm_install_node "${NODE_VERSION}"
-install_jq
+## nvm_install_node "${NODE_VERSION}"
+## install_jq
 
 echo "======== Run cc tests ========"
 THIS_DIR=$PWD
