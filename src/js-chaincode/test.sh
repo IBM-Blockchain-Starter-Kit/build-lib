@@ -17,13 +17,13 @@ nvm_install_node "${NODE_VERSION}"
 install_jq
 
 echo "======== Run cc tests ========"
-for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
-  for cc_path in $(jq -r ".${org}.chaincode | .[] | .path" "${CONFIGPATH}"); do    
-    echo "Processing Tests on Path: ${cc_path}"
-    cd "${CC_REPO_DIR}/${cc_path}" || exit 1
-    npm run test
-  done
-done
+##for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
+##  for cc_path in $(jq -r ".${org}.chaincode | .[] | .path" "${CONFIGPATH}"); do    
+##    echo "Processing Tests on Path: ${cc_path}"
+##    cd "${CC_REPO_DIR}/${cc_path}" || exit 1
+##    npm run test
+##  done
+##done
 ## npm run test
 
 echo "======== Run deploy_config.json tests ========"
