@@ -15,7 +15,7 @@ ls -agln "$CC_REPO_DIR"
 
 echo "======== Download dependencies ========"
 setup_env
-## install_python "${PYTHON_VERSION}"
+install_python "${PYTHON_VERSION}"
 # echo "Y" | apt-get install python2.7
 nvm_install_node "${NODE_VERSION}"
 
