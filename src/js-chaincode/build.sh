@@ -29,6 +29,7 @@ echo "======== Building chaincode ========"
 install_jq
 for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
   for cc_path in $(jq -r ".${org}.chaincode | .[] | .path" "${CONFIGPATH}"); do    
+    echo "Processing path: ${cc_path}"
     cd "${CC_REPO_DIR}/${cc_path}" || exit 1
     npm install
     npm run build # transpile from typescript to javascript
