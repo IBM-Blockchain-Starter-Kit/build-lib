@@ -17,7 +17,6 @@ nvm_install_node "${NODE_VERSION}"
 install_jq
 
 echo "======== Run cc tests ========"
-install_jq
 for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
   for cc_path in $(jq -r ".${org}.chaincode | .[] | .path" "${CONFIGPATH}"); do    
     echo "Processing Tests on Path: ${cc_path}"
