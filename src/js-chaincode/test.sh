@@ -13,8 +13,8 @@ $DEBUG && set -x
 ## cd "$CC_REPO_DIR" || exit 1
 
 echo "======== Download dependencies ========"
-## nvm_install_node "${NODE_VERSION}"
-## install_jq
+nvm_install_node "${NODE_VERSION}"
+install_jq
 
 echo "======== Run cc tests ========"
 THIS_DIR=$PWD
@@ -26,7 +26,7 @@ for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
   done
 done
 cd $THIS_DIR
-## npm run test
+
 
 echo "======== Run deploy_config.json tests ========"
 # convert strings (if only one element) into array
