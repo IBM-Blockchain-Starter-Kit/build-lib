@@ -71,7 +71,6 @@ function deploy_cc() {
 
       ADMIN_IDENTITY_FILE="${PROFILES_PATH}/ADMINIDENTITY_${ORGINDEX}.json"
       CONN_PROFILE_FILE="${PROFILES_PATH}/CONNPROFILE_${ORGINDEX}.json"
-      ORGINDEX=$((ORGINDEX + 1))
 
       # Should install
       if [[ "true" == $(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .install" "${CONFIGPATH}") ]]; then
@@ -108,6 +107,7 @@ function deploy_cc() {
         fi
       done
     done
+    ORGINDEX=$((ORGINDEX + 1))
   done
 
   rm -rf "${PROFILES_PATH}"
