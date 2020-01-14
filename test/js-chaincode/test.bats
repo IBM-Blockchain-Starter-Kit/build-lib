@@ -46,16 +46,12 @@ teardown() {
         \"chaincode\": [
             {
                 \"path\": \"chaincode/ping\"
-            },
-            {
-              \"path\": \"chaincode/woo\"
             }
         ]
       }
     }" > ${SCRIPT_DIR}/deploy_config.json
 
   mkdir -p ${CC_REPO_DIR}/chaincode/ping
-  mkdir -p ${CC_REPO_DIR}/chaincode/woo
 
   run ${SCRIPT_DIR}/js-chaincode/test.sh
 
