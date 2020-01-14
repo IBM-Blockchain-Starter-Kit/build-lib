@@ -33,8 +33,8 @@ teardown() {
 
   export CC_REPO_DIR="."
   export NODE_VERSION="8.16.0"
-  export ADMIN_IDENTITY_STRING="{[]}"
-  export CONNECTION_PROFILE_STRING="{[]}"
+  export ADMIN_IDENTITY_STRING="[{}]"
+  export CONNECTION_PROFILE_STRING="[{}]"
   export CONFIGPATH="${SCRIPT_DIR}/deploy_config.json" 
 
   echo "{
