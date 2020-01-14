@@ -45,7 +45,7 @@ teardown() {
     \"org1msp\": {
         \"chaincode\": [
             {
-                \"path\": \"chaincode/ping\",
+                \"path\": \"chaincode/ping\"
             },
             {
               \"path\: \"chaincode/woo\"
