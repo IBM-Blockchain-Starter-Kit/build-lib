@@ -55,7 +55,7 @@ teardown() {
                 \"path\": \"chaincode/ping\"
             },
             {
-              \"path\: \"chaincode/woo\"
+              \"path\": \"chaincode/woo\"
             }
         ],
       }
