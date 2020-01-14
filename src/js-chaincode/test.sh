@@ -17,7 +17,7 @@ nvm_install_node "${NODE_VERSION}"
 install_jq
 
 echo "======== Run cc tests ========"
-THIS_DIR=$PWD
+THIS_DIR="$PWD"
 for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
   for cc_path in $(jq -r ".${org}.chaincode | .[] | .path" "${CONFIGPATH}"); do    
     echo "Processing Tests on Path: ${cc_path}"
@@ -25,7 +25,7 @@ for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
     npm run test
   done
 done
-cd $THIS_DIR || exit 1
+cd "$THIS_DIR" || exit 1
 
 
 echo "======== Run deploy_config.json tests ========"
