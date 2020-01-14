@@ -43,7 +43,25 @@ teardown() {
   export PYTHON_VERSION="2.7.15"
   export NODE_VERSION="8.16.0"
   export FABRIC_CLI_DIR="."
+
+  export CONFIGPATH="${SCRIPT_DIR}/deploy_config.json" 
+
+  echo "{
+    \"org1msp\": {
+        \"chaincode\": [
+            {
+                \"path\": \"chaincode/ping\",
+            },
+            {
+              \"path\: \"chaincode/woo\"
+            }
+        ],
+      }
+    }" > ${SCRIPT_DIR}/deploy_config.json
   
+  mkdir -p ${CC_REPO_DIR}/chaincode/ping
+  mkdir -p ${CC_REPO_DIR}/chaincode/woo
+
   run ${SCRIPT_DIR}/js-chaincode/build.sh
 
   echo $output

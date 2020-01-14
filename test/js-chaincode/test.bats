@@ -34,8 +34,25 @@ teardown() {
   export NODE_VERSION="8.16.0"
   export ADMIN_IDENTITY_STRING="{}"
   export CONNECTION_PROFILE_STRING="{}"
-  export CONFIGPATH=$(mktemp)
-  echo "[{}]" >> "$CONFIGPATH"
+  #export CONFIGPATH=$(mktemp)
+  #echo "[{}]" >> "$CONFIGPATH"
+  export CONFIGPATH="${SCRIPT_DIR}/deploy_config.json" 
+
+  echo "{
+    \"org1msp\": {
+        \"chaincode\": [
+            {
+                \"path\": \"chaincode/ping\",
+            },
+            {
+              \"path\: \"chaincode/woo\"
+            }
+        ],
+      }
+    }" > ${SCRIPT_DIR}/deploy_config.json
+
+  mkdir -p ${CC_REPO_DIR}/chaincode/ping
+  mkdir -p ${CC_REPO_DIR}/chaincode/woo
 
   run ${SCRIPT_DIR}/js-chaincode/test.sh
 
