@@ -26,6 +26,16 @@ npm run build
 # npm link
 
 echo "======== Building chaincode ========"
-cd "$CC_REPO_DIR" || exit 1
-npm install
-npm run build # transpile from typescript to javascript
+install_jq
+for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
+  for cc_path in $(jq -r ".${org}.chaincode | .[] | .path" "${CONFIGPATH}"); do    
+    echo "Processing path: ${cc_path}"
+    cd "${CC_REPO_DIR}/${cc_path}" || exit 1
+    npm install
+    npm run build # transpile from typescript to javascript
+  done
+done
+
+## cd "$CC_REPO_DIR" || exit 1
+## npm install
+## npm run build # transpile from typescript to javascript

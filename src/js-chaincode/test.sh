@@ -10,14 +10,23 @@ source "${SCRIPT_DIR}/common/utils.sh"
 source "${SCRIPT_DIR}/common/blockchain.sh"
 
 $DEBUG && set -x
-cd "$CC_REPO_DIR" || exit 1
+## cd "$CC_REPO_DIR" || exit 1
 
 echo "======== Download dependencies ========"
 nvm_install_node "${NODE_VERSION}"
 install_jq
 
 echo "======== Run cc tests ========"
-npm run test
+THIS_DIR="$PWD"
+for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
+  for cc_path in $(jq -r ".${org}.chaincode | .[] | .path" "${CONFIGPATH}"); do    
+    echo "Processing Tests on Path: ${cc_path}"
+    cd "${CC_REPO_DIR}/${cc_path}" || exit 1
+    npm run test
+  done
+done
+cd "$THIS_DIR" || exit 1
+
 
 echo "======== Run deploy_config.json tests ========"
 # convert strings (if only one element) into array
