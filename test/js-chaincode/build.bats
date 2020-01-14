@@ -26,6 +26,7 @@ teardown() {
   echo "unset -f setup_env" >> "${SCRIPT_DIR}/common/utils.sh"  
   echo "unset -f install_python" >> "${SCRIPT_DIR}/common/utils.sh"  
   echo "unset -f nvm_install_node" >> "${SCRIPT_DIR}/common/utils.sh"  
+  echo "unset -f install_jq" >> ${SCRIPT_DIR}/common/utils.sh
 
   source "${SCRIPT_DIR}/common/env.sh"
   source "${SCRIPT_DIR}/common/utils.sh"
@@ -38,6 +39,7 @@ teardown() {
     "run build : true" \
     "install : true" \
     "run build : true"
+  stub install_jq "true"
 
   export CC_REPO_DIR="."
   export PYTHON_VERSION="2.7.15"
@@ -71,4 +73,5 @@ teardown() {
   unstub install_python
   unstub nvm_install_node
   unstub npm  
+  unstub install_jq
 }
