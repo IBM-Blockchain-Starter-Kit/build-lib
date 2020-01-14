@@ -50,7 +50,7 @@ teardown() {
             {
               \"path\": \"chaincode/woo\"
             }
-        ],
+        ]
       }
     }" > ${SCRIPT_DIR}/deploy_config.json
 
