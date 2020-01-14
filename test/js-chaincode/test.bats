@@ -28,17 +28,13 @@ teardown() {
 
   stub nvm_install_node "8.16.0 : true"
   stub install_jq "true"
-  # stub npm "run test : true"
   stub npm \
-    "run test : true" \
-    "run test : true"
+    "run test : true" 
 
   export CC_REPO_DIR="."
   export NODE_VERSION="8.16.0"
-  export ADMIN_IDENTITY_STRING="{}"
-  export CONNECTION_PROFILE_STRING="{}"
-  #export CONFIGPATH=$(mktemp)
-  #echo "[{}]" >> "$CONFIGPATH"
+  export ADMIN_IDENTITY_STRING="{[]}"
+  export CONNECTION_PROFILE_STRING="{[]}"
   export CONFIGPATH="${SCRIPT_DIR}/deploy_config.json" 
 
   echo "{
