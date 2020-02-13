@@ -101,9 +101,15 @@ function deploy_cc() {
 
           endorsement_policy=$(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .endorsement_policy?" "${CONFIGPATH}")
           if [[ $endorsement_policy == null ]]; then unset endorsement_policy; fi
+          
+          if [ -z "${chaincode_dir_prefix}" ]; then
+            local pdc_config_dir="${collections_config}"
+          else
+            local pdc_config_dir="${chaincode_dir_prefix}/${collections_config}"
+          fi
 
           instantiate_fabric_chaincode "${ORG}" "${ADMIN_IDENTITY_FILE}" "${CONN_PROFILE_FILE}" \
-            "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "${platform}" "${init_fn}" "${init_args}" "${collections_config}" "${endorsement_policy}"
+            "${CC_NAME}" "${CC_VERSION}" "${CHANNEL}" "${platform}" "${init_fn}" "${init_args}" "${pdc_config_dir}" "${endorsement_policy}"
         fi
       done
     done
