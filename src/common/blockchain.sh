@@ -83,7 +83,7 @@ function instantiate_fabric_chaincode {
   fi
 
   if [[ -n $COLLECTIONS_CONFIG ]]; then
-    COLLECTIONS_CONFIG_FLAG=" --collections-config $(pwd)/${COLLECTIONS_CONFIG}"
+    COLLECTIONS_CONFIG_FLAG=" --collections-config ${COLLECTIONS_CONFIG}"
   fi
 
   if [[ -n $ENDORSEMENT_POLICY ]]; then

@@ -99,6 +99,11 @@ function deploy_cc() {
           collections_config=$(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .collections_config?" "${CONFIGPATH}")
           if [[ $collections_config == null ]]; then unset collections_config; fi
 
+          if [[ -n "${collections_config}" ]]; then
+            #collections config must be in the same directory as the chaincode plus any additional path specified by user
+            collections_config="${cc_dir}/${collections_config}"
+          fi
+
           endorsement_policy=$(jq -r ".[\"${ORG}\"].chaincode | .[${CCINDEX}] | .endorsement_policy?" "${CONFIGPATH}")
           if [[ $endorsement_policy == null ]]; then unset endorsement_policy; fi
 
