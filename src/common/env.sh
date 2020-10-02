@@ -4,8 +4,8 @@ ROOTDIR=${ROOTDIR:=$(pwd)}
 export DEBUG=${DEBUG:=false}
 
 # set nvm and node expected versions
-# export NODE_VERSION=${NODE_VERSION:="8.16.2"}
-export NODE_VERSION="8.16.2"
+NODE_VERSION=${NODE_VERSION:-"8.16.2"}
+export NODE_VERSION=${NODE_VERSION}
 # export NVM_VERSION="0.33.11"
 export NVM_VERSION=${NVM_VERSION:="0.35.1"}
 
