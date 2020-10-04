@@ -34,6 +34,10 @@ export FABRIC_CLI_DIR=$ROOTDIR/${FABRIC_CLI_DIR:="/fabric-cli"}
 
 ## Fabric V2.x Env setup
 if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
+    echo "-------- Installing jq --------"
+    install_jq
+    echo "-------- Installing V2 Binaries --------"
+    install_fabric_bin
 
     # Check Required Orderer and Identity file
     if [[ -z $ORDERERS_LIST_JSON_STRING ]];then

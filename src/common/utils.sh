@@ -44,6 +44,7 @@ function install_jq {
 #   None
 #######################################
 function install_fabric_bin {
+    #TODO make version dynamic
     curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.1.1 1.4.9 -d -s
     chmod +x bin/configtxgen
     chmod +x bin/idemixgen
