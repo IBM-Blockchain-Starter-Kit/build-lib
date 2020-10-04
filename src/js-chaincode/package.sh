@@ -13,6 +13,9 @@ source "${SCRIPT_DIR}/common/blockchain.sh"
 : "${CC_NAME:?"CC_NAME not set" }"
 : "${CC_VERSION:?"CC_VERSION not set" }"
 
+## Need to remove the danm node_modules
+rm -rf "${CC_REPO_DIR}/node_modules"
+
 packageCC "${CC_REPO_DIR}" "${CC_NAME}" "${CC_VERSION}" "node"
 
 if [[ ! -f "${CC_NAME}@${CC_VERSION}.tgz" ]];then
