@@ -79,18 +79,17 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
 
     #Extract env
     #Get Msp
-    MSP_ID=$(echo ${CONNECTION_PROFILE_STRING} | jq -r '.. | .mspid? | select(.)')
+    MSP_ID=$(echo ${CONNECTION_PROFILE_STRING} | jq -r '.[0] | .. | .mspid? | select(.)')
     # Get root tls cert
-    echo ${CONNECTION_PROFILE_STRING} | jq -r 'first(.peers | .. | .pem? | select(.))' > tmpPeerRootCert.pem
+    echo ${CONNECTION_PROFILE_STRING} | jq -r '.[0] | first(.peers | .. | .pem? | select(.))' > tmpPeerRootCert.pem
     ROOTCACERT=${ROOTDIR}/tmpPeerRootCert.pem
 
     peers=()
     peers_counter=0
     while read peer_url; do
         peers+=("${peer_url##*//}") # truncate grpc protocol prefix
-        echo "PEER_${peers_counter}=${peer_url##*//}" >> peers.properties
         peers_counter=$(expr $peers_counter + 1)
-    done < <(echo ${CONNECTION_PROFILE_STRING} | jq -r '.peers | .. | .url? | select(.)')
+    done < <(echo ${CONNECTION_PROFILE_STRING} | jq -r '.[0] | .peers | .. | .url? | select(.)')
     export peers
 
     # Note: chaincode level shouldn't be array as deploy_config.json is a specific chaincode configuration for distinct source code deployment
