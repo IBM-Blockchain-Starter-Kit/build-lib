@@ -2,6 +2,9 @@
 #
 # Common utility functions, e.g. to make curl requests
 
+## Logging helpers
+source <(curl -sSL https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scriptUtils.sh)
+
 #######################################
 # Exit script with an error
 # Globals:
@@ -29,6 +32,27 @@ function install_jq {
   curl -o jq -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
   chmod +x jq
   export PATH=${PATH}:${PWD}
+}
+
+#######################################
+# Installs fabric binaries v2
+# Globals:
+#   set: PATH
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function install_fabric_bin {
+    curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.1.1 1.4.9 -d -s
+    chmod +x bin/configtxgen
+    chmod +x bin/idemixgen
+    chmod +x bin/configtxlator
+    chmod +x bin/fabric-ca-client
+    chmod +x bin/orderer
+    chmod +x bin/peer
+    export FABRIC_CFG_PATH=${PWD}/config
+    export PATH=${PATH}:${PWD}
 }
 
 #######################################
@@ -247,3 +271,22 @@ function setup_env {
   # echo 'npm config get python'...`npm config get python`
 
 }
+
+verifyPeerEnv(){
+    if [[ -z $ORDERER_PEM ]];then
+        warnln "ORDERER_PEM not set. Please make sure Peer env is set correctly"
+    elif [[ -z $CORE_PEER_TLS_ROOTCERT_FILE ]];then
+        warnln "CORE_PEER_TLS_ROOTCERT_FILE not set. Please make sure Peer env is set correctly"
+    elif [[ -z $CORE_PEER_ADDRESS ]];then
+        warnln "CORE_PEER_ADDRESS not set. Please make sure Peer env is set correctly"
+    fi
+
+    if [[ -z $CORE_PEER_LOCALMSPID ]];then
+        fatalln "CORE_PEER_LOCALMSPID not set. Please make sure Peer env is set correctly"
+    elif [[ -z $CORE_PEER_MSPCONFIGPATH ]];then
+        fatalln "CORE_PEER_MSPCONFIGPATH not set. Please make sure Peer env is set correctly"
+    elif [[ -z $FABRIC_CFG_PATH ]];then
+        fatalln "FABRIC_CFG_PATH not set. Please make sure Peer env is set correctly"
+    fi
+}
+

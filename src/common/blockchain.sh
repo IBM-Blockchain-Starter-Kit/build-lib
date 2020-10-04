@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source "${SCRIPT_DIR}/common/utils.sh"
+
 #######################################
 # Install chaincode on peer(s) provided specified parameters
 # Globals:
@@ -31,7 +33,6 @@ function install_fabric_chaincode {
   echo ">>> ${CMD}"
   echo "${CMD}" | bash
 }
-
 
 #######################################
 # Instantiate chaincode function provided specified parameters
@@ -92,4 +93,259 @@ function instantiate_fabric_chaincode {
 
   echo ">>> ${CMD} ${INIT_FN_FLAG} ${INIT_ARGS_FLAG} ${COLLECTIONS_CONFIG_FLAG} ${ENDORSEMENT_POLICY_FLAG} --timeout 360000"
   echo "${CMD} ${INIT_FN_FLAG} ${INIT_ARGS_FLAG} ${COLLECTIONS_CONFIG_FLAG} ${ENDORSEMENT_POLICY_FLAG} --timeout 360000" | bash
+}
+
+##### THIS SECTION BELOW ARE FOR FABRIC V2.X CLI CMDS
+
+#######################################
+# V2.x Install chaincode on peer(s) provided specified parameters
+# Requires peer cli env and msp to be set
+# Globals:
+#   CORE_PEER_ADDRESS: peer address to install
+# Arguments:
+#   - $1: CC_PACKAGE: Package of CC
+# Returns:
+#   None
+#######################################
+function install_fabric_chaincodev2 {
+    CC_PACKAGE=$1
+
+    #install on all peers
+    for p in ${peers[@]};do
+        export CORE_PEER_ADDRESS=${!p}
+        verifyPeerEnv
+        peer lifecycle chaincode install ${CC_PACKAGE}
+        res=$?
+        verifyResult $res "Chaincode installation on ${CORE_PEER_ADDRESS} has failed"
+        successln "Chaincode is installed on ${CORE_PEER_ADDRESS}"
+    done
+}
+
+#######################################
+# V2.x Query Installed chaincode on peer(s) provided specified parameters
+# Requires peer cli env and msp to be set
+# Globals:
+#   CORE_PEER_ADDRESS: peer address to install
+#   CC_NAME: chaincode name
+#   CC_VERSION: chaincode version
+# Arguments:
+#   None
+# Returns:
+#   Set PACKAGE_ID env for lifecycle approveformyorg
+#######################################
+queryInstalled() {
+
+    for p in ${peers[@]};do
+        export CORE_PEER_ADDRESS=${!p}
+        verifyPeerEnv
+        peer lifecycle chaincode queryinstalled >&log.txt
+        res=$?
+        cat log.txt
+        PACKAGE_ID=$(cat log.txt | awk "/$CC_NAME/ && /$CC_VERSION/" | awk '{print $3}')
+        PACKAGE_ID=${PACKAGE_ID%%,*} # truncate last comma
+        export PACKAGE_ID=${PACKAGE_ID}
+
+        verifyResult $res "Query installed on ${CORE_PEER_ADDRESS} has failed"
+        successln "Query installed successful on ${CORE_PEER_ADDRESS} on channel"
+    done
+}
+
+#######################################
+# V2.x checkCommitReadiness VERSION PEER ORG
+# Requires peer cli env and msp to be set
+# Globals:
+#   CORE_PEER_ADDRESS: peer address to install
+#   CC_NAME: chaincode name
+#   CC_VERSION: chaincode version
+#   CHANNEL_NAME: channel name to check commit readiness
+#   MAX_RETRY: max retry count
+#   DELAY: Delay count for retry
+#   CC_SEQUENCE: sequence number for chaincode lifecycle - defaults to 1 if not set
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+checkCommitReadiness() {
+
+    for p in ${peers[@]};do
+        export CORE_PEER_ADDRESS=${!p}
+        infoln "Checking the commit readiness of the chaincode definition on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'..."
+        local rc=1
+        local COUNTER=1
+        # continue to poll
+        # we either get a successful response, or reach MAX RETRY
+        while [ $rc -ne 0 -a $COUNTER -lt $MAX_RETRY ]; do
+            sleep $DELAY
+            infoln "Attempting to check the commit readiness of the chaincode definition on ${CORE_PEER_ADDRESS}, Retry after $DELAY seconds."
+            peer lifecycle chaincode checkcommitreadiness --channelID $CHANNEL_NAME \
+                --name ${CC_NAME} \
+                --version ${CC_VERSION} \
+                --sequence ${CC_SEQUENCE:-1} \
+                --output json >&log.txt
+            res=$?
+            let rc=0
+            for var in "$@"; do
+              grep "$var" log.txt &>/dev/null || let rc=1
+            done
+            COUNTER=$(expr $COUNTER + 1)
+        done
+        cat log.txt
+        if test $rc -eq 0; then
+            infoln "Checking the commit readiness of the chaincode definition successful on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
+        else
+            fatalln "After $MAX_RETRY attempts, Check commit readiness result on ${CORE_PEER_ADDRESS} is INVALID!"
+        fi
+    done
+}
+
+#######################################
+# V2.x commitChaincodeDefinition VERSION PEER ORG (PEER ORG)... on all peers
+# Requires peer cli env and msp to be set
+# Globals:
+#   CORE_PEER_ADDRESS: peer address to install
+#   CC_NAME: chaincode name
+#   CC_VERSION: chaincode version
+#   CHANNEL_NAME: channel name to check commit readiness
+#   MAX_RETRY: max retry count
+#   DELAY: Delay count for retry
+#   CC_SEQUENCE: sequence number for chaincode lifecycle - defaults to 1 if not set
+# Arguments:
+#   None
+# Returns:
+#   Set PACKAGE_ID env for lifecycle approveformyorg
+#######################################
+commitChaincodeDefinition() {
+    for ord in ${orderers[@]};do
+        for p in ${peers[@]};do
+            export CORE_PEER_ADDRESS=${!p}
+            verifyPeerEnv
+            peer lifecycle chaincode commit -o ${ord} --tls --cafile "${ORDERER_PEM}" \
+                --channelID $CHANNEL_NAME \
+                --name ${CC_NAME}  \
+                --version ${CC_VERSION} \
+                --sequence ${CC_SEQUENCE:-1}  >&log.txt
+            res=$?
+            cat log.txt
+            verifyResult $res "Chaincode definition commit failed on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' failed"
+            successln "Chaincode definition committed on channel '$CHANNEL_NAME'"
+            if [[ $res == 0 ]];then
+                break
+            fi
+        done
+    done
+}
+
+#######################################
+# V2.x Query commited chaincode for org with retry
+# Requires peer cli env and msp to be set
+# Globals:
+#   CORE_PEER_ADDRESS: peer address to install
+#   CC_NAME: chaincode name
+#   CC_VERSION: chaincode version
+#   CHANNEL_NAME: channel name to check commit readiness
+#   MAX_RETRY: max retry count
+#   DELAY: Delay count for retry
+#   CC_SEQUENCE: sequence number for chaincode lifecycle - defaults to 1 if not set
+# Arguments:
+#   None
+# Returns:
+#   Set PACKAGE_ID env for lifecycle approveformyorg
+#######################################
+queryCommitted() {
+    for p in ${peers[@]};do
+        export CORE_PEER_ADDRESS=${!p}
+        verifyPeerEnv
+        EXPECTED_RESULT="Version: ${CC_VERSION}, Sequence: ${CC_SEQUENCE}, Endorsement Plugin: escc, Validation Plugin: vscc"
+        infoln "Querying chaincode definition on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'..."
+        local rc=1
+        local COUNTER=1
+        # continue to poll
+        # we either get a successful response, or reach MAX RETRY
+        while [ $rc -ne 0 -a $COUNTER -lt $MAX_RETRY ]; do
+            sleep $DELAY
+            infoln "Attempting to Query committed status on ${CORE_PEER_ADDRESS}, Retry after $DELAY seconds."
+
+            peer lifecycle chaincode querycommitted --channelID $CHANNEL_NAME --name ${CC_NAME} >&log.txt
+            res=$?
+
+            test $res -eq 0 && VALUE=$(cat log.txt | grep -o '^Version: '$CC_VERSION', Sequence: [0-9]*, Endorsement Plugin: escc, Validation Plugin: vscc')
+            test "$VALUE" = "$EXPECTED_RESULT" && let rc=0
+            COUNTER=$(expr $COUNTER + 1)
+        done
+        cat log.txt
+        if test $rc -eq 0; then
+            successln "Query chaincode definition successful on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
+        else
+            fatalln "After $MAX_RETRY attempts, Query chaincode definition result on ${CORE_PEER_ADDRESS} is INVALID!"
+        fi
+    done
+}
+
+#######################################
+# V2.x Package chaincode for lifecycle
+# Requires peer cli env and msp to be set
+# Globals:
+#    CC_PATH: Abs path to cc
+#    CC_NAME: chaincode name
+#    CC_VERSION: chaincode version
+#    LANG: chaincode runtime
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+packageCC() {
+    local CC_PATH=$1
+    local CC_NAME=$2
+    local CC_VERSION=$3
+    local LANG=$4
+    verifyPeerEnv
+    peer lifecycle chaincode package ${CC_NAME}@${CC_VERSION}.tgz \
+        --lang ${LANG} \
+        --label ${CC_NAME}-${CC_VERSION} \
+        --path ${CC_PATH}
+    res=$?
+    verifyResult $res "Chaincode package for ${CC_NAME}:${CC_VERSION} failed"
+    successln "Chaincode package for ${CC_NAME}:${CC_VERSION} Success!"
+}
+
+#######################################
+# V2.x Package chaincode for lifecycle
+# Requires peer cli env and msp to be set
+# Globals:
+#    CC_PATH: Abs path to cc
+#    CC_NAME: chaincode name
+#    CC_VERSION: chaincode version
+#    LANG: chaincode runtime
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+approveForMyOrg() {
+
+    for ord in ${orderers[@]};do
+        for p in ${peers[@]};do
+            export CORE_PEER_ADDRESS=${p}
+            verifyPeerEnv
+            peer lifecycle chaincode approveformyorg -o ${ord} --tls --cafile "${ORDERER_PEM}" \
+                --channelID $CHANNEL_NAME \
+                --name ${CC_NAME} \
+                --version ${CC_VERSION} \
+                --sequence ${CC_SEQUENCE} \
+                --package-id ${PACKAGE_ID}
+            res=$?
+            { set +x; } 2>/dev/null
+            cat log.txt
+            verifyResult $res "Chaincode definition approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' failed"
+            successln "Chaincode definition approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
+            if [[ $res == 0 ]];then
+                break
+            fi
+        done
+        if [[ $res == 0 ]];then
+            break
+        fi
+    done
 }
