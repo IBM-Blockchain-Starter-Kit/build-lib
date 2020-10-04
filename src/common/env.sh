@@ -88,6 +88,7 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     peers_counter=0
     while read peer_url; do
         peers+=("${peer_url##*//}") # truncate grpc protocol prefix
+        echo "PEER_${peers_counter}=${peer_url##*//}" >> peers.properties
         peers_counter=$(expr $peers_counter + 1)
     done < <(echo ${CONNECTION_PROFILE_STRING} | jq -r '.[0] | .peers | .. | .url? | select(.)')
     export peers
