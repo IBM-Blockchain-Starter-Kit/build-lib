@@ -291,3 +291,8 @@ function verifyPeerEnv(){
     fi
 }
 
+function verifyResult() {
+  if [ $1 -ne 0 ]; then
+    fatalln "$2"
+  fi
+}
