@@ -273,7 +273,7 @@ function setup_env {
 
 }
 
-verifyPeerEnv(){
+function verifyPeerEnv(){
     if [[ -z $ORDERER_PEM ]];then
         warnln "ORDERER_PEM not set. Please make sure Peer env is set correctly"
     elif [[ -z $CORE_PEER_TLS_ROOTCERT_FILE ]];then

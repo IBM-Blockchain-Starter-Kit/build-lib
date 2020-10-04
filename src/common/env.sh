@@ -36,8 +36,6 @@ export FABRIC_CLI_DIR=$ROOTDIR/${FABRIC_CLI_DIR:="/fabric-cli"}
 if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     echo "-------- Installing jq --------"
     install_jq
-    echo "-------- Installing V2 Binaries --------"
-    install_fabric_bin
 
     # Check Required Orderer and Identity file
     if [[ -z $ORDERERS_LIST_JSON_STRING ]];then
@@ -115,6 +113,7 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     export CORE_PEER_MSPCONFIGPATH="${ROOTDIR}/${ADMIN_IDENTITY_NAME}/msp"
     export CORE_PEER_TLS_ENABLED=true
     export ORDERER_PEM=${ORDERER_PEM}
+    export FABRIC_CFG_PATH="${ROOTDIR}/${ADMIN_IDENTITY_NAME}"
     # Peers and Orderers
     export PEERS_COUNT=${peers_counter}
     source peers.properties

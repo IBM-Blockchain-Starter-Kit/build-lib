@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source "$(pwd)/utils.sh"
+
 # Creates a Peer MSP for cli from an IBP identity JSON
 
 set -o pipefail
