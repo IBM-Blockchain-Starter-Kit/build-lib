@@ -4,12 +4,6 @@
 
 set -o pipefail
 
-if [[ ! -z "$1" ]];then
-    echo "Usage ./create_msp.sh ADMIN_IDENTITY_NAME outputDir"
-    echo "make sure identity_file.json has no space: arg1 = $1, arg2 = $2"
-    exit 1
-fi
-
 ## Check if dir exists
 [[ ! -d "$2" ]] && mkdir "$2"
 
@@ -22,11 +16,11 @@ cert=$(echo "$1" | jq -r '.cert')
 ca=$(echo "$1" | jq -r '.ca')
 key=$(echo "$1" | jq -r '.private_key')
 
-if [[ -z "$cert" ]];then
+if [[ "$cert" == "null"  ]];then
     fatalln "cert from json not found"
-elif [[ -z "$ca" ]];then
+elif [[ "$ca" == "null"  ]];then
     fatalln "ca from json not found"
-elif [[ -z "$key" ]];then
+elif [[ "$key" == "null" ]];then
     fatalln "key from json not found"
 fi
 
