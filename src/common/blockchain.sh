@@ -339,7 +339,7 @@ approveForMyOrg() {
                 --name ${CC_NAME} \
                 --version ${CC_VERSION} \
                 --sequence ${CC_SEQUENCE:-1} \
-                --package-id ${PACKAGE_ID}
+                --package-id ${PACKAGE_ID}  ${CC_PDC_CONFIG}  >&log.txt
             res=$?
             { set +x; } 2>/dev/null
             cat log.txt
