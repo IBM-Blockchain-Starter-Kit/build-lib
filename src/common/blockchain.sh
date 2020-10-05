@@ -270,7 +270,7 @@ queryCommitted() {
             sleep $DELAY
             infoln "Attempting to Query committed status on ${CORE_PEER_ADDRESS}, Retry after $DELAY seconds."
 
-            peer lifecycle chaincode querycommitted --channelID $CHANNEL_NAME --name ${CC_NAME} >&log.txt
+            peer lifecycle chaincode querycommitted --channelID $CHANNEL_NAME --name ${CC_NAME}  >&log.txt
             res=$?
 
             test $res -eq 0 && VALUE=$(cat log.txt | grep -o '^Version: '$CC_VERSION', Sequence: [0-9]*, Endorsement Plugin: escc, Validation Plugin: vscc')
