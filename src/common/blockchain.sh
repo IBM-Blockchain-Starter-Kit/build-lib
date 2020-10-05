@@ -216,6 +216,7 @@ checkCommitReadiness() {
 #   Set PACKAGE_ID env for lifecycle approveformyorg
 #######################################
 commitChaincodeDefinition() {
+
     for ord in ${orderers[@]};do
     ## Orderers should be used only as failover
         for p in ${peers[@]};do
@@ -225,7 +226,7 @@ commitChaincodeDefinition() {
                 --channelID $CHANNEL_NAME \
                 --name ${CC_NAME}  \
                 --version ${CC_VERSION} \
-                --sequence ${CC_SEQUENCE:-1}  >&log.txt
+                --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} >&log.txt
             res=$?
             cat log.txt
             verifyResult $res "Chaincode definition commit failed on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' failed"

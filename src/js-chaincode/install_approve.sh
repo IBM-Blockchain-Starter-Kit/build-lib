@@ -15,6 +15,7 @@ source "${SCRIPT_DIR}/common/blockchain.sh"
 : "${PEERS_COUNT:?"PEERS_COUNT not set" }"
 : "${CHANNEL_NAME:?"CHANNEL_NAME not set" }"
 
+#todo queryInstalled first to make sure we dont need to install
 install_fabric_chaincodev2 "${ROOTDIR}/${CC_NAME}@${CC_VERSION}.tgz"
 
 queryInstalled

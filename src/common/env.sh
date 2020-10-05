@@ -103,6 +103,15 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     #TODO enable multiple channel
     CHANNEL_NAME=$(cat $CONFIGPATH | jq -r '. | .. | .chaincode? | .[0] | .channel | select(.)')
 
+    ##PDC
+    pdc_json_path=$(cat $CONFIGPATH | jq -r '. | .. | .chaincode? | .[0] | .pdc_path? | select(.)')
+    if [[ $pdc_json_path != null && $pdc_json_path != "" ]]; then
+        CC_PDC_CONFIG="--collections-config ${CC_REPO_DIR}/${pdc_json_path}"
+    else
+        CC_PDC_CONFIG=""
+    fi
+
+    export CC_PDC_CONFIG=${CC_PDC_CONFIG}
     export CHANNEL_NAME=${CHANNEL_NAME}
     export CC_VERSION=${CC_VERSION}
     export CC_NAME=${CC_NAME}
