@@ -100,7 +100,7 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     if [[ $json_version != null && $json_version != "" ]]; then
         CC_VERSION=$json_version
     else
-        CC_VERSION="$(date '+%Y%m%d.%H')" #Note, if pipeline stages dont complete in 1 hr, this will be inconsistent
+        CC_VERSION="${CC_VERSION_OVERRIDE:-latest}" #Note, if pipeline stages dont complete in 1 hr, this will be inconsistent
     fi
     #TODO enable multiple channel
     CHANNEL_NAME=$(cat $CONFIGPATH | jq -r '. | .. | .chaincode? | .[0] | .channel | select(.)')
