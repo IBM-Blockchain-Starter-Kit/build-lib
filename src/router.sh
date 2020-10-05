@@ -14,7 +14,7 @@ if [[ "${stage}" != "build" ]] && \
     [[ "${stage}" != "deploy" ]] && \
     [[ "${stage}" != "install_approve" ]] && \
     [[ "${stage}" != "package" ]] && \
-    [[ "${stage}" != "deply_v2" ]]; then
+    [[ "${stage}" != "deploy_v2" ]]; then
     echo "Invalid stage: ${stage} selected"
     exit 1
 fi
