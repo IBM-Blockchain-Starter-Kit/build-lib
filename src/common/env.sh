@@ -111,6 +111,14 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
         CC_PDC_CONFIG=""
     fi
 
+    ## Signature policy should be defined at cicd by admin
+    if [[ -z $CC_SIGNATURE_POLICY ]];then
+        CC_SIGNATURE_POLICY=""
+    else
+        CC_SIGNATURE_POLICY="--signature-policy ${CC_SIGNATURE_POLICY}"
+    fi
+
+    export CC_SIGNATURE_POLICY=${CC_SIGNATURE_POLICY}
     export CC_PDC_CONFIG=${CC_PDC_CONFIG}
     export CHANNEL_NAME=${CHANNEL_NAME}
     export CC_VERSION=${CC_VERSION}
@@ -121,7 +129,7 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     export CORE_PEER_TLS_ENABLED=true
     export ORDERER_PEM=${ORDERER_PEM}
     export FABRIC_CFG_PATH="${ROOTDIR}/${ADMIN_IDENTITY_NAME}"
-    # Peers and Orderers
+    # Peers and Orderers counts from gateways
     export PEERS_COUNT=${peers_counter}
     export ORDERERS_COUNT=${orderer_counter}
 fi

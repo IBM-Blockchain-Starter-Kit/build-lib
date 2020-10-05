@@ -182,7 +182,7 @@ checkCommitReadiness() {
                 --name ${CC_NAME} \
                 --version ${CC_VERSION} \
                 --sequence ${CC_SEQUENCE:-1} \
-                --output json >&log.txt
+                --output json ${CC_SIGNATURE_POLICY} >&log.txt
             res=$?
             status=$(cat log.txt | jq -rc '.approvals')
             if [[ $status =~ "true" ]];then
@@ -194,7 +194,7 @@ checkCommitReadiness() {
         if test $rc -eq 0; then
             infoln "Checking the commit readiness of the chaincode definition successful on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
         else
-            fatalln "After $MAX_RETRY attempts, Check commit readiness result on ${CORE_PEER_ADDRESS} is INVALID!"
+            fatalln "After $COUNTER attempts, Check commit readiness result on ${CORE_PEER_ADDRESS} is INVALID!"
         fi
     done
 }
@@ -226,7 +226,7 @@ commitChaincodeDefinition() {
                 --channelID $CHANNEL_NAME \
                 --name ${CC_NAME}  \
                 --version ${CC_VERSION} \
-                --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} >&log.txt
+                --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_POLICY} >&log.txt
             res=$?
             cat log.txt
             verifyResult $res "Chaincode definition commit failed on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' failed"
@@ -282,7 +282,7 @@ queryCommitted() {
         if test $rc -eq 0; then
             successln "Query chaincode definition successful on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
         else
-            fatalln "After $MAX_RETRY attempts, Query chaincode definition result on ${CORE_PEER_ADDRESS} is INVALID!"
+            fatalln "After $COUNTER attempts, Query chaincode definition result on ${CORE_PEER_ADDRESS} is INVALID!"
         fi
     done
 }
@@ -339,7 +339,8 @@ approveForMyOrg() {
                 --name ${CC_NAME} \
                 --version ${CC_VERSION} \
                 --sequence ${CC_SEQUENCE:-1} \
-                --package-id ${PACKAGE_ID}  ${CC_PDC_CONFIG}  >&log.txt
+                --waitForEvent \
+                --package-id ${PACKAGE_ID} ${CC_PDC_CONFIG} ${CC_SIGNATURE_POLICY} >&log.txt
             res=$?
             { set +x; } 2>/dev/null
             cat log.txt
