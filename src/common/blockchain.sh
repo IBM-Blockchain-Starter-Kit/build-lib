@@ -274,7 +274,7 @@ queryCommitted() {
             res=$?
 
             test $res -eq 0 && VALUE=$(cat log.txt | grep -o '^Version: '$CC_VERSION', Sequence: [0-9]*, Endorsement Plugin: escc, Validation Plugin: vscc')
-            test "$VALUE" = "$EXPECTED_RESULT" && let rc=0
+            test "$VALUE" = "$EXPECTED_RESULT" && rc=0
             COUNTER=$(expr $COUNTER + 1)
         done
         cat log.txt
