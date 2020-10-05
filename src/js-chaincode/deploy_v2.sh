@@ -16,7 +16,7 @@ source "${SCRIPT_DIR}/common/blockchain.sh"
 : "${CHANNEL_NAME:?"CHANNEL_NAME not set" }"
 # retries used for checkCommitReadiness
 export MAX_RETRY=3
-export DELAY=1
+export DELAY=3
 checkCommitReadiness
 commitChaincodeDefinition
 queryCommitted
