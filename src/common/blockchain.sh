@@ -217,6 +217,7 @@ checkCommitReadiness() {
 #######################################
 commitChaincodeDefinition() {
     for ord in ${orderers[@]};do
+    ## Orderers should be used only as failover
         for p in ${peers[@]};do
             export CORE_PEER_ADDRESS=${p}
             verifyPeerEnv
@@ -233,6 +234,9 @@ commitChaincodeDefinition() {
                 break
             fi
         done
+        if [[ $res == 0 ]];then
+            break
+        fi
     done
 }
 
