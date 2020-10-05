@@ -256,7 +256,7 @@ queryCommitted() {
     for p in ${peers[@]};do
         export CORE_PEER_ADDRESS=${p}
         verifyPeerEnv
-        EXPECTED_RESULT="Version: ${CC_VERSION}, Sequence: ${CC_SEQUENCE}, Endorsement Plugin: escc, Validation Plugin: vscc"
+        EXPECTED_RESULT="Version: ${CC_VERSION}, Sequence: ${CC_SEQUENCE:-1}, Endorsement Plugin: escc, Validation Plugin: vscc"
         infoln "Querying chaincode definition on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'..."
         local rc=1
         local COUNTER=1
@@ -333,7 +333,7 @@ approveForMyOrg() {
                 --channelID $CHANNEL_NAME \
                 --name ${CC_NAME} \
                 --version ${CC_VERSION} \
-                --sequence ${CC_SEQUENCE} \
+                --sequence ${CC_SEQUENCE:-1} \
                 --package-id ${PACKAGE_ID}
             res=$?
             { set +x; } 2>/dev/null
