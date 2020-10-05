@@ -184,9 +184,10 @@ checkCommitReadiness() {
                 --sequence ${CC_SEQUENCE:-1} \
                 --output json >&log.txt
             res=$?
-            let rc=0
-            #TODO fix and use jq to check instead
-            cat log.txt | grep "true" || let rc=1
+            status=$(cat log.txt | jq -rc '.approvals')
+            if [[ $status =~ "true" ]];then
+                rc=0
+            fi
             COUNTER=$(expr $COUNTER + 1)
         done
         cat log.txt
