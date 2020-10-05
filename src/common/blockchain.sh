@@ -112,7 +112,7 @@ function install_fabric_chaincodev2 {
 
     #install on all peers
     for p in ${peers[@]};do
-        export CORE_PEER_ADDRESS=${!p}
+        export CORE_PEER_ADDRESS=${p}
         verifyPeerEnv
         peer lifecycle chaincode install ${CC_PACKAGE}
         res=$?
@@ -136,7 +136,7 @@ function install_fabric_chaincodev2 {
 queryInstalled() {
 
     for p in ${peers[@]};do
-        export CORE_PEER_ADDRESS=${!p}
+        export CORE_PEER_ADDRESS=${p}
         verifyPeerEnv
         peer lifecycle chaincode queryinstalled >&log.txt
         res=$?
@@ -169,7 +169,7 @@ queryInstalled() {
 checkCommitReadiness() {
 
     for p in ${peers[@]};do
-        export CORE_PEER_ADDRESS=${!p}
+        export CORE_PEER_ADDRESS=${p}
         infoln "Checking the commit readiness of the chaincode definition on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'..."
         local rc=1
         local COUNTER=1
@@ -218,7 +218,7 @@ checkCommitReadiness() {
 commitChaincodeDefinition() {
     for ord in ${orderers[@]};do
         for p in ${peers[@]};do
-            export CORE_PEER_ADDRESS=${!p}
+            export CORE_PEER_ADDRESS=${p}
             verifyPeerEnv
             peer lifecycle chaincode commit -o ${ord} --tls --cafile "${ORDERER_PEM}" \
                 --channelID $CHANNEL_NAME \
@@ -254,7 +254,7 @@ commitChaincodeDefinition() {
 #######################################
 queryCommitted() {
     for p in ${peers[@]};do
-        export CORE_PEER_ADDRESS=${!p}
+        export CORE_PEER_ADDRESS=${p}
         verifyPeerEnv
         EXPECTED_RESULT="Version: ${CC_VERSION}, Sequence: ${CC_SEQUENCE}, Endorsement Plugin: escc, Validation Plugin: vscc"
         infoln "Querying chaincode definition on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'..."
