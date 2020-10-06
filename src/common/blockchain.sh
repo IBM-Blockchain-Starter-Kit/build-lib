@@ -182,7 +182,7 @@ checkCommitReadiness() {
                 --name ${CC_NAME} \
                 --version ${CC_VERSION} \
                 --sequence ${CC_SEQUENCE:-1} \
-                --output json ${CC_SIGNATURE_POLICY} >&log.txt
+                --output json ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" >&log.txt
             res=$?
             status=$(cat log.txt | jq -rc '.approvals')
             if [[ $status =~ "true" ]];then
@@ -226,9 +226,9 @@ commitChaincodeDefinition() {
                 --channelID $CHANNEL_NAME \
                 --name ${CC_NAME}  \
                 --version ${CC_VERSION} \
-                --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_POLICY} >&log.txt
+                --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}"
             res=$?
-            cat log.txt
+
             verifyResult $res "Chaincode definition commit failed on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' failed"
             successln "Chaincode definition committed on channel '$CHANNEL_NAME'"
             if [[ $res == 0 ]];then
@@ -340,10 +340,8 @@ approveForMyOrg() {
                 --version ${CC_VERSION} \
                 --sequence ${CC_SEQUENCE:-1} \
                 --waitForEvent \
-                --package-id ${PACKAGE_ID} ${CC_PDC_CONFIG} ${CC_SIGNATURE_POLICY} >&log.txt
+                --package-id ${PACKAGE_ID} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}"
             res=$?
-            { set +x; } 2>/dev/null
-            cat log.txt
             verifyResult $res "Chaincode definition approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' failed"
             successln "Chaincode definition approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
             if [[ $res == 0 ]];then

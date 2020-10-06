@@ -112,13 +112,13 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     fi
 
     ## Signature policy should be defined at cicd by admin
-    if [[ -z $CC_SIGNATURE_POLICY ]];then
-        CC_SIGNATURE_POLICY=""
+    if [[ -z $SIGN_POLICY ]];then
+        SIGN_POLICY=""
+        CC_SIGNATURE_OPTION=""
     else
-        CC_SIGNATURE_POLICY="--signature-policy ${CC_SIGNATURE_POLICY}"
+        export CC_SIGNATURE_OPTION="--signature-policy"
     fi
 
-    export CC_SIGNATURE_POLICY=${CC_SIGNATURE_POLICY}
     export CC_PDC_CONFIG=${CC_PDC_CONFIG}
     export CHANNEL_NAME=${CHANNEL_NAME}
     export CC_VERSION=${CC_VERSION}
