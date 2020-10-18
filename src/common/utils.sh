@@ -45,13 +45,15 @@ function install_jq {
 #######################################
 function install_fabric_bin {
     #TODO make version dynamic
-    curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.1.1 1.4.9 -d -s
-    chmod +x bin/configtxgen
-    chmod +x bin/idemixgen
-    chmod +x bin/configtxlator
-    chmod +x bin/fabric-ca-client
-    chmod +x bin/orderer
-    chmod +x bin/peer
+    if [[ ! -f "bin/peer" ]];then
+        curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.1.1 1.4.9 -d -s
+        chmod +x bin/configtxgen
+        chmod +x bin/idemixgen
+        chmod +x bin/configtxlator
+        chmod +x bin/fabric-ca-client
+        chmod +x bin/orderer
+        chmod +x bin/peer
+    fi
     export FABRIC_CFG_PATH=${PWD}/config
     export PATH=${PATH}:${PWD}
 }

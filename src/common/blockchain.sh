@@ -145,7 +145,7 @@ queryInstalled() {
         PACKAGE_ID=${PACKAGE_ID%%,*} # truncate last comma
         export PACKAGE_ID=${PACKAGE_ID}
 
-        verifyResult $res "Query installed on ${CORE_PEER_ADDRESS} has failed"
+        verifyResult $res "Query installed successful on ${CORE_PEER_ADDRESS} on channel for PACKAGE_ID=${PACKAGE_ID} failed!"
         successln "Query installed successful on ${CORE_PEER_ADDRESS} on channel for PACKAGE_ID=${PACKAGE_ID}"
     done
 }
@@ -336,15 +336,15 @@ approveForMyOrg() {
         for p in ${peers[@]};do
             export CORE_PEER_ADDRESS=${p}
             verifyPeerEnv
+            set -x
             peer lifecycle chaincode approveformyorg -o ${ord} --tls --cafile "${ORDERER_PEM}" \
                 --channelID $CHANNEL_NAME \
                 --name ${CC_NAME} \
                 --version ${CC_VERSION} \
-                --sequence ${CC_SEQUENCE:-1} \
-                --package-id ${PACKAGE_ID} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" \
+                --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" \
                 --waitForEvent
             res=$?
-            verifyResult $res "Chaincode definition approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' failed"
+            verifyResult $res "Chaincode definition ${CC_NAME}:${CC_VERSION} with ${PACKAGE_ID} approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' Failed!"
             successln "Chaincode definition ${CC_NAME}:${CC_VERSION} with ${PACKAGE_ID} approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
             if [[ $res == 0 ]];then
                 break
