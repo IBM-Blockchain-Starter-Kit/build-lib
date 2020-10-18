@@ -116,8 +116,7 @@ function install_fabric_chaincodev2 {
         verifyPeerEnv
         peer lifecycle chaincode install ${CC_PACKAGE}
         res=$?
-        verifyResult $res "Chaincode installation on ${CORE_PEER_ADDRESS} has failed"
-        successln "Chaincode is installed on ${CORE_PEER_ADDRESS}"
+        verifyResult $res "Chaincode ${CC_PACKAGE} installation on ${CORE_PEER_ADDRESS} "
     done
 }
 
@@ -145,8 +144,7 @@ queryInstalled() {
         PACKAGE_ID=${PACKAGE_ID%%,*} # truncate last comma
         export PACKAGE_ID=${PACKAGE_ID}
 
-        verifyResult $res "Query installed successful on ${CORE_PEER_ADDRESS} on channel for PACKAGE_ID=${PACKAGE_ID} failed!"
-        successln "Query installed successful on ${CORE_PEER_ADDRESS} on channel for PACKAGE_ID=${PACKAGE_ID}"
+        verifyResult $res "Query installed on ${CORE_PEER_ADDRESS} on channel for PACKAGE_ID: ${PACKAGE_ID} "
     done
 }
 
@@ -182,19 +180,19 @@ checkCommitReadiness() {
                 --name ${CC_NAME} \
                 --version ${CC_VERSION} \
                 --sequence ${CC_SEQUENCE:-1} \
-                --output json ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" >&log.txt
+                --output json ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" >&log.txt
             res=$?
+            cat log.txt
             status=$(cat log.txt | jq -rc '.approvals')
             if [[ $status =~ "true" ]];then
                 rc=0
             fi
             COUNTER=$(expr $COUNTER + 1)
         done
-        cat log.txt
         if test $rc -eq 0; then
-            infoln "Checking the commit readiness of the chaincode definition successful on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
+            infoln "Checking the commit readiness of the ${CC_NAME}:${CC_VERSION} definition successful on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
         else
-            fatalln "After $COUNTER attempts, Check commit readiness result on ${CORE_PEER_ADDRESS} is INVALID!"
+            fatalln "After $COUNTER attempts, Check commit readiness result on ${CORE_PEER_ADDRESS} is INVALID! Args: ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" "
         fi
     done
 }
@@ -219,6 +217,7 @@ commitChaincodeDefinition() {
 
     for ord in ${orderers[@]};do
     ## Orderers should be used only as failover
+        # commit on all peers
         for p in ${peers[@]};do
             export CORE_PEER_ADDRESS=${p}
             verifyPeerEnv
@@ -226,14 +225,11 @@ commitChaincodeDefinition() {
                 --channelID $CHANNEL_NAME \
                 --name ${CC_NAME}  \
                 --version ${CC_VERSION} \
-                --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}"
+                --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" \
+                --waitForEvent
             res=$?
 
-            verifyResult $res "Chaincode definition commit failed on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' failed"
-            successln "Chaincode definition committed on channel '$CHANNEL_NAME'"
-            if [[ $res == 0 ]];then
-                break
-            fi
+            verifyResult $res "Chaincode ${CC_NAME}:${CC_VERSION} definition commit on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' with args: --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" "
         done
         if [[ $res == 0 ]];then
             break
@@ -280,9 +276,9 @@ queryCommitted() {
         done
         cat log.txt
         if test $rc -eq 0; then
-            successln "Query chaincode definition successful on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
+            successln "Query chaincode ${CC_NAME} definition successful on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
         else
-            fatalln "After $COUNTER attempts, Query chaincode definition result on ${CORE_PEER_ADDRESS} is INVALID!"
+            fatalln "After $COUNTER attempts, Query chaincode ${CC_NAME} definition result on ${CORE_PEER_ADDRESS} is INVALID!"
         fi
     done
 }
@@ -311,8 +307,7 @@ packageCC() {
         --label ${CC_NAME}-${CC_VERSION} \
         --path ${CC_PATH}
     res=$?
-    verifyResult $res "Chaincode package for ${CC_NAME}:${CC_VERSION} failed"
-    successln "Chaincode package for ${CC_NAME}:${CC_VERSION} Success!"
+    verifyResult $res "Chaincode package for ${CC_NAME}:${CC_VERSION} "
 }
 
 #######################################
@@ -344,14 +339,12 @@ approveForMyOrg() {
                 --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" \
                 --waitForEvent
             res=$?
-            verifyResult $res "Chaincode definition ${CC_NAME}:${CC_VERSION} with ${PACKAGE_ID} approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' Failed!"
-            successln "Chaincode definition ${CC_NAME}:${CC_VERSION} with ${PACKAGE_ID} approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
+            verifyResult $res "Chaincode definition ${CC_NAME}:${CC_VERSION} with ${PACKAGE_ID} approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
             if [[ $res == 0 ]];then
                 break
             fi
             counter=$(expr $counter + 1)
         done
-        #TODO also check length of peers
         if [[ $res == 0 ]] && [[ $counter -ne $peer_count ]];then
             break
         fi

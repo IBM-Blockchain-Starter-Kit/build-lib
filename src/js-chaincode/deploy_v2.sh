@@ -17,7 +17,7 @@ source "${SCRIPT_DIR}/common/blockchain.sh"
 # retries used for checkCommitReadiness
 export MAX_RETRY=3
 export DELAY=3
-#TODO check commit readiness needs more checking for seq
-#checkCommitReadiness
+
+checkCommitReadiness
 commitChaincodeDefinition
 queryCommitted

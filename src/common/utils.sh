@@ -45,6 +45,7 @@ function install_jq {
 #######################################
 function install_fabric_bin {
     #TODO make version dynamic
+    #check if bin exists, peer cli is the most important for now
     if [[ ! -f "bin/peer" ]];then
         curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.1.1 1.4.9 -d -s
         chmod +x bin/configtxgen
@@ -295,6 +296,8 @@ function verifyPeerEnv(){
 
 function verifyResult() {
   if [ $1 -ne 0 ]; then
-    fatalln "$2"
+    fatalln "$2 Failed!"
+  else
+    successln "$2 Success!"
   fi
 }
