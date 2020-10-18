@@ -146,7 +146,7 @@ queryInstalled() {
         export PACKAGE_ID=${PACKAGE_ID}
 
         verifyResult $res "Query installed on ${CORE_PEER_ADDRESS} has failed"
-        successln "Query installed successful on ${CORE_PEER_ADDRESS} on channel"
+        successln "Query installed successful on ${CORE_PEER_ADDRESS} on channel for PACKAGE_ID=${PACKAGE_ID}"
     done
 }
 
@@ -329,6 +329,8 @@ packageCC() {
 #   None
 #######################################
 approveForMyOrg() {
+    peer_count=${#peers[@]}
+    counter=0
 
     for ord in ${orderers[@]};do
         for p in ${peers[@]};do
@@ -339,16 +341,18 @@ approveForMyOrg() {
                 --name ${CC_NAME} \
                 --version ${CC_VERSION} \
                 --sequence ${CC_SEQUENCE:-1} \
-                --waitForEvent \
-                --package-id ${PACKAGE_ID} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}"
+                --package-id ${PACKAGE_ID} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" \
+                --waitForEvent
             res=$?
             verifyResult $res "Chaincode definition approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' failed"
-            successln "Chaincode definition approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
+            successln "Chaincode definition ${CC_NAME}:${CC_VERSION} with ${PACKAGE_ID} approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
             if [[ $res == 0 ]];then
                 break
             fi
+            counter=$(expr $counter + 1)
         done
-        if [[ $res == 0 ]];then
+        #TODO also check length of peers
+        if [[ $res == 0 ]] && [[ $counter -ne $peer_count ]];then
             break
         fi
     done
