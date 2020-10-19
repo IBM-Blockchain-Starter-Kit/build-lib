@@ -331,7 +331,6 @@ approveForMyOrg() {
         for p in ${peers[@]};do
             export CORE_PEER_ADDRESS=${p}
             verifyPeerEnv
-            set -x
             peer lifecycle chaincode approveformyorg -o ${ord} --tls --cafile "${ORDERER_PEM}" \
                 --channelID $CHANNEL_NAME \
                 --name ${CC_NAME} \
