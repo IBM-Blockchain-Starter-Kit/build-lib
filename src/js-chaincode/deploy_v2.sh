@@ -19,5 +19,7 @@ export MAX_RETRY=3
 export DELAY=3
 
 checkCommitReadiness
+
 commitChaincodeDefinition
+
 queryCommitted

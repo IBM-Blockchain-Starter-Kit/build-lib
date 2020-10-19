@@ -221,6 +221,7 @@ commitChaincodeDefinition() {
         for p in ${peers[@]};do
             export CORE_PEER_ADDRESS=${p}
             verifyPeerEnv
+            set -x
             peer lifecycle chaincode commit -o ${ord} --tls --cafile "${ORDERER_PEM}" \
                 --channelID $CHANNEL_NAME \
                 --name ${CC_NAME}  \
@@ -228,8 +229,10 @@ commitChaincodeDefinition() {
                 --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" \
                 --waitForEvent
             res=$?
-
             verifyResult $res "Chaincode ${CC_NAME}:${CC_VERSION} definition commit on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' with args: --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" "
+            if [[ $res == 0 ]];then
+                break
+            fi
         done
         if [[ $res == 0 ]];then
             break
