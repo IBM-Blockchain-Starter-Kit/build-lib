@@ -18,6 +18,8 @@ source "${SCRIPT_DIR}/common/blockchain.sh"
 export MAX_RETRY=3
 export DELAY=3
 
+queryInstalled
+
 checkCommitReadiness
 
 commitChaincodeDefinition
