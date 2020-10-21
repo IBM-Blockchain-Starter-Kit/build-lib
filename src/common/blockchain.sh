@@ -107,16 +107,13 @@ function instantiate_fabric_chaincode {
 # Returns:
 #   None
 #######################################
-function install_fabric_chaincodev2 {
-    CC_PACKAGE=$1
-
-    #install on all peers
+installChaincode_v2() {
+    cc_package=$1
     for p in ${peers[@]};do
         export CORE_PEER_ADDRESS=${p}
-        verifyPeerEnv
-        peer lifecycle chaincode install ${CC_PACKAGE}
+        peer lifecycle chaincode install ${cc_package}
         res=$?
-        verifyResult $res "Chaincode ${CC_PACKAGE} installation on ${CORE_PEER_ADDRESS} "
+        verifyResult $res "Chaincode ${cc_package} installation on ${CORE_PEER_ADDRESS} "
     done
 }
 
@@ -136,15 +133,18 @@ queryInstalled() {
 
     for p in ${peers[@]};do
         export CORE_PEER_ADDRESS=${p}
-        verifyPeerEnv
         peer lifecycle chaincode queryinstalled >&log.txt
         res=$?
         cat log.txt
         PACKAGE_ID=$(cat log.txt | awk "/$CC_NAME/ && /$CC_VERSION/" | awk '{print $3}')
-        PACKAGE_ID=${PACKAGE_ID%%,*} # truncate last comma
+        PACKAGE_ID=${PACKAGE_ID%%,*}
         export PACKAGE_ID=${PACKAGE_ID}
 
-        verifyResult $res "Query installed on ${CORE_PEER_ADDRESS} on channel for PACKAGE_ID: ${PACKAGE_ID} "
+        if [[ ${PACKAGE_ID} == "" ]];then
+            res=3
+        fi
+
+        verifyResult $res "Query installed on ${CORE_PEER_ADDRESS} with Package ID : ${PACKAGE_ID} "
     done
 }
 
@@ -166,35 +166,33 @@ queryInstalled() {
 #######################################
 checkCommitReadiness() {
 
+    infoln "Checking the commit readiness of the chaincode definition on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'..."
+    local rc=1
+    local COUNTER=1
+
     for p in ${peers[@]};do
         export CORE_PEER_ADDRESS=${p}
-        infoln "Checking the commit readiness of the chaincode definition on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'..."
-        local rc=1
-        local COUNTER=1
-        # continue to poll
-        # we either get a successful response, or reach MAX RETRY
-        while [ $rc -ne 0 -a $COUNTER -lt $MAX_RETRY ]; do
-            sleep $DELAY
-            infoln "Attempting to check the commit readiness of the chaincode definition on ${CORE_PEER_ADDRESS}, Retry after $DELAY seconds."
-            peer lifecycle chaincode checkcommitreadiness --channelID $CHANNEL_NAME \
-                --name ${CC_NAME} \
-                --version ${CC_VERSION} \
-                --sequence ${CC_SEQUENCE:-1} \
-                --output json ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" >&log.txt
-            res=$?
-            cat log.txt
-            status=$(cat log.txt | jq -rc '.approvals')
-            if [[ $status =~ "true" ]];then
-                rc=0
-            fi
-            COUNTER=$(expr $COUNTER + 1)
-        done
-        if test $rc -eq 0; then
-            infoln "Checking the commit readiness of the ${CC_NAME}:${CC_VERSION} definition successful on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
-        else
-            fatalln "After $COUNTER attempts, Check commit readiness result on ${CORE_PEER_ADDRESS} is INVALID! Args: ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" "
+        sleep $DELAY
+        infoln "Attempting to check the commit readiness of the chaincode definition on ${CORE_PEER_ADDRESS}, Retry after $DELAY seconds."
+        peer lifecycle chaincode checkcommitreadiness --channelID $CHANNEL_NAME \
+            --name ${CC_NAME} \
+            --version ${CC_VERSION} \
+            --sequence ${CC_SEQUENCE:-1} \
+            --output json ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} ${SIGN_POLICY} >&log.txt
+        res=$?
+        cat log.txt
+        status=$(cat log.txt | jq -rc '.approvals')
+        if [[ $status =~ "true" ]];then
+            rc=0
         fi
     done
+
+    if test $rc -eq 0; then
+        infoln "Checking the commit readiness of the chaincode definition successful on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
+    else
+        fatalln "After $COUNTER attempts, Check commit readiness result on ${CORE_PEER_ADDRESS} is INVALID!"
+    fi
+
 }
 
 #######################################
@@ -216,18 +214,17 @@ checkCommitReadiness() {
 commitChaincodeDefinition() {
 
     for ord in ${orderers[@]};do
-    ## Orderers should be used only as failover
-        # commit on all peers
         for p in ${peers[@]};do
             export CORE_PEER_ADDRESS=${p}
-            verifyPeerEnv
             peer lifecycle chaincode commit -o ${ord} --tls --cafile "${ORDERER_PEM}" \
-                --channelID $CHANNEL_NAME \
-                --name ${CC_NAME}  \
-                --version ${CC_VERSION} \
-                --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}"
+            --channelID $CHANNEL_NAME \
+            --name ${CC_NAME}  \
+            --version ${CC_VERSION} \
+            --sequence ${CC_SEQUENCE:-1}  \
+            --waitForEvent ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} ${SIGN_POLICY}
             res=$?
-            verifyResult $res "Chaincode ${CC_NAME}:${CC_VERSION} definition commit on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' with args: --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" "
+
+            verifyResult $res "Chaincode definition commit on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
             if [[ $res == 0 ]];then
                 break
             fi
@@ -255,32 +252,22 @@ commitChaincodeDefinition() {
 #   Set PACKAGE_ID env for lifecycle approveformyorg
 #######################################
 queryCommitted() {
+
+    EXPECTED_RESULT="Version: ${CC_VERSION}, Sequence: ${CC_SEQUENCE:-1}, Endorsement Plugin: escc, Validation Plugin: vscc"
+    infoln "Querying chaincode definition on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'..."
+    local rc=1
+    local COUNTER=1
+
     for p in ${peers[@]};do
         export CORE_PEER_ADDRESS=${p}
-        verifyPeerEnv
-        EXPECTED_RESULT="Version: ${CC_VERSION}, Sequence: ${CC_SEQUENCE:-1}, Endorsement Plugin: escc, Validation Plugin: vscc"
-        infoln "Querying chaincode definition on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'..."
-        local rc=1
-        local COUNTER=1
-        # continue to poll
-        # we either get a successful response, or reach MAX RETRY
-        while [ $rc -ne 0 -a $COUNTER -lt $MAX_RETRY ]; do
-            sleep $DELAY
-            infoln "Attempting to Query committed status on ${CORE_PEER_ADDRESS}, Retry after $DELAY seconds."
+        infoln "Attempting to Query committed status on ${CORE_PEER_ADDRESS}, Retry after $DELAY seconds."
 
-            peer lifecycle chaincode querycommitted --channelID $CHANNEL_NAME --name ${CC_NAME}  >&log.txt
-            res=$?
-
-            test $res -eq 0 && VALUE=$(cat log.txt | grep -o '^Version: '$CC_VERSION', Sequence: [0-9]*, Endorsement Plugin: escc, Validation Plugin: vscc')
-            test "$VALUE" = "$EXPECTED_RESULT" && rc=0
-            COUNTER=$(expr $COUNTER + 1)
-        done
+        peer lifecycle chaincode querycommitted --channelID $CHANNEL_NAME --name ${CC_NAME} >&log.txt
+        res=$?
         cat log.txt
-        if test $rc -eq 0; then
-            successln "Query chaincode ${CC_NAME} definition successful on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
-        else
-            fatalln "After $COUNTER attempts, Query chaincode ${CC_NAME} definition result on ${CORE_PEER_ADDRESS} is INVALID!"
-        fi
+
+        test $res -eq 0 && VALUE=$(cat log.txt | grep -o '^Version: '$CC_VERSION', Sequence: [0-9]*, Endorsement Plugin: escc, Validation Plugin: vscc')
+        test "$VALUE" = "$EXPECTED_RESULT"
     done
 }
 
@@ -325,27 +312,27 @@ packageCC() {
 #   None
 #######################################
 approveForMyOrg() {
-    peer_count=${#peers[@]}
-    counter=0
 
     for ord in ${orderers[@]};do
         for p in ${peers[@]};do
             export CORE_PEER_ADDRESS=${p}
-            verifyPeerEnv
             peer lifecycle chaincode approveformyorg -o ${ord} --tls --cafile "${ORDERER_PEM}" \
-                --channelID $CHANNEL_NAME \
-                --name ${CC_NAME} \
-                --version ${CC_VERSION} \
-                --sequence ${CC_SEQUENCE:-1} ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} "${SIGN_POLICY}" \
-                --waitForEvent
+            --channelID $CHANNEL_NAME \
+            --name ${CC_NAME} \
+            --version ${CC_VERSION} \
+            --sequence ${CC_SEQUENCE:-1} \
+            --package-id ${PACKAGE_ID} \
+            --waitForEvent ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} ${SIGN_POLICY}
             res=$?
-            verifyResult $res "Chaincode definition ${CC_NAME}:${CC_VERSION} with ${PACKAGE_ID} approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
+
+            verifyResult $res "Chaincode definition ${PACKAGE_ID} approved on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME' "
+
+            # Approval only required for 1 peer so break if successful, this is default : TODO enable some logic that requires some policy?
             if [[ $res == 0 ]];then
                 break
             fi
-            counter=$(expr $counter + 1)
         done
-        if [[ $res == 0 ]] && [[ $counter -ne $peer_count ]];then
+        if [[ $res == 0 ]];then
             break
         fi
     done

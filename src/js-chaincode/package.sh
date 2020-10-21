@@ -12,7 +12,7 @@ source "${SCRIPT_DIR}/common/blockchain.sh"
 : "${CC_REPO_DIR:?"CC_REPO_DIR not set" }"
 : "${CC_NAME:?"CC_NAME not set" }"
 : "${CC_VERSION:?"CC_VERSION not set" }"
-
+verifyPeerEnv
 ## Need to remove the danm node_modules
 rm -rf "${CC_REPO_DIR}/node_modules"
 

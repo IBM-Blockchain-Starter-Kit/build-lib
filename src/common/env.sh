@@ -109,6 +109,7 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
 
     ##PDC
     pdc_json_path=$(cat $CONFIGPATH | jq -r '. | .. | .chaincode? | .[0] | .pdc_path? | select(.)')
+
     if [[ $pdc_json_path != null && $pdc_json_path != "" ]]; then
         CC_PDC_CONFIG="--collections-config ${CC_REPO_DIR}/${pdc_json_path}"
     else
@@ -118,9 +119,9 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     ## Signature policy should be defined at cicd by admin
     if [[ -z $SIGN_POLICY ]];then
         SIGN_POLICY=""
-        CC_SIGNATURE_OPTION=""
+        export CC_SIGNATURE_OPTION=""
     else
-        export CC_SIGNATURE_OPTION="--signature-policy"
+        export CC_SIGNATURE_OPTION=--signature-policy
     fi
 
     export CC_PDC_CONFIG=${CC_PDC_CONFIG}

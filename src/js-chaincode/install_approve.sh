@@ -14,9 +14,9 @@ source "${SCRIPT_DIR}/common/blockchain.sh"
 : "${CC_VERSION:?"CC_VERSION not set" }"
 : "${PEERS_COUNT:?"PEERS_COUNT not set" }"
 : "${CHANNEL_NAME:?"CHANNEL_NAME not set" }"
-
+verifyPeerEnv
 #todo queryInstalled first to make sure we dont need to install
-install_fabric_chaincodev2 "${ROOTDIR}/${CC_NAME}@${CC_VERSION}.tgz"
+installChaincode_v2 "${ROOTDIR}/${CC_NAME}@${CC_VERSION}.tgz"
 
 queryInstalled
 
