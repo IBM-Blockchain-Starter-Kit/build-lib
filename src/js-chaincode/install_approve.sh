@@ -8,7 +8,8 @@ source "${SCRIPT_DIR}/common/utils.sh"
 source "${SCRIPT_DIR}/common/env.sh"
 # shellcheck source=src/common/blockchain.sh
 source "${SCRIPT_DIR}/common/blockchain.sh"
-export CC_SEQUENCE=$(expr $LATEST_SEQ + 1)
+
+export CC_SEQUENCE=${CC_SEQUENCE_OVERRIDE:-$(expr $LATEST_SEQ + 1)}
 
 : "${CC_REPO_DIR:?"CC_REPO_DIR not set" }"
 : "${CC_NAME:?"CC_NAME not set" }"

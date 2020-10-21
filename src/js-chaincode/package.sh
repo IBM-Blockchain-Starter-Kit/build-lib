@@ -21,14 +21,14 @@ rm -rf "${CC_REPO_DIR}/node_modules"
 queryCommitted
 if [[ -z $LATEST_SEQ ]];then
     # Did not find last seq therefore define
-    export LATEST_SEQ=1
+    export LATEST_SEQ=0
 fi
 
 #rm last entry
 awk '!/LATEST_SEQ/' build.properties > temp && mv temp build.properties
 echo "LATEST_SEQ=${LATEST_SEQ}" >> build.properties
 
-export CC_SEQUENCE=$(expr $LATEST_SEQ + 1)
+export CC_SEQUENCE=${CC_SEQUENCE_OVERRIDE:-$(expr $LATEST_SEQ + 1)}
 
 packageCC "${CC_REPO_DIR}" "${CC_NAME}" "${CC_VERSION}" "${CC_SEQUENCE}" "node"
 
