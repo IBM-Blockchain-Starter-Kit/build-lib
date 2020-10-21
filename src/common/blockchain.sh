@@ -253,7 +253,6 @@ commitChaincodeDefinition() {
 #######################################
 queryCommitted() {
 
-    EXPECTED_RESULT="Version: ${CC_VERSION}, Sequence: ${CC_SEQUENCE}, Endorsement Plugin: escc, Validation Plugin: vscc"
     infoln "Querying chaincode definition on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'..."
     local rc=1
     local COUNTER=1
@@ -271,12 +270,10 @@ queryCommitted() {
             export LATEST_SEQ=$(jq -r '.sequence' log.txt)
         fi
 
-        test $res -eq 0 && VALUE=$(cat log.txt | grep -o '^Version: '$CC_VERSION', Sequence: [0-9]*, Endorsement Plugin: escc, Validation Plugin: vscc')
-#        test "$VALUE" = "$EXPECTED_RESULT"
         OK_STATUS="Error: query failed with status: 404 - namespace ${CC_NAME} is not defined"
 
-        if [[ $OK_STATUS != $(cat log.txt) ]] || [[ "$VALUE" != "$EXPECTED_RESULT" ]];then
-            verifyResult $res "$(cat log.txt)"
+        if [[ $OK_STATUS != $(cat log.txt) ]];then
+            verifyResult $res "$(cat log.txt) "
         else
             verifyResult 0 "$(cat log.txt)"
         fi
