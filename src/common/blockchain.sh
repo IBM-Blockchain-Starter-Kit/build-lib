@@ -177,7 +177,7 @@ checkCommitReadiness() {
         peer lifecycle chaincode checkcommitreadiness --channelID $CHANNEL_NAME \
             --name ${CC_NAME} \
             --version ${CC_VERSION} \
-            --sequence ${CC_SEQUENCE:-1} \
+            --sequence ${CC_SEQUENCE} \
             --output json ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} ${SIGN_POLICY} >&log.txt
         res=$?
         cat log.txt
@@ -220,7 +220,7 @@ commitChaincodeDefinition() {
             --channelID $CHANNEL_NAME \
             --name ${CC_NAME}  \
             --version ${CC_VERSION} \
-            --sequence ${CC_SEQUENCE:-1}  \
+            --sequence ${CC_SEQUENCE}  \
             --waitForEvent ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} ${SIGN_POLICY}
             res=$?
 
@@ -253,21 +253,34 @@ commitChaincodeDefinition() {
 #######################################
 queryCommitted() {
 
-    EXPECTED_RESULT="Version: ${CC_VERSION}, Sequence: ${CC_SEQUENCE:-1}, Endorsement Plugin: escc, Validation Plugin: vscc"
+    EXPECTED_RESULT="Version: ${CC_VERSION}, Sequence: ${CC_SEQUENCE}, Endorsement Plugin: escc, Validation Plugin: vscc"
     infoln "Querying chaincode definition on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'..."
     local rc=1
     local COUNTER=1
 
     for p in ${peers[@]};do
         export CORE_PEER_ADDRESS=${p}
-        infoln "Attempting to Query committed status on ${CORE_PEER_ADDRESS}, Retry after $DELAY seconds."
+        infoln "Attempting to Query committed ${CC_NAME} status on ${CORE_PEER_ADDRESS}"
 
-        peer lifecycle chaincode querycommitted --channelID $CHANNEL_NAME --name ${CC_NAME} >&log.txt
+        peer lifecycle chaincode querycommitted --output json --channelID $CHANNEL_NAME --name ${CC_NAME} >&log.txt
         res=$?
-        cat log.txt
+        echo "res=$res"
+#        cat log.txt
+        if [[ $res -eq 0 ]];then
+            #TODO need to accouont for multiple peer that may not have their commited seq in sync
+            export LATEST_SEQ=$(jq -r '.sequence' log.txt)
+        fi
 
         test $res -eq 0 && VALUE=$(cat log.txt | grep -o '^Version: '$CC_VERSION', Sequence: [0-9]*, Endorsement Plugin: escc, Validation Plugin: vscc')
         test "$VALUE" = "$EXPECTED_RESULT"
+        OK_STATUS="Error: query failed with status: 404 - namespace ${CC_NAME} is not defined"
+
+        if [[ $OK_STATUS != $(cat log.txt) ]];then
+            verifyResult $res "$(cat log.txt)"
+        else
+            verifyResult 0 "$(cat log.txt)"
+        fi
+
     done
 }
 
@@ -288,14 +301,15 @@ packageCC() {
     local CC_PATH=$1
     local CC_NAME=$2
     local CC_VERSION=$3
-    local LANG=$4
+    local CC_SEQUENCE
+    local LANG=$5
     verifyPeerEnv
-    peer lifecycle chaincode package ${CC_NAME}@${CC_VERSION}.tgz \
+    peer lifecycle chaincode package ${CC_NAME}@${CC_VERSION}-${CC_SEQUENCE}.tgz \
         --lang ${LANG} \
-        --label ${CC_NAME}-${CC_VERSION} \
+        --label ${CC_NAME}-${CC_VERSION}-${CC_SEQUENCE} \
         --path ${CC_PATH}
     res=$?
-    verifyResult $res "Chaincode package for ${CC_NAME}:${CC_VERSION} "
+    verifyResult $res "Chaincode package for ${CC_NAME}:${CC_VERSION}-${CC_SEQUENCE} "
 }
 
 #######################################
@@ -320,7 +334,7 @@ approveForMyOrg() {
             --channelID $CHANNEL_NAME \
             --name ${CC_NAME} \
             --version ${CC_VERSION} \
-            --sequence ${CC_SEQUENCE:-1} \
+            --sequence ${CC_SEQUENCE} \
             --package-id ${PACKAGE_ID} \
             --waitForEvent ${CC_PDC_CONFIG} ${CC_SIGNATURE_OPTION} ${SIGN_POLICY}
             res=$?

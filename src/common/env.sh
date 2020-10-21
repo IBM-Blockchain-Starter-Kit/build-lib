@@ -96,6 +96,7 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     export peers
 
     # Note: chaincode level shouldn't be array as deploy_config.json is a specific chaincode configuration for distinct source code deployment
+    # TODO Allow CC_NAME override at pipeline
     CC_NAME=$(cat $CONFIGPATH | jq -r '. | .. | .chaincode? | .[0] | .name | select(.)')
 
     json_version=$(cat $CONFIGPATH | jq -r '. | .. | .chaincode? | .[0] | .version? | select(.)')
