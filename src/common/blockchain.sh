@@ -262,14 +262,14 @@ queryCommitted() {
         infoln "Attempting to Query committed ${CC_NAME} status on ${CORE_PEER_ADDRESS}"
         set +e
         peer lifecycle chaincode querycommitted --output json --channelID $CHANNEL_NAME --name ${CC_NAME} > log.txt 2>&1
-        res=$?
+        set -e
+        res=${PIPESTATUS[0]}
         echo "res=$res"
 #        cat log.txt
         if [[ $res -eq 0 ]];then
             #TODO need to accouont for multiple peer that may not have their commited seq in sync
             export LATEST_SEQ=$(jq -r '.sequence' log.txt)
         fi
-        set -e
         OK_STATUS="Error: query failed with status: 404 - namespace ${CC_NAME} is not defined"
 
         if [[ $OK_STATUS != $(cat log.txt) ]];then
