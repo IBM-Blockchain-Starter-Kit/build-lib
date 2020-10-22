@@ -35,3 +35,5 @@ packageCC "${CC_REPO_DIR}" "${CC_NAME}" "${CC_VERSION}" "${CC_SEQUENCE}" "node"
 if [[ ! -f "${CC_NAME}@${CC_VERSION}-${CC_SEQUENCE}.tgz" ]];then
     fatalln "${CC_NAME}@${CC_VERSION}-${CC_SEQUENCE}.tgz not created by packageCC"
 fi
+
+##TODO publish package here using interface

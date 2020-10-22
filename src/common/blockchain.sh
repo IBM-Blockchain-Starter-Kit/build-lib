@@ -261,7 +261,7 @@ queryCommitted() {
         export CORE_PEER_ADDRESS=${p}
         infoln "Attempting to Query committed ${CC_NAME} status on ${CORE_PEER_ADDRESS}"
 
-        peer lifecycle chaincode querycommitted --output json --channelID $CHANNEL_NAME --name ${CC_NAME} >&log.txt
+        peer lifecycle chaincode querycommitted --output json --channelID $CHANNEL_NAME --name ${CC_NAME} > log.txt 2>&1
         res=$?
         echo "res=$res"
 #        cat log.txt
