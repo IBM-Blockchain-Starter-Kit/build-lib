@@ -71,11 +71,11 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
 
     #Create MSP
     cert=$(echo "${ADMIN_IDENTITY_STRING}" | jq -r '.cert')
-#    ca=$(echo "${ADMIN_IDENTITY_STRING}" | jq -r '.ca')
+    ca=$(echo "${ADMIN_IDENTITY_STRING}" | jq -r '.ca')
     key=$(echo "${ADMIN_IDENTITY_STRING}" | jq -r '.private_key')
     name=$(echo "${ADMIN_IDENTITY_STRING}" | jq -r '.name')
-#    ./${SCRIPT_DIR}/common/create_msp_from_identity.sh "${ROOTDIR}/${ADMIN_IDENTITY_NAME}" "${cert}" "${ca}" "${key}" "${name}"
-    ./${SCRIPT_DIR}/common/create_msp_from_identity.sh "${ROOTDIR}/${ADMIN_IDENTITY_NAME}" "${cert}" "${key}" "${name}"
+    ./${SCRIPT_DIR}/common/create_msp_from_identity.sh "${ROOTDIR}/${ADMIN_IDENTITY_NAME}" "${cert}" "${ca}" "${key}" "${name}"
+#    ./${SCRIPT_DIR}/common/create_msp_from_identity.sh "${ROOTDIR}/${ADMIN_IDENTITY_NAME}" "${cert}" "${key}" "${name}"
 
     # Download Fabric BIN and setup PEER's core.yaml for identity
     install_fabric_bin
