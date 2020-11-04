@@ -4,7 +4,7 @@ source <(curl -sSL https://raw.githubusercontent.com/hyperledger/fabric-samples/
 
 # Creates a Peer MSP for cli from an IBP identity JSON
 
-if [ "$#" -ne 5 ]; then
+if [ "$#" -ne 4 ]; then
     echo "Illegal number of parameters"
     fatalln "Usage: ./create_msp_from_identity.sh dirToCreateMsp base64Cert base64CA base64Key nameOfIdentity"
 fi
