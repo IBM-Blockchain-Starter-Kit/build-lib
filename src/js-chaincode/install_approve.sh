@@ -21,7 +21,9 @@ export CC_SEQUENCE=${CC_SEQUENCE_OVERRIDE:-$(expr $LATEST_SEQ + 1)}
 verifyPeerEnv
 
 #todo queryInstalled first to make sure we dont need to install
-installChaincode_v2 "${ROOTDIR}/${CC_NAME}@${CC_VERSION}-${CC_SEQUENCE}.tgz"
+if [[ ${INSTALL_OVERRIDE_SKIP} == "false" ]];then
+    installChaincode_v2 "${ROOTDIR}/${CC_NAME}@${CC_VERSION}-${CC_SEQUENCE}.tgz"
+fi
 
 queryInstalled
 
