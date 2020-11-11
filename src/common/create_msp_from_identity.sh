@@ -20,8 +20,8 @@ mkdir -p "${1}/msp/admincerts"
 
 cert=$2
 ca=$3
-key=$3
-name=$4
+key=$4
+name=$5
 
 if [[ "$cert" == "null"  ]];then
     fatalln "cert from json not found"
