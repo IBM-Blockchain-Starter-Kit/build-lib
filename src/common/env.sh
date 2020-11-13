@@ -84,10 +84,12 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     #Extract env
     #Get Msp
     MSP_ID=$(echo ${CONNECTION_PROFILE_STRING} | jq -r '.[0] | .. | .mspid? | select(.)')
-    # Get root tls cert
+    # Get root tls cert for first peer
     echo ${CONNECTION_PROFILE_STRING} | jq -r '.[0] | first(.peers | .. | .pem? | select(.))' > tmpPeerRootCert.pem
     ROOTCACERT=${ROOTDIR}/tmpPeerRootCert.pem
-
+    # Get first peer url
+    PEER_ADDR=$(echo ${CONNECTION_PROFILE_STRING} | jq -r '.[0] | first(.peers | .. | .url? | select(.))')
+    # peers array deprecated TODO
     peers=()
     peers_counter=0
     while read peer_url; do
@@ -95,6 +97,25 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
         peers_counter=$(expr $peers_counter + 1)
     done < <(echo ${CONNECTION_PROFILE_STRING} | jq -r '.[0] | .peers | .. | .url? | select(.)')
     export peers
+    #peers array above should be removed
+    declare -A peersMap
+    while read -r peerObj; do
+    #    echo $peerObj
+        peerUrl=$(echo $peerObj | jq -r '.url')
+        peerUrl=${peerUrl##*//}
+        peerPemFile=${peerUrl}.pem
+        #save pemfile
+        echo $peerObj | jq -r '.pem' > ${peerPemFile}
+        # create map
+        peersMap["${peerUrl}"]=$(pwd)/${peerPemFile}
+    done < <(echo ${CONNECTION_PROFILE_STRING} | jq -rc '.[0] | .peers | keys[] as $k | {"url": "\(.[$k] | .url)" , "pem": "\(.[$k] | .tlsCACerts.pem)"}')
+    export peersMap
+
+    ## Build the peer string for peer cli
+    peerAddrString=""
+    for peer in "${!peersMap[@]}";do
+        peerAddrString+="--peerAddresses $peer --tlsRootCertFiles ${peersMap[$peer]} "
+    done
 
     # Note: chaincode level shouldn't be array as deploy_config.json is a specific chaincode configuration for distinct source code deployment
     # TODO Allow CC_NAME override at pipeline
@@ -130,6 +151,7 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     export CHANNEL_NAME=${CHANNEL_NAME}
     export CC_VERSION=${CC_VERSION}
     export CC_NAME=${CC_NAME}
+    export CORE_PEER_ADDRESS=${PEER_ADDR##*//}
     export CORE_PEER_LOCALMSPID=${MSP_ID}
     export CORE_PEER_TLS_ROOTCERT_FILE=${ROOTCACERT}
     export CORE_PEER_MSPCONFIGPATH="${ROOTDIR}/${ADMIN_IDENTITY_NAME}/msp"
@@ -138,5 +160,6 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     export FABRIC_CFG_PATH="${ROOTDIR}/${ADMIN_IDENTITY_NAME}"
     # Peers and Orderers counts from gateways
     export PEERS_COUNT=${peers_counter}
+    export PEER_ADDRESSES_STRING=${peerAddrString}
     export ORDERERS_COUNT=${orderer_counter}
 fi
