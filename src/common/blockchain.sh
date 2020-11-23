@@ -292,7 +292,7 @@ packageCC() {
     local CC_SEQUENCE=$4
     local LANG=$5
     verifyPeerEnv
-    peer lifecycle chaincode package ${CC_NAME}@${CC_VERSION}-${CC_SEQUENCE}.tgz \
+    peer lifecycle chaincode package ${CC_NAME}@${CC_VERSION}.tgz \
         --lang ${LANG} \
         --label ${CC_NAME}-${CC_VERSION}-${CC_SEQUENCE} \
         --path ${CC_PATH}

@@ -22,7 +22,7 @@ verifyPeerEnv
 
 #todo queryInstalled first to make sure we dont need to install
 if [[ ${INSTALL_OVERRIDE_SKIP} == "false" ]];then
-    installChaincode_v2 "${ROOTDIR}/${CC_NAME}@${CC_VERSION}-${CC_SEQUENCE}.tgz"
+    installChaincode_v2 "${ROOTDIR}/${CC_NAME}@${CC_VERSION}.tgz"
 fi
 
 queryInstalled

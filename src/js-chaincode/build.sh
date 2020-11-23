@@ -27,6 +27,7 @@ npm run build
 
 echo "======== Building chaincode ========"
 install_jq
+##TODO fail on error, because jq is piped below, it doesn't fail if jq errors
 for org in $(jq -r "keys | .[]" "${CONFIGPATH}"); do
   for cc_path in $(jq -r ".${org}.chaincode | .[] | .path" "${CONFIGPATH}"); do    
     echo "Processing path: ${cc_path}"
