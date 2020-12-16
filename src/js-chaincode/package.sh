@@ -31,9 +31,9 @@ echo "LATEST_SEQ=${LATEST_SEQ}" >> build.properties
 export CC_SEQUENCE=${CC_SEQUENCE_OVERRIDE:-$(expr $LATEST_SEQ + 1)}
 
 ## Update package.json cc name and version
-cd "${CC_REPO_DIR}"
-npm version "${CC_VERSION}"
-cd -
+#cd "${CC_REPO_DIR}"
+#npm version "${CC_VERSION}"
+#cd -
 
 packageCC "${CC_REPO_DIR}" "${CC_NAME}" "${CC_VERSION}" "${CC_SEQUENCE}" "node"
 
