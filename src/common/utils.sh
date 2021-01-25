@@ -3,7 +3,7 @@
 # Common utility functions, e.g. to make curl requests
 
 ## Logging helpers
-source <(curl -sSL https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scriptUtils.sh)
+source <(curl -sSL "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh")
 
 #######################################
 # Exit script with an error
@@ -44,10 +44,13 @@ function install_jq {
 #   None
 #######################################
 function install_fabric_bin {
+    local FAB_VERSION=${1:-"2.1.1"}
+    local CA_VERSION=${2:-"1.4.9"}
+
     #TODO make version dynamic
     #check if bin exists, peer cli is the most important for now
     if [[ ! -f "bin/peer" ]];then
-        curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.1.1 1.4.9 -d -s
+        curl -sSL https://bit.ly/2ysbOFE | bash -s -- "${FAB_VERSION}" "${CA_VERSION}" -d -s
         chmod +x bin/configtxgen
         chmod +x bin/idemixgen
         chmod +x bin/configtxlator
