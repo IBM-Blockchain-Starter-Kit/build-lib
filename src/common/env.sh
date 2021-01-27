@@ -26,14 +26,14 @@ export CONFIGPATH=${CONFIGPATH:-"${CC_REPO_DIR}/deploy_config.json"}
 export CHAINCODEPATH=${CHAINCODEPATH:-"$CC_REPO_DIR/chaincode"}
 
 # hlf dir
-export HLF_VERSION=${HLF_VERSION:="1.4.4"}
+export HLF_VERSION=${HLF_VERSION:="1.4.9"}
 export FABRIC_SRC_DIR=${ROOTDIR}/fabric-${HLF_VERSION}
 
 # fabric-cli dir
 export FABRIC_CLI_DIR=$ROOTDIR/${FABRIC_CLI_DIR:="/fabric-cli"}
 
 ## Fabric V2.x Env setup
-if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
+if [[ $HLF_VERSION == "1."* && $ENABLE_PEER_CLI == 'true' ]];then
     echo "-------- Installing jq --------"
     install_jq
 
@@ -78,7 +78,7 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
 #    ./${SCRIPT_DIR}/common/create_msp_from_identity.sh "${ROOTDIR}/${ADMIN_IDENTITY_NAME}" "${cert}" "${key}" "${name}"
 
     # Download Fabric BIN and setup PEER's core.yaml for identity
-    install_fabric_bin
+    install_fabric_bin "${HLF_VERSION}" "1.4.9" # ca 1.4.9 is latest
     cp $FABRIC_CFG_PATH/core.yaml "${ROOTDIR}/${ADMIN_IDENTITY_NAME}"
 
     #Extract env
@@ -160,6 +160,6 @@ if [[ $HLF_VERSION = "2."* && $ENABLE_PEER_CLI == 'true' ]];then
     export FABRIC_CFG_PATH="${ROOTDIR}/${ADMIN_IDENTITY_NAME}"
     # Peers and Orderers counts from gateways
     export PEERS_COUNT=${peers_counter}
-    export PEER_ADDRESSES_STRING=${peerAddrString}
+    export PEER_ADDRESSES_STRING=${peerAddrString} ##Not being used so safe for fab v1.x
     export ORDERERS_COUNT=${orderer_counter}
 fi

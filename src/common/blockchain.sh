@@ -292,12 +292,28 @@ packageCC() {
     local CC_SEQUENCE=$4
     local LANG=$5
     verifyPeerEnv
+    if [[ "${HLF_VERSION}" == "1."* ]];then
+      LABEL=${CC_NAME}-${CC_VERSION}
+      peer chaincode package ${CC_NAME}@${CC_VERSION}.tgz \
+        --lang ${LANG} \
+        --name ${CC_NAME} \
+        --version ${CC_VERSION} \
+        --path ${CC_PATH}
+      res=$?
+    else
+      LABEL=${CC_NAME}-${CC_VERSION}-${CC_SEQUENCE}
+      peer lifecycle chaincode package ${CC_NAME}@${CC_VERSION}.tgz \
+          --lang ${LANG} \
+          --label ${LABEL} \
+          --path ${CC_PATH}
+      res=$?
+    fi
     peer lifecycle chaincode package ${CC_NAME}@${CC_VERSION}.tgz \
         --lang ${LANG} \
-        --label ${CC_NAME}-${CC_VERSION}-${CC_SEQUENCE} \
+        --label ${LABEL} \
         --path ${CC_PATH}
     res=$?
-    verifyResult $res "Chaincode package for ${CC_NAME}:${CC_VERSION}-${CC_SEQUENCE} "
+    verifyResult $res "Chaincode package for ${LABEL} "
 }
 
 #######################################
