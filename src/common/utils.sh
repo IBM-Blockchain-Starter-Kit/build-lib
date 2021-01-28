@@ -9,8 +9,8 @@ if curl --head --silent --fail "https://raw.githubusercontent.com/hyperledger/fa
   chmod +x fab-sample-utils.sh
   pwd
   find fab-sample-utils.sh
-
-  source fab-sample-utils.sh
+  TMP_FILE=$(pwd)/fab-sample-utils.sh
+  source "${TMP_FILE}"
 else
   echo "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh does not exist, failing, please check to make sure util script is there."
   exit 1
