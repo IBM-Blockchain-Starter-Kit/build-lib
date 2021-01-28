@@ -310,11 +310,7 @@ packageCC() {
           --path ${CC_PATH}
       res=$?
     fi
-    peer lifecycle chaincode package ${CC_NAME}@${CC_VERSION}.tgz \
-        --lang ${LANG} \
-        --label ${LABEL} \
-        --path ${CC_PATH}
-    res=$?
+
     verifyResult $res "Chaincode package for ${LABEL} "
 }
 
