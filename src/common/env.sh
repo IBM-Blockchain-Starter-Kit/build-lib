@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+
 ROOTDIR=${ROOTDIR:=$(pwd)}
 
 export DEBUG=${DEBUG:=false}

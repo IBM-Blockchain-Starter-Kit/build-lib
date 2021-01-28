@@ -1,4 +1,4 @@
-#!/bin/bash
+
 #
 # Common utility functions, e.g. to make curl requests
 
