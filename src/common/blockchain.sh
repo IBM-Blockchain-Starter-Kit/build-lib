@@ -296,11 +296,11 @@ packageCC() {
 
     if [[ $HLF_VERSION == "1."* ]];then
       LABEL=${CC_NAME}-${CC_VERSION}
-      peer chaincode package ${CC_NAME}@${CC_VERSION}.tgz \
-        --lang ${LANG} \
-        --name ${CC_NAME} \
-        --version ${CC_VERSION} \
-        --path ${CC_PATH}
+      peer chaincode package \
+        --lang "${LANG}" \
+        --name "${CC_NAME}" \
+        --version "${CC_VERSION}" \
+        --path "${CC_PATH}" "${CC_NAME}@${CC_VERSION}.tgz"
       res=$?
     else
       LABEL=${CC_NAME}-${CC_VERSION}-${CC_SEQUENCE}
