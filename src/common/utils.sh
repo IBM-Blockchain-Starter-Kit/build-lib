@@ -3,10 +3,9 @@
 # Common utility functions, e.g. to make curl requests
 
 ## Logging helpers
-if curl --head --silent --fail "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh" 2> /dev/null;
- then
+if curl --head --silent --fail "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh" 2> /dev/null;then
   source <(curl -sSL "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh")
- else
+else
   echo "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh does not exist, failing, please check to make sure util script is there."
   exit 1
 fi
