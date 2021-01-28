@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+
 
 source "${SCRIPT_DIR}/common/utils.sh"
 
@@ -286,12 +286,14 @@ queryCommitted() {
 #   None
 #######################################
 packageCC() {
+    set -x
     local CC_PATH=$1
     local CC_NAME=$2
     local CC_VERSION=$3
     local CC_SEQUENCE=$4
     local LANG=$5
     verifyPeerEnv
+
     if [[ $HLF_VERSION == "1."* ]];then
       LABEL=${CC_NAME}-${CC_VERSION}
       peer chaincode package ${CC_NAME}@${CC_VERSION}.tgz \
