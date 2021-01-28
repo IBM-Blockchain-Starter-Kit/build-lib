@@ -4,7 +4,10 @@
 
 ## Logging helpers
 if curl --head --silent --fail "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh" 2> /dev/null;then
-  source <(curl -sSL "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh")
+  # redo for non bash shells
+  curl -sSL "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh" -o fab-sample-utils.sh
+  chmod +x fab-sample-utils.sh
+  source fab-sample-utils.sh
 else
   echo "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh does not exist, failing, please check to make sure util script is there."
   exit 1
