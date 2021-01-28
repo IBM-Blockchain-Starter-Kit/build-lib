@@ -70,6 +70,7 @@ function install_fabric_bin {
         chmod +x bin/peer
     fi
     export FABRIC_CFG_PATH=$(pwd)/config
+    cp bin/* /usr/local/bin/ # excessive
     export PATH=${PATH}:$(pwd)/bin
 }
 
