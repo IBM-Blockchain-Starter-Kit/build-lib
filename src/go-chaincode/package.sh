@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 
 export ENABLE_PEER_CLI=true
 # Common deploy script for chaincode
@@ -41,6 +40,6 @@ if [[ ! -f "${CC_NAME}@${CC_VERSION}.tgz" ]];then
 fi
 
 ##TODO publish package here using interface
-if [[ "${ARTIFACTORY_ENABLE}" == "true" ]];then
-  curl -H "X-JFrog-Art-Api:$REGISTRY_CREDS_PSW" -T "${CC_NAME}@${CC_VERSION}.tgz" "https://gbsartifactory.in.edst.ibm.com/artifactory/Lygon/devtest/chaincode/${CC_NAME}@${CC_VERSION}.tgz"
-fi
+#if [[ "${ARTIFACTORY_ENABLE}" == "true" ]];then
+#  curl -H "X-JFrog-Art-Api:$REGISTRY_CREDS_PSW" -T "${CC_NAME}@${CC_VERSION}.tgz" "https://gbsartifactory.in.edst.ibm.com/artifactory/Lygon/devtest/chaincode/${CC_NAME}@${CC_VERSION}.tgz"
+#fi

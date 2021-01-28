@@ -69,8 +69,8 @@ function install_fabric_bin {
         chmod +x bin/orderer
         chmod +x bin/peer
     fi
-    export FABRIC_CFG_PATH=${PWD}/config
-    export PATH=${PATH}:${PWD}
+    export FABRIC_CFG_PATH=$(pwd)/config
+    export PATH=${PATH}:$(pwd)/bin
 }
 
 #######################################
