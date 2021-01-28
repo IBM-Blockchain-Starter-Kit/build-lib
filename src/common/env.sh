@@ -119,7 +119,11 @@ if [[ $HLF_VERSION == "1."* && $ENABLE_PEER_CLI == 'true' ]];then
 
     # Note: chaincode level shouldn't be array as deploy_config.json is a specific chaincode configuration for distinct source code deployment
     # TODO Allow CC_NAME override at pipeline
-    CC_NAME=$(cat $CONFIGPATH | jq -r '. | .. | .chaincode? | .[0] | .name | select(.)')
+    if [[ ! -z "${CC_NAME_OVERRIDE}" ]];then
+        CC_NAME=${CC_NAME_OVERRIDE}
+    else
+        CC_NAME=$(cat $CONFIGPATH | jq -r '. | .. | .chaincode? | .[0] | .name | select(.)')
+    fi
 
     json_version=$(cat $CONFIGPATH | jq -r '. | .. | .chaincode? | .[0] | .version? | select(.)')
     if [[ $json_version != null && $json_version != "" ]]; then
