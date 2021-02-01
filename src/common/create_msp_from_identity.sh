@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+
 ## Logging helpers
 source <(curl -sSL https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scriptUtils.sh)
 
