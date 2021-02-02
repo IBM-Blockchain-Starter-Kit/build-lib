@@ -34,6 +34,7 @@ export FABRIC_CLI_DIR=$ROOTDIR/${FABRIC_CLI_DIR:="/fabric-cli"}
 
 ## Fabric V2.x Env setup
 if [[ $HLF_VERSION == "1."* && $ENABLE_PEER_CLI == 'true' ]];then
+    if [[ $DEBUG == 'true' ]];then set -x; fi;
     echo "-------- Installing jq --------"
     install_jq
 
@@ -74,13 +75,15 @@ if [[ $HLF_VERSION == "1."* && $ENABLE_PEER_CLI == 'true' ]];then
     ca=$(echo "${ADMIN_IDENTITY_STRING}" | jq -r '.ca')
     key=$(echo "${ADMIN_IDENTITY_STRING}" | jq -r '.private_key')
     name=$(echo "${ADMIN_IDENTITY_STRING}" | jq -r '.name')
-    ./${SCRIPT_DIR}/common/create_msp_from_identity.sh "${ROOTDIR}/${ADMIN_IDENTITY_NAME}" "${cert}" "${ca}" "${key}" "${name}"
+
+    source ${SCRIPT_DIR}/common/create_msp_from_identity.sh "${ROOTDIR}/${ADMIN_IDENTITY_NAME}" "${cert}" "${ca}" "${key}" "${name}"
 #    ./${SCRIPT_DIR}/common/create_msp_from_identity.sh "${ROOTDIR}/${ADMIN_IDENTITY_NAME}" "${cert}" "${key}" "${name}"
 
     # Download Fabric BIN and setup PEER's core.yaml for identity
     install_fabric_bin "${HLF_VERSION}" "1.4.9" # ca 1.4.9 is latest
     ## Check if dir exists
     [[ ! -d "${ROOTDIR}/${ADMIN_IDENTITY_NAME}" ]] && exit 6
+
     cp $(pwd)/config/core.yaml "${ROOTDIR}/${ADMIN_IDENTITY_NAME}/"
 
     #Extract env
