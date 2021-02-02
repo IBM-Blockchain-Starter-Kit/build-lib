@@ -79,7 +79,7 @@ if [[ $HLF_VERSION == "1."* && $ENABLE_PEER_CLI == 'true' ]];then
 
     # Download Fabric BIN and setup PEER's core.yaml for identity
     install_fabric_bin "${HLF_VERSION}" "1.4.9" # ca 1.4.9 is latest
-    cp $ROOTDIR/core.yaml "${ROOTDIR}/${ADMIN_IDENTITY_NAME}"
+    cp $(pwd)/config/core.yaml "${ROOTDIR}/${ADMIN_IDENTITY_NAME}/"
 
     #Extract env
     #Get Msp

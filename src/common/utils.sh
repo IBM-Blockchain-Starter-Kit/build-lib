@@ -69,9 +69,9 @@ function install_fabric_bin {
         chmod +x bin/orderer
         chmod +x bin/peer
     fi
-    cp config/core.yaml ${ROOTDIR}
     export FABRIC_CFG_PATH=$(pwd)/config
     export PATH=${PATH}:$(pwd)/bin
+    echo "debug: $FABRIC_CFG_PATH"
 }
 
 #######################################
