@@ -1,6 +1,18 @@
 
 ## Logging helpers
-source <(curl -sSL https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scriptUtils.sh)
+## Logging helpers
+if curl --head --silent --fail "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh" 2> /dev/null;then
+  # redo for non bash shells
+  curl -sSL "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh" -o fab-sample-utils.sh
+  chmod +x fab-sample-utils.sh
+  pwd
+  find fab-sample-utils.sh
+  TMP_FILE=$(pwd)/fab-sample-utils.sh
+  source "${TMP_FILE}"
+else
+  echo "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh does not exist, failing, please check to make sure util script is there."
+  exit 1
+fi
 
 # Creates a Peer MSP for cli from an IBP identity JSON
 
