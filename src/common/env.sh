@@ -156,6 +156,22 @@ if [[ $HLF_VERSION == "1."* && $ENABLE_PEER_CLI == 'true' ]];then
         export CC_SIGNATURE_OPTION=--signature-policy
     fi
 
+    ## Endorsement policy should be defined at cicd by admin
+    if [[ -z $ENDORSEMENT_POLICY ]];then
+        ENDORSEMENT_POLICY=""
+        export CC_ENDORSEMENT_OPTION=""
+    else
+        export CC_ENDORSEMENT_OPTION=--policy
+    fi
+
+    ## Init Constructor if needed
+    if [[ -z $INIT_ARGS ]];then
+        INIT_ARGS=""
+        export CC_INIT_ARGS_OPTION=""
+    else
+        export CC_INIT_ARGS_OPTION=--ctor
+    fi
+
     export CC_PDC_CONFIG=${CC_PDC_CONFIG}
     export CHANNEL_NAME=${CHANNEL_NAME}
     export CC_VERSION=${CC_VERSION}
