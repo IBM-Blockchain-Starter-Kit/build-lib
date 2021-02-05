@@ -139,7 +139,6 @@ instantiate_peer_cli() {
 
   for ord in ${orderers[@]};do
     ## Check for instantiated, if instantiated, only upgrade
-    peer chaincode list --instantiated -C $CHANNEL_NAME
     if [[ `peer chaincode list --instantiated -C $CHANNEL_NAME` == *${CC_NAME}* ]];then
       echo "instnatiated"
       peer chaincode upgrade -o ${ord} --tls cafile "${ORDERER_PEM}" \
