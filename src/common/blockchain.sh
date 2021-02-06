@@ -114,8 +114,8 @@ installChaincode_v2() {
     for peer in "${!peersMap[@]}";do
         export CORE_PEER_ADDRESS=${peer}
         export CORE_PEER_TLS_ROOTCERT_FILE=${peersMap[$peer]}
-        if [[ ${PEER_CLI_V1} == "true" ]];then
-          peer chaincode install
+        if [[ "${PEER_CLI_V1}" == "true" ]];then
+          peer chaincode install ${cc_package}
         else
           peer lifecycle chaincode install ${cc_package}
         fi
