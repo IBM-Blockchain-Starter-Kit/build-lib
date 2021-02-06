@@ -127,20 +127,20 @@ if [[ $HLF_VERSION == "1."* && $ENABLE_PEER_CLI == 'true' ]];then
     if [[ ! -z "${CC_NAME_OVERRIDE}" ]];then
         CC_NAME=${CC_NAME_OVERRIDE}
     else
-        CC_NAME=$(cat $CONFIGPATH | jq -r --arg cc_index $CC_INDEX '. | .. | .chaincode? | .[$cc_index] | .name | select(.)')
+        CC_NAME=$(cat $CONFIGPATH | jq -r --argjson cc_index $CC_INDEX '. | .. | .chaincode? | .[$cc_index] | .name | select(.)')
     fi
 
-    json_version=$(cat $CONFIGPATH | jq -r --arg cc_index $CC_INDEX  '. | .. | .chaincode? | .[$cc_index] | .version? | select(.)')
+    json_version=$(cat $CONFIGPATH | jq -r --argjson cc_index $CC_INDEX  '. | .. | .chaincode? | .[$cc_index] | .version? | select(.)')
     if [[ $json_version != null && $json_version != "" ]]; then
         CC_VERSION=$json_version
     else
         CC_VERSION="${CC_VERSION_OVERRIDE:-latest}"
     fi
     #TODO enable multiple channel
-    CHANNEL_NAME=$(cat $CONFIGPATH | jq -r --arg cc_index $CC_INDEX  '. | .. | .chaincode? | .[$cc_index] | .channel | select(.)')
+    CHANNEL_NAME=$(cat $CONFIGPATH | jq -r --argjson cc_index $CC_INDEX  '. | .. | .chaincode? | .[$cc_index] | .channel | select(.)')
 
     ##PDC
-    pdc_json_path=$(cat $CONFIGPATH | jq -r --arg cc_index $CC_INDEX  '. | .. | .chaincode? | .[$cc_index] | .pdc_path? | select(.)')
+    pdc_json_path=$(cat $CONFIGPATH | jq -r --argjson cc_index $CC_INDEX  '. | .. | .chaincode? | .[$cc_index] | .pdc_path? | select(.)')
 
     if [[ $pdc_json_path != null && $pdc_json_path != "" ]]; then
         CC_PDC_CONFIG="--collections-config ${CC_REPO_DIR}/${pdc_json_path}"
