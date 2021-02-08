@@ -113,7 +113,7 @@ if [[ $HLF_VERSION == "1."* && $ENABLE_PEER_CLI == 'true' ]];then
         echo $peerObj | jq -r '.pem' > ${peerPemFile}
         # create map
         peersMap["${peerUrl}"]=$(pwd)/${peerPemFile}
-    done < <(echo ${CONNECTION_PROFILE_STRING} | jq -rc '.[0] | .peers | keys[] as $k | {"url": "\(.[$k] | .url)" , "pem": "\(.[$k] | .tlsCACerts.pem)"}')
+    done < <(echo "${CONNECTION_PROFILE_STRING}" | jq -rc '.[0] | .peers | keys[] as $k | {"url": "\(.[$k] | .url)" , "pem": "\(.[$k] | .tlsCACerts.pem)"}')
     export peersMap
 
     ## Build the peer string for peer cli

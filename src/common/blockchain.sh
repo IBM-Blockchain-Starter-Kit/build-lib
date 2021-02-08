@@ -145,7 +145,6 @@ instantiate_peer_cli() {
         --channelID $CHANNEL_NAME \
         --name ${CC_NAME}  \
         --version ${CC_VERSION} \
-        ${PEER_ADDRESSES_STRING} \
         ${CC_PDC_CONFIG} ${CC_ENDORSEMENT_OPTION} ${ENDORSEMENT_POLICY} ${CC_INIT_ARGS_OPTION} ${INIT_ARGS}
         res=$?
     else
@@ -153,7 +152,6 @@ instantiate_peer_cli() {
         --channelID $CHANNEL_NAME \
         --name ${CC_NAME}  \
         --version ${CC_VERSION} \
-        ${PEER_ADDRESSES_STRING} \
         ${CC_PDC_CONFIG} ${CC_ENDORSEMENT_OPTION} ${ENDORSEMENT_POLICY} ${CC_INIT_ARGS_OPTION} ${INIT_ARGS}
         res=$?
     fi
