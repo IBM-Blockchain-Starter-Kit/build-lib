@@ -141,14 +141,14 @@ instantiate_peer_cli() {
     ## Check for instantiated, if instantiated, only upgrade
     if [[ `peer chaincode list --instantiated -C $CHANNEL_NAME` == *${CC_NAME}* ]];then
       echo "instnatiated"
-      peer chaincode upgrade -o ${ord} --tls cafile "${ORDERER_PEM}" \
+      peer chaincode upgrade -o ${ord} --tls --cafile "${ORDERER_PEM}" \
         --channelID $CHANNEL_NAME \
         --name ${CC_NAME}  \
         --version ${CC_VERSION} \
         ${CC_PDC_CONFIG} ${CC_ENDORSEMENT_OPTION} ${ENDORSEMENT_POLICY} ${CC_INIT_ARGS_OPTION} ${INIT_ARGS}
         res=$?
     else
-      peer chaincode instantiate -o ${ord} --tls cafile "${ORDERER_PEM}" \
+      peer chaincode instantiate -o ${ord} --tls --cafile "${ORDERER_PEM}" \
         --channelID $CHANNEL_NAME \
         --name ${CC_NAME}  \
         --version ${CC_VERSION} \
