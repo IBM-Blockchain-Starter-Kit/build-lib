@@ -38,8 +38,3 @@ packageCC "${CC_REPO_DIR}" "${CC_NAME}" "${CC_VERSION}" "${CC_SEQUENCE}" "golang
 if [[ ! -f "${CC_NAME}@${CC_VERSION}.tgz" ]];then
     fatalln "${CC_NAME}@${CC_VERSION}.tgz not created by packageCC"
 fi
-
-##TODO publish package here using interface
-#if [[ "${ARTIFACTORY_ENABLE}" == "true" ]];then
-#  curl -H "X-JFrog-Art-Api:$REGISTRY_CREDS_PSW" -T "${CC_NAME}@${CC_VERSION}.tgz" "https://gbsartifactory.in.edst.ibm.com/artifactory/Lygon/devtest/chaincode/${CC_NAME}@${CC_VERSION}.tgz"
-#fi
