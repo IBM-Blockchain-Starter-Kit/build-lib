@@ -49,10 +49,9 @@ This json is used to extract chaincode information such as chaincode name, versi
     "_COMMENT": "This is a config for pipeline script to deploy the chaincode.",
     "chaincode": [
       {
-        "name": "guarantee",
-        "path": "gbsgit.in.dst.ibm.com/lygon/bg-chaincode/cmd/guarantee",
-        "channel": "lygon-testissuer-guarantee-channel",
-        "channels": ["lygon-testissuer-guarantee-channel"],
+        "name": "somecc",
+        "path": "path/to/cc",
+        "channel": "channel",
         "install": true,
         "instantiate": true,
         "init_args": "\"{\"arg1\":\"000000\",}\"}",
@@ -82,7 +81,7 @@ event an orderer is down or not reachable.
 ```json
 [
     {
-        "api_url": "grpcs://n4a3499-lygonordererservicenode3.devd-lygon-iks-e5fbe70a16444e53a79426b94254b29a-0000.au-syd.containers.appdomain.cloud:7050",
+        "api_url": "grpcs://orderer-node:7050",
         "pem": "LS0tLS1CRU..."
     }
 ]
