@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+
 
 source "${SCRIPT_DIR}/common/utils.sh"
 
@@ -109,14 +109,59 @@ function instantiate_fabric_chaincode {
 #######################################
 installChaincode_v2() {
     #TODO add flag to avoid installing all peers
+    ## Note that there is a better way instead of looping through all of the peers: fix https://jira.hyperledger.org/browse/FAB-18339?filter=-2
     cc_package=$1
     for peer in "${!peersMap[@]}";do
         export CORE_PEER_ADDRESS=${peer}
         export CORE_PEER_TLS_ROOTCERT_FILE=${peersMap[$peer]}
-        peer lifecycle chaincode install ${cc_package}
+        if [[ "${PEER_CLI_V1}" == "true" ]];then
+          peer chaincode install ${cc_package}
+        else
+          peer lifecycle chaincode install ${cc_package}
+        fi
         res=$?
         verifyResult $res "Chaincode ${cc_package} installation on ${CORE_PEER_ADDRESS} "
     done
+}
+
+
+#######################################
+# V1.x Upgrades the chiancode if the chaincode is instantiated
+#TODO
+# Globals:
+#   CORE_PEER_ADDRESS: peer address to install
+# Arguments:
+#   - $1: CC_PACKAGE: Package of CC
+# Returns:
+#   None
+#######################################
+instantiate_peer_cli() {
+
+  for ord in ${orderers[@]};do
+    ## Check for instantiated, if instantiated, only upgrade
+    if [[ `peer chaincode list --instantiated -C $CHANNEL_NAME` == *${CC_NAME}* ]];then
+      echo "instnatiated"
+      peer chaincode upgrade -o ${ord} --tls --cafile "${ORDERER_PEM}" \
+        --channelID $CHANNEL_NAME \
+        --name ${CC_NAME}  \
+        --version ${CC_VERSION} \
+        ${CC_PDC_CONFIG} ${CC_ENDORSEMENT_OPTION} ${ENDORSEMENT_POLICY} ${CC_INIT_ARGS_OPTION} "${INIT_ARGS}"
+        res=$?
+    else
+      peer chaincode instantiate -o ${ord} --tls --cafile "${ORDERER_PEM}" \
+        --channelID $CHANNEL_NAME \
+        --name ${CC_NAME}  \
+        --version ${CC_VERSION} \
+        ${CC_PDC_CONFIG} ${CC_ENDORSEMENT_OPTION} ${ENDORSEMENT_POLICY} ${CC_INIT_ARGS_OPTION} "${INIT_ARGS}"
+        res=$?
+    fi
+
+    verifyResult $res "Chaincode definition instantiation on ${CORE_PEER_ADDRESS} on channel '$CHANNEL_NAME'"
+    if [[ $res == 0 ]];then
+        break
+    fi
+
+  done
 }
 
 #######################################
@@ -286,18 +331,32 @@ queryCommitted() {
 #   None
 #######################################
 packageCC() {
+    set -x
     local CC_PATH=$1
     local CC_NAME=$2
     local CC_VERSION=$3
     local CC_SEQUENCE=$4
     local LANG=$5
     verifyPeerEnv
-    peer lifecycle chaincode package ${CC_NAME}@${CC_VERSION}.tgz \
-        --lang ${LANG} \
-        --label ${CC_NAME}-${CC_VERSION}-${CC_SEQUENCE} \
-        --path ${CC_PATH}
-    res=$?
-    verifyResult $res "Chaincode package for ${CC_NAME}:${CC_VERSION}-${CC_SEQUENCE} "
+
+    if [[ $HLF_VERSION == "1."* ]];then
+      LABEL=${CC_NAME}-${CC_VERSION}
+      peer chaincode package \
+        --lang "${LANG}" \
+        --name "${CC_NAME}" \
+        --version "${CC_VERSION}" \
+        --path "${CC_PATH}" "${CC_NAME}@${CC_VERSION}.tgz"
+      res=$?
+    else
+      LABEL=${CC_NAME}-${CC_VERSION}-${CC_SEQUENCE}
+      peer lifecycle chaincode package ${CC_NAME}@${CC_VERSION}.tgz \
+          --lang ${LANG} \
+          --label ${LABEL} \
+          --path ${CC_PATH}
+      res=$?
+    fi
+
+    verifyResult $res "Chaincode package for ${LABEL} "
 }
 
 #######################################
