@@ -124,6 +124,10 @@ if [[ $HLF_VERSION == "1."* && $ENABLE_PEER_CLI == 'true' ]] || [[ $HLF_VERSION 
 
     # Note: chaincode level shouldn't be array as deploy_config.json is a specific chaincode configuration for distinct source code deployment
     # TODO Allow CC_NAME override at pipeline
+    if [[ ! -z "${CC_INDEX}" ]];then
+        #set default
+        CC_INDEX=0
+    fi
     if [[ ! -z "${CC_NAME_OVERRIDE}" ]];then
         CC_NAME=${CC_NAME_OVERRIDE}
     else
