@@ -13,6 +13,8 @@ a stage of a pipeline.
 ## Environment Setups
 Each stage will call common/env.sh to set up the environment.
 
+Any ENV that is not defined Required are optional
+
 - DEBUG           - default to false, set this to true for verbose
 - NODE_VERSION    - Node version to install the bin. Must match a node version from repository.
 - NVM_VERSION     - NVM version to use and install. Must match a nvm official version.
