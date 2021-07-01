@@ -120,14 +120,14 @@ General idea is to override some envs values you need before calling route.sh or
 Examples, assuming that build-lib is cloned into $HOME dir and $HOME is the root dir of the chaincode proj. Examples below are showing 
 different context settings and not necessarily valid in a pipeline
 
-- Build stage
+- **Build stage**
 ```bash
 !#/bin/bash
 CONFIGPATH=$HOME/deploy_config.json
 source build-lib/src/router.sh build js
 ```
 
-- Package Stage
+- **Package Stage**
 ```bash
 !#/bin/bash
 CONFIGPATH=$HOME/deploy_config.json
@@ -135,7 +135,7 @@ CC_VERSION_OVERRIDE=$GIT_COMMIT
 source build-lib/src/router.sh package js
 ```
 
-- Install Stage
+- **Install Stage**
 ```bash
 CC_INDEX=1
 INSTALL_OVERRIDE_SKIP=false
@@ -148,6 +148,19 @@ source build-lib/src/router.sh install go
 
 ```
 
+- **Deploy Stage**
+
+Note! When setting Deploy's stage context, CONNECTION_PROFILE_STRING must contain the CP of the first org's Install/Approve stage CP. If you want to deploy to all or some org(s), you must add the peer information in the CP's organizations.[yourmsp].peers and peers definition. Order is important, make sure [yourmsp] org peers are first in both of these properties.
+```bash
+#!/bin/bash
+## Override SEQ number
+#export CC_SEQUENCE_OVERRIDE=2
+source build.properties
+
+export CC_VERSION_OVERRIDE=$GIT_COMMIT_HASH
+set -x
+source "${SCRIPT_DIR}/router.sh" deploy_v2 "${PLATFORM}"
+```
 
 ## Unit tests
 
