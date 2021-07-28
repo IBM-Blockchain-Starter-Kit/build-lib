@@ -45,6 +45,8 @@ strings for --peerAddresses and --tlsRootCertFiles flags in the order of peers a
 
 This json is used to extract chaincode information such as chaincode name, versions, paths, and channels.
 
+*Although chaincode is an array(for backwards compatible), do not have more than 1 chaincode object when using V2*
+
 ```json
 {
   "org": {
