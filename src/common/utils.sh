@@ -1,6 +1,20 @@
-#!/usr/bin/env bash
+
 #
 # Common utility functions, e.g. to make curl requests
+
+## Logging helpers
+if curl --head --silent --fail "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh" 2> /dev/null;then
+  # redo for non bash shells
+  curl -sSL "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh" -o fab-sample-utils.sh
+  chmod +x fab-sample-utils.sh
+  pwd
+  find fab-sample-utils.sh
+  TMP_FILE=$(pwd)/fab-sample-utils.sh
+  source "${TMP_FILE}"
+else
+  echo "https://raw.githubusercontent.com/hyperledger/fabric-samples/master/test-network/scripts/utils.sh does not exist, failing, please check to make sure util script is there."
+  exit 1
+fi
 
 #######################################
 # Exit script with an error
@@ -29,6 +43,35 @@ function install_jq {
   curl -o jq -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
   chmod +x jq
   export PATH=${PATH}:${PWD}
+}
+
+#######################################
+# Installs fabric binaries v2
+# Globals:
+#   set: PATH
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function install_fabric_bin {
+    local FAB_VERSION=${1:-"2.1.1"}
+    local CA_VERSION=${2:-"1.4.9"}
+
+    #TODO make version dynamic
+    #check if bin exists, peer cli is the most important for now
+    if [[ ! -f "bin/peer" ]];then
+        curl -sSL https://bit.ly/2ysbOFE | bash -s -- "${FAB_VERSION}" "${CA_VERSION}" -d -s
+        chmod +x bin/configtxgen
+        chmod +x bin/idemixgen
+        chmod +x bin/configtxlator
+        chmod +x bin/fabric-ca-client
+        chmod +x bin/orderer
+        chmod +x bin/peer
+    fi
+    export FABRIC_CFG_PATH=$(pwd)/config
+    export PATH=${PATH}:$(pwd)/bin
+    echo "debug: $FABRIC_CFG_PATH"
 }
 
 #######################################
@@ -246,4 +289,30 @@ function setup_env {
   # echo 'which python'...`which python`
   # echo 'npm config get python'...`npm config get python`
 
+}
+
+function verifyPeerEnv(){
+    if [[ -z $ORDERER_PEM ]];then
+        warnln "ORDERER_PEM not set. Please make sure Peer env is set correctly"
+    elif [[ -z $CORE_PEER_TLS_ROOTCERT_FILE ]];then
+        warnln "CORE_PEER_TLS_ROOTCERT_FILE not set. Please make sure Peer env is set correctly"
+    elif [[ -z $CORE_PEER_ADDRESS ]];then
+        warnln "CORE_PEER_ADDRESS not set. Please make sure Peer env is set correctly"
+    fi
+
+    if [[ -z $CORE_PEER_LOCALMSPID ]];then
+        fatalln "CORE_PEER_LOCALMSPID not set. Please make sure Peer env is set correctly"
+    elif [[ -z $CORE_PEER_MSPCONFIGPATH ]];then
+        fatalln "CORE_PEER_MSPCONFIGPATH not set. Please make sure Peer env is set correctly"
+    elif [[ -z $FABRIC_CFG_PATH ]];then
+        fatalln "FABRIC_CFG_PATH not set. Please make sure Peer env is set correctly"
+    fi
+}
+
+function verifyResult() {
+  if [ $1 -ne 0 ]; then
+    fatalln "$2 Failed!"
+  else
+    successln "$2 Success!"
+  fi
 }

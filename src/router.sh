@@ -9,7 +9,14 @@ stage="$1"
 platform="$2"
 executable_script=""
 
-if [[ "${stage}" != "build" ]] && [[ "${stage}" != "test" ]] && [[ "${stage}" != "deploy" ]]; then
+if [[ "${stage}" != "build" ]] && \
+    [[ "${stage}" != "test" ]] && \
+    [[ "${stage}" != "deploy" ]] && \
+    [[ "${stage}" != "install_approve" ]] && \
+    [[ "${stage}" != "package" ]] && \
+    [[ "${stage}" != "install_cli" ]] && \
+    [[ "${stage}" != "deploy_cli" ]] && \
+    [[ "${stage}" != "deploy_v2" ]]; then
     echo "Invalid stage: ${stage} selected"
     exit 1
 fi

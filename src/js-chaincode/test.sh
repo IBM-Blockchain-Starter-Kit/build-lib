@@ -45,7 +45,3 @@ hm_orgs=$(jq "keys | length" "$CONFIGPATH")
 if [[ "${hm_adminids}" != "${hm_connprofs}" ]]; then
     error_exit "number of ADMIN IDENTITIES does not match the number of CONNECTION PROFILES"
 fi
-
-if [[ "${hm_adminids}" != "${hm_orgs}" ]]; then
-    error_exit "number of ADMIN IDENTITIES does not match the number of ORGANIZATIONS defined in the deploy_config.json file"    
-fi

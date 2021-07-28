@@ -5,3 +5,5 @@ bats-mock/
 TEST-report.xml
 tst-output.txt
 sample-config.json
+/.idea/
+/workspace/

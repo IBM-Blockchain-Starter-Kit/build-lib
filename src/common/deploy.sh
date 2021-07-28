@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
 # Common deploy script for chaincode
-
-# shellcheck source=src/common/env.sh
-source "${SCRIPT_DIR}/common/env.sh"
 # shellcheck source=src/common/utils.sh
 source "${SCRIPT_DIR}/common/utils.sh"
+# shellcheck source=src/common/env.sh
+source "${SCRIPT_DIR}/common/env.sh"
 # shellcheck source=src/common/blockchain.sh
 source "${SCRIPT_DIR}/common/blockchain.sh"
 
@@ -119,3 +118,5 @@ function deploy_cc() {
 
   if [[ ! $ECODE ]]; then error_exit "ERROR: please check the deploy_config.json to set deploy jobs"; fi
 }
+
+
